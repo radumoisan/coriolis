@@ -1,0 +1,40 @@
+# Default values for Canonical Kubernetes Explorer.
+replicaCount: 1
+logging: INFO
+certmanager:
+  cluster_issuer: letsencrypt
+image:
+  repository: cr.virtomat.io/virtomat/cloudbase-coriolis-docs
+  tag: 0.0.0
+  pullPolicy: IfNotPresent
+service:
+  port: 80
+  targetPort: 80
+ingress:
+  use_tls: true
+  host: docs.coriolis.cloudbase.wiki
+  class: nginx
+proxy:
+  enabled: true
+  service:
+    targetPort: 4180
+  CLIENT_ID: mkdocs
+  CLIENT_SECRET: ""
+  COOKIE_SECRET: ""
+  COOKIE_REFRESH: '12h' # aligned with "Access Token Lifespan"
+  COOKIE_EXPIRE: '168h' # aligned with "SSO Session Idle"
+  REDIRECT_URL: https://docs.coriolis.cloudbase.wiki/oauth2/callback
+  OIDC_ISSUER_URL: https://auth.virtomat.dev/realms/mkdocs
+  EMAIL_DOMAINS: '*'
+  INSECURE_OIDC_ALLOW_UNVERIFIED_EMAIL: true
+  keycloak:
+    secret_name: oauth2-proxy-mkdocs
+    client_secret_key: client-secret
+  cookie:
+    secret_name: oauth2-proxy-mkdocs
+    secret_key: cookie-secret
+  redis:
+    enabled: true
+    connection_url: redis://valkey:6379
+    secret_name: redis
+    secret_key: password

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  revisionHistoryLimit: 0
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-container
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+  {{- if .Values.proxy.enabled}}
+      - name: oauth2-proxy
+        image: quay.io/oauth2-proxy/oauth2-proxy:latest-alpine
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: OAUTH2_PROXY_SKIP_PROVIDER_BUTTON
+            value: "true"
+          - name: OAUTH2_PROXY_HTTP_ADDRESS
+            value: "0.0.0.0:4180"
+          - name: OAUTH2_PROXY_PROVIDER
+            value: "keycloak-oidc"
+          - name: OAUTH2_PROXY_CLIENT_ID
+            value: {{ .Values.proxy.CLIENT_ID | quote }}
+          - name: OAUTH2_PROXY_CLIENT_SECRET
+          {{- if .Values.proxy.keycloak.secret_name }}
+            value: ""
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.proxy.keycloak.secret_name | quote }}
+                key: {{ .Values.proxy.keycloak.client_secret_key | default "client-secret" | quote }}
+          {{- else }}
+            value: {{ .Values.proxy.CLIENT_SECRET | quote }}
+          {{- end }}
+          - name: OAUTH2_PROXY_COOKIE_SECRET
+          {{- if .Values.proxy.cookie.secret_name }}
+            value: ""
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.proxy.cookie.secret_name | quote }}
+                key: {{ .Values.proxy.cookie.secret_key | default "cookie-secret" | quote }}
+          {{- else }}
+            value: {{ .Values.proxy.COOKIE_SECRET | quote }}
+          {{- end }}
+          - name: OAUTH2_PROXY_COOKIE_REFRESH
+            value: {{ .Values.proxy.COOKIE_REFRESH | quote }}
+          - name: OAUTH2_PROXY_COOKIE_EXPIRE
+            value: {{ .Values.proxy.COOKIE_EXPIRE | quote }}
+          - name: OAUTH2_PROXY_REDIRECT_URL
+            value: {{ .Values.proxy.REDIRECT_URL | quote }}
+          - name: OAUTH2_PROXY_OIDC_ISSUER_URL
+            value: {{ .Values.proxy.OIDC_ISSUER_URL | quote }}
+          - name: OAUTH2_PROXY_EMAIL_DOMAINS
+            value: {{ .Values.proxy.EMAIL_DOMAINS | quote }}
+          - name: OAUTH2_PROXY_CODE_CHALLENGE_METHOD
+            value: "S256"
+          - name: OAUTH2_PROXY_UPSTREAMS
+            value: "http://127.0.0.1:{{ .Values.service.targetPort }}"
+          - name: OAUTH2_PROXY_SESSION_COOKIE_MINIMAL
+            value: "false"
+          - name: OAUTH2_PROXY_SCOPES
+            value: "openid,profile,email"
+          - name: OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER
+            value: "true"
+        {{- if .Values.proxy.redis.enabled }}
+          - name: OAUTH2_PROXY_SESSION_STORE_TYPE
+            value: "redis"
+          - name: OAUTH2_PROXY_REDIS_CONNECTION_URL
+            value: {{ .Values.proxy.redis.connection_url | default "redis://redis-master:6379" | quote }}
+          - name: OAUTH2_PROXY_REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.proxy.redis.secret_name | default "redis" | quote }}
+                key: {{ .Values.proxy.redis.secret_key | default "password" | quote }}
+        {{- end }}
+          - name: OAUTH2_PROXY_INSECURE_OIDC_ALLOW_UNVERIFIED_EMAIL
+            value: {{ .Values.proxy.INSECURE_OIDC_ALLOW_UNVERIFIED_EMAIL | quote }}
+  {{- end }}
+      imagePullSecrets:
+        - name: regcred
