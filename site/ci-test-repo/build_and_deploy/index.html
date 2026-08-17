@@ -1,0 +1,389 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Training documentation for exploring Canonical Kubernetes.">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>Build and Deploy Instructions - Canonical Kubernetes Explorer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#build-and-deploy-instructions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Canonical Kubernetes Explorer" class="md-header__button md-logo" aria-label="Canonical Kubernetes Explorer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Canonical Kubernetes Explorer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Build and Deploy Instructions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Canonical Kubernetes Explorer" class="md-nav__button md-logo" aria-label="Canonical Kubernetes Explorer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Canonical Kubernetes Explorer
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="build-and-deploy-instructions">Build and Deploy Instructions<a class="headerlink" href="#build-and-deploy-instructions" title="Permanent link">&para;</a></h1>
+<h1 id="prepare-local-repo">Prepare local repo<a class="headerlink" href="#prepare-local-repo" title="Permanent link">&para;</a></h1>
+<h2 id="clone-conductor-repository">Clone conductor repository<a class="headerlink" href="#clone-conductor-repository" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:virtomat/ci-test-repo.git<span class="w"> </span>virt-ci-test-repo
+</code></pre></div>
+<details class="note">
+<summary>Initial directory structure should look like this: <em>(expand to see)</em></summary>
+<div class="highlight"><pre><span></span><code>radu@ThinkPad-L380$<span class="w"> </span>tree<span class="w"> </span>-L<span class="w"> </span><span class="m">2</span>
+.
+├──<span class="w"> </span>docs
+│<span class="w">    </span>├──<span class="w"> </span>README.md
+│<span class="w">    </span>└──<span class="w"> </span>test.md
+├──<span class="w"> </span>helm
+│<span class="w">    </span>├──<span class="w"> </span>Chart.yaml
+│<span class="w">    </span>├──<span class="w"> </span>templates
+│<span class="w">    </span>│<span class="w">    </span>├──<span class="w"> </span>deployment.yaml
+│<span class="w">    </span>│<span class="w">    </span>├──<span class="w"> </span>ingress.yaml
+│<span class="w">    </span>│<span class="w">    </span>└──<span class="w"> </span>service.yaml
+│<span class="w">    </span>└──<span class="w"> </span>values.yaml
+├──<span class="w"> </span>app.py
+├──<span class="w"> </span>Dockerfile
+├──<span class="w"> </span>logger.py
+├──<span class="w"> </span>README.md
+└──<span class="w"> </span>requirements.txt
+</code></pre></div>
+</details>
+<h2 id="docker-image">Docker Image<a class="headerlink" href="#docker-image" title="Permanent link">&para;</a></h2>
+<p>You can build the image with <em>(local usage)</em>:
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>.<span class="w"> </span>-t<span class="w"> </span>testapp
+</code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>As this repo is integrated on the CI pipeline, there is no need to push the image</em><br>
+Building the image locally is for testing purposes when (for some reason) the build fails.</p>
+</div>
+<h2 id="helm-chart">Helm Chart<a class="headerlink" href="#helm-chart" title="Permanent link">&para;</a></h2>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<p>Create regcred docker registry secret. This has to have Read permission over virtomat project (to pull cixpress images)
+and Read/Write permissions over target project.
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>cixpress<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>regcred<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>--docker-server<span class="o">=</span>cr.virtomat.io<span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>--docker-username<span class="o">=</span><span class="s1">&#39;robot-virtomat+cixpress&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">           </span>--docker-password<span class="o">=</span><span class="s1">&#39;07NESZAGTyubvOW2aIOTHMBVlxuTGZ3o&#39;</span>
+</code></pre></div></p>
+<h3 id="installation-dev-cluster">Installation (Dev Cluster)<a class="headerlink" href="#installation-dev-cluster" title="Permanent link">&para;</a></h3>
+<p>From source code repository<em>(for reference only)</em>:
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>install<span class="w"> </span>testapp<span class="w"> </span>./helm
+</code></pre></div>
+From published helm chart:
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>install<span class="w"> </span>testapp<span class="w"> </span>oci://cr.virtomat.io/virtomat/cixpress/helm/testapp
+</code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>As this chart is integrated on the CD pipeline, there is no need to install it manually.</em>
+<em>CD is managed with ArgoCD</em></p>
+</div>
+<h3 id="installation-local-dev-cluster">Installation (Local Dev Cluster)<a class="headerlink" href="#installation-local-dev-cluster" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code>helm<span class="w"> </span>-n<span class="w"> </span>cixpress<span class="w"> </span>install<span class="w"> </span>conductor<span class="w"> </span>./helm<span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span><span class="nv">logging</span><span class="o">=</span>DEBUG<span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span>ingress.enableTLS<span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span>persistence.mount_dev_dir<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span><span class="nv">dev_dir_path</span><span class="o">=</span>/home/radu/Dev/virt-ci-test-repo
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>-n<span class="w"> </span>cixpress<span class="w"> </span>install<span class="w"> </span>conductor<span class="w"> </span>oci://cr.virtomat.io/virtomat/cixpress/helm/conductor<span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span><span class="nv">logging</span><span class="o">=</span>DEBUG<span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span>ingress.enableTLS<span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span>persistence.mount_dev_dir<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">          </span>--set<span class="w"> </span><span class="nv">dev_dir_path</span><span class="o">=</span>/home/radu/Dev/virt-ci-test-repo
+</code></pre></div></p>
+<details class="tip">
+<summary>Mounting local workdir inside the runtime container</summary>
+<p><em>Mounting local workdir inside the runtime container allows live modifications (in your IDE of choice) and reloads of the application runtime without any workarounds.</em> 
+<em>This requires a working local </em><em>microk8s</em><em> cluster</em></p>
+</details>
+<details class="info">
+<summary>Proxy-forward webhook calls from github</summary>
+<p><em>Proxy-forward webhook calls from github to local environment (https://www.ultrahook.com/)</em>
+<div class="highlight"><pre><span></span><code>ultrahook<span class="w"> </span>conductor<span class="w"> </span>http://ci.dev.virtomat.io/conductor/start-build-pipeline
+</code></pre></div></p>
+</details>
+<h2 id="verify-the-installation">Verify the installation<a class="headerlink" href="#verify-the-installation" title="Permanent link">&para;</a></h2>
+<p>Check that the pods are fine (running and ready):
+<div class="highlight"><pre><span></span><code>radu@ThinkPad-L380$<span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>cixpress<span class="w"> </span>get<span class="w"> </span>pods
+NAME<span class="w">                                  </span>READY<span class="w">   </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
+testapp-59c797ffbd-vhwn9<span class="w">              </span><span class="m">1</span>/1<span class="w">     </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>70d
+</code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Depending on the specific release name you used with helm install the name of the pods might have different names.</p>
+</div>
+<p>Check the ingress for the frontend and for the backend:
+<div class="highlight"><pre><span></span><code><span class="m">03</span>:32<span class="w"> </span>PM<span class="w"> </span>~
+radu@ThinkPad-L380$<span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>cixpress<span class="w"> </span>get<span class="w"> </span>ing
+NAME<span class="w">            </span>CLASS<span class="w">   </span>HOSTS<span class="w">                   </span>ADDRESS<span class="w">         </span>PORTS<span class="w">     </span>AGE
+testapp-demo<span class="w">    </span>nginx<span class="w">   </span>testapp.virtomat.dev<span class="w">    </span><span class="m">85</span>.204.43.218<span class="w">   </span><span class="m">80</span>,<span class="w"> </span><span class="m">443</span><span class="w">   </span>235d
+</code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>

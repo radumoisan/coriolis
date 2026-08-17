@@ -1,0 +1,573 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Training documentation for exploring Canonical Kubernetes.">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>Configuration for a simple app - Canonical Kubernetes Explorer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration-for-a-simple-app" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Canonical Kubernetes Explorer" class="md-header__button md-logo" aria-label="Canonical Kubernetes Explorer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Canonical Kubernetes Explorer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration for a simple app
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Canonical Kubernetes Explorer" class="md-nav__button md-logo" aria-label="Canonical Kubernetes Explorer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Canonical Kubernetes Explorer
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#project-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project template
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline templates
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pipeline-configs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline configs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simulating-github-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulating github trigger
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="configuration-for-a-simple-app">Configuration for a simple app<a class="headerlink" href="#configuration-for-a-simple-app" title="Permanent link">&para;</a></h1>
+<h2 id="project-template">Project template<a class="headerlink" href="#project-template" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>I'm using a simple python app for test in this exercise. You can clone the source code from <code>git@github.com:virtomat/ci-test-repo.git</code></p>
+</div>
+<p>Regardless of the language (python, java, Angular, etc) the project structure is the same. It looks like this:</p>
+<div class="highlight"><pre><span></span><code>radu@ThinkPad-L380$<span class="w"> </span>tree<span class="w"> </span>-L<span class="w"> </span><span class="m">2</span>
+.
+├──<span class="w"> </span>docs
+│<span class="w">    </span>├──<span class="w"> </span>build_and_deploy.md
+│<span class="w">    </span>└──<span class="w"> </span>configuration.md
+├──<span class="w"> </span>helm
+│<span class="w">    </span>├──<span class="w"> </span>Chart.yaml
+│<span class="w">    </span>├──<span class="w"> </span>templates
+│<span class="w">    </span>│<span class="w">    </span>├──<span class="w"> </span>deployment.yaml
+│<span class="w">    </span>│<span class="w">    </span>├──<span class="w"> </span>ingress.yaml
+│<span class="w">    </span>│<span class="w">    </span>└──<span class="w"> </span>service.yaml
+│<span class="w">    </span>└──<span class="w"> </span>values.yaml
+├──<span class="w"> </span>app.py
+├──<span class="w"> </span>logger.py
+├──<span class="w"> </span>Dockerfile
+├──<span class="w"> </span>requirements.txt
+└──<span class="w"> </span>README.md
+</code></pre></div>
+<ul>
+<li><code>docs</code> - This is a directory dedicated for documentation related to this app. It is usually automatically build to a static html site with mkdocs.</li>
+<li><code>helm</code> - This is the Helm Chart definition. Notice the templates directory. A basic setup will require a <code>deployment</code> (the actual container in a pod), a service (expose the pod on the internal network) and an ingress (basic layer 7 routing rules, to expose the app outside the cluster)</li>
+<li><code>app.py</code> - Test app code (Flask app)</li>
+<li><code>logger.py</code>- Some logging setup I find useful.</li>
+<li><code>Dockerfile</code> - Dockerfile to build the container</li>
+<li><code>README.md</code> - Optional Readme file (deprecated in favor of docs directory).</li>
+</ul>
+<h2 id="pipeline-templates">Pipeline templates<a class="headerlink" href="#pipeline-templates" title="Permanent link">&para;</a></h2>
+<p>A pipeline template is pretty basic at this point (expected to be extended in functionality), and only specifies the steps in the pipeline. 
+The definition is supported as <code>json</code> content and we use REST API to push and pull the template definitions.</p>
+<p>For the <code>Default</code> template the json looks like this:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;Default&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;pvc&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1Gi&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;feather:github&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git-clone&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;docker_decolorize&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kaniko-build&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;helm&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;helm-update&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;icon&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;heroicons_mini:arrow-path-rounded-square&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cleanup&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<ul>
+<li><code>pvc</code> - This is the spec for a volume where the workspace will be. All steps in the pipeline will share this workspace.</li>
+<li><code>steps</code> - This are the steps in the pipeline. The execution will follow the order specified here. The naming is also important, as each step name becomed the prefix in finding the right manifest for the job.</li>
+</ul>
+<details class="example">
+<summary>Create/Update a template definition: <em>(expand to see)</em></summary>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--location<span class="w"> </span><span class="s1">&#39;http://ci.virtomat.dev/conductor/templates&#39;</span><span class="w"> </span><span class="se">\</span>
+--header<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+--data<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;Default&quot;: {</span>
+<span class="s1">        &quot;pvc&quot;: {</span>
+<span class="s1">            &quot;required&quot;: true,</span>
+<span class="s1">            &quot;size&quot;: &quot;1Gi&quot;</span>
+<span class="s1">        },</span>
+<span class="s1">        &quot;steps&quot;: [</span>
+<span class="s1">            {</span>
+<span class="s1">                &quot;name&quot;: &quot;git-clone&quot;,</span>
+<span class="s1">                &quot;icon&quot;: &quot;feather:github&quot;</span>
+<span class="s1">            },</span>
+<span class="s1">            {</span>
+<span class="s1">                &quot;name&quot;: &quot;kaniko-build&quot;,</span>
+<span class="s1">                &quot;icon&quot;: &quot;docker_decolorize&quot;</span>
+<span class="s1">            },</span>
+<span class="s1">            {</span>
+<span class="s1">                &quot;name&quot;: &quot;helm-update&quot;,</span>
+<span class="s1">                &quot;icon&quot;: &quot;helm&quot;</span>
+<span class="s1">            },</span>
+<span class="s1">            {</span>
+<span class="s1">                &quot;name&quot;: &quot;cleanup&quot;,</span>
+<span class="s1">                &quot;icon&quot;: &quot;heroicons_mini:arrow-path-rounded-square&quot;</span>
+<span class="s1">            }</span>
+<span class="s1">        ]</span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary>Retrieve a template definition <em>(expand to see)</em></summary>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--location<span class="w"> </span><span class="s1">&#39;https://ci.virtomat.dev/conductor/templates&#39;</span>
+<span class="o">{</span>
+<span class="w">    </span><span class="s2">&quot;Default&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">        </span><span class="s2">&quot;pvc&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">            </span><span class="s2">&quot;required&quot;</span>:<span class="w"> </span>true,
+<span class="w">            </span><span class="s2">&quot;size&quot;</span>:<span class="w"> </span><span class="s2">&quot;1Gi&quot;</span>
+<span class="w">        </span><span class="o">}</span>,
+<span class="w">        </span><span class="s2">&quot;steps&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">            </span><span class="o">{</span>
+<span class="w">                </span><span class="s2">&quot;icon&quot;</span>:<span class="w"> </span><span class="s2">&quot;feather:github&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;git-clone&quot;</span>
+<span class="w">            </span><span class="o">}</span>,
+<span class="w">            </span><span class="o">{</span>
+<span class="w">                </span><span class="s2">&quot;icon&quot;</span>:<span class="w"> </span><span class="s2">&quot;docker_decolorize&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;kaniko-build&quot;</span>
+<span class="w">            </span><span class="o">}</span>,
+<span class="w">            </span><span class="o">{</span>
+<span class="w">                </span><span class="s2">&quot;icon&quot;</span>:<span class="w"> </span><span class="s2">&quot;helm&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;helm-update&quot;</span>
+<span class="w">            </span><span class="o">}</span>,
+<span class="w">            </span><span class="o">{</span>
+<span class="w">                </span><span class="s2">&quot;icon&quot;</span>:<span class="w"> </span><span class="s2">&quot;heroicons_mini:arrow-path-rounded-square&quot;</span>,
+<span class="w">                </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;cleanup&quot;</span>
+<span class="w">            </span><span class="o">}</span>
+<span class="w">        </span><span class="o">]</span>
+<span class="w">    </span><span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+</details>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can have as many templates as you want. Each template defines a new kind of pipeline.</p>
+</div>
+<h2 id="pipeline-configs">Pipeline configs<a class="headerlink" href="#pipeline-configs" title="Permanent link">&para;</a></h2>
+<p>For the test app the json looks like this:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;templateName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Default&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;git-clone&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;git_repo_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gitlab.com/virtomat/ci-test-repo.git&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;git_branch&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;logging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;webhook_secret&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4F2XqXXk&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;ttlSecondsAfterFinished&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;kaniko-build&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;logging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;ttlSecondsAfterFinished&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;helm-update&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;logging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;ttlSecondsAfterFinished&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;cleanup&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;logging&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;docs_repo_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/virtomat/voyager-docs.git&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;ttlSecondsAfterFinished&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<ul>
+<li><code>templateName</code> - references the template name (it has to exist)</li>
+<li><code>steps</code> - The steps in the pipeline must follow the naming in the template.<ul>
+<li><code>git-clone</code> - This step will clone the git repo in the workspace directory.</li>
+<li><code>kaniko-build</code> - This is the build steps (builds the container and pushes it to the registry)</li>
+<li><code>helm-update</code> - This is the helm update step (version increment) and published the Chart to registry</li>
+<li><code>cleanup</code> - Some cleanup tasks.</li>
+</ul>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Todo</p>
+<p>We should move <code>ttlSecondsAfterFinished</code> to template, this is a common config, usually applicable for all pipelines of the same kind</p>
+</div>
+<details class="example">
+<summary>Curl call example   <em>(exand to see)</em></summary>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--location<span class="w"> </span><span class="s1">&#39;http://ci.virtomat.dev/conductor/configure&#39;</span><span class="w"> </span><span class="se">\</span>
+--header<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+--data<span class="w"> </span><span class="s1">&#39;[</span>
+<span class="s1">    {</span>
+<span class="s1">        &quot;templateName&quot;: &quot;Default&quot;,</span>
+<span class="s1">        &quot;steps&quot;: {</span>
+<span class="s1">            &quot;git-clone&quot;: {</span>
+<span class="s1">                &quot;git_repo_url&quot;: &quot;gitlab.com/virtomat/ci-test-repo.git&quot;,</span>
+<span class="s1">                &quot;git_branch&quot;: &quot;main&quot;,</span>
+<span class="s1">                &quot;logging&quot;: &quot;DEBUG&quot;,</span>
+<span class="s1">                &quot;webhook_secret&quot;: &quot;4F2XqXXk&quot;,</span>
+<span class="s1">                &quot;ttlSecondsAfterFinished&quot;: 120</span>
+<span class="s1">            },</span>
+<span class="s1">            &quot;kaniko-build&quot;: {</span>
+<span class="s1">                &quot;logging&quot;: &quot;DEBUG&quot;,</span>
+<span class="s1">                &quot;ttlSecondsAfterFinished&quot;: 120</span>
+<span class="s1">            },</span>
+<span class="s1">            &quot;helm-update&quot;: {</span>
+<span class="s1">                &quot;logging&quot;: &quot;DEBUG&quot;,</span>
+<span class="s1">                &quot;ttlSecondsAfterFinished&quot;: 120</span>
+<span class="s1">            },</span>
+<span class="s1">            &quot;cleanup&quot;: {</span>
+<span class="s1">                &quot;logging&quot;: &quot;DEBUG&quot;,</span>
+<span class="s1">                &quot;docs_repo_url&quot;: &quot;https://github.com/virtomat/voyager-docs.git&quot;,</span>
+<span class="s1">                &quot;ttlSecondsAfterFinished&quot;: 120</span>
+<span class="s1">            }</span>
+<span class="s1">        }</span>
+<span class="s1">    }</span>
+<span class="s1">]&#39;</span>
+</code></pre></div>
+</details>
+<h2 id="simulating-github-trigger">Simulating github trigger<a class="headerlink" href="#simulating-github-trigger" title="Permanent link">&para;</a></h2>
+<p>You can use a <code>curl</code> call to trigger a pipeline (just replace the repo url with your own repo url):</p>
+<details class="example">
+<summary>GitHub trigger   <em>(expand to see)</em></summary>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--location<span class="w"> </span><span class="s1">&#39;https://ci.virtomat.dev/conductor/githubTrigger&#39;</span><span class="w"> </span><span class="se">\</span>
+--header<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+--data<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;ref&quot;: &quot;refs/heads/main&quot;,  </span>
+<span class="s1">    &quot;repository&quot;: {</span>
+<span class="s1">        &quot;clone_url&quot;: &quot;https://github.com/virtomat/ci-test-repo.git&quot;  </span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary>GitLab trigger   <em>(expand to see)</em></summary>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--location<span class="w"> </span><span class="s1">&#39;https://ci.virtomat.dev/conductor/gitlabTrigger&#39;</span><span class="w"> </span><span class="se">\</span>
+--header<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+--data<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;ref&quot;: &quot;refs/heads/main&quot;,</span>
+<span class="s1">    &quot;repository&quot;: {</span>
+<span class="s1">        &quot;git_http_url&quot;: &quot;https://gitlab.com/virtomat/ci-test-repo.git&quot;</span>
+<span class="s1">    }</span>
+<span class="s1">}&#39;</span>
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>
