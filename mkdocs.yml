@@ -9,7 +9,8 @@ theme:
     - content.code.copy
 
 nav:
-  - "📄 Home": index.md
+  - 📄 Home: index.md
+  - 📄 Image Builds: image-builds.md
 
 markdown_extensions:
   - tables
