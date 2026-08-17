@@ -1,58 +1,115 @@
 # Coriolis Discovery
 
 !!! abstract
-    This in-progress map records observed product boundaries, delivery paths, and unresolved questions. It is not a deployment tutorial or finalized architecture.
+    This in-progress, evidence-based map supports an OVA-first newcomer path. It is not a finalized architecture, installation guide, or tutorial.
 
 ## :material-book-open-page-variant-outline: Repository Landscape
 
+The root repository contains this MkDocs site and its own Helm chart only. It is not the product deployment repository.
+
 - `coriolis-oss` is the core application source.
-- `coriolis-docker` provides build and deployment automation.
-- `coriolis-cd` provides appliance delivery and deployment CLI tooling.
-- `coriolis-ci` is the Jenkins orchestrator and validation layer.
-- `python-coriolismetalhubclient` is an auxiliary client.
+- `coriolis-docker` contains Docker and Ansible build/deployment work.
+- `coriolis-cd` supplies CD and appliance/configuration tooling.
+- `coriolis-ci` orchestrates Jenkins builds and validation.
+- `python-coriolismetalhubclient` is an auxiliary Metal Hub client.
 
-This root repository hosts the MkDocs site and its Helm chart only. That chart is not product Helm support.
+The relationships are non-linear: CI invokes CD/configuration, Docker/Ansible consumes source inputs, and individual images use additional dependencies. These repositories are not a single linear stack.
 
-## :material-book-open-page-variant-outline: Observed Relationships
+## :material-book-open-page-variant-outline: Observed Appliance Workflow
 
-`coriolis-ci` invokes `coriolis-cd`; `coriolis-cd` invokes Docker tooling on an appliance; and `coriolis-docker` builds or deploys services. `coriolis-oss` is a source input to those builds. These relationships are not a simple linear dependency graph: repositories can be used independently and additional sources contribute to individual images.
+The following is an observed VMware appliance workflow, not proof of a clean Ubuntu 22.04 installation:
 
-## :material-book-open-page-variant-outline: Deployment Model
+1. Start from a VMware base template.
+2. Pull the tools image.
+3. Use CD/configuration tooling.
+4. Build Coriolis images through Docker/Ansible.
+5. Deploy Kolla dependencies.
+6. Configure the appliance.
+7. Export an OVA.
+8. Import the OVA.
+9. Validate a migration.
 
-The observed application deployment model uses Docker and Ansible. Selected OpenStack supporting services are deployed by upstream Kolla and Kolla-Ansible: Keystone, Barbican, RabbitMQ, MariaDB, and Memcached. No product Helm or Kubernetes deployment artifacts were found.
+Evidence: [appliance setup build](http://10.8.1.121:8080/job/1_coriolis-appliance-setup/860/) and [CI build 1395](http://10.8.1.121:8080/job/coriolis-ci/1395/).
 
-## :material-book-open-page-variant-outline: Image Supply Chain
+## :material-book-open-page-variant-outline: Current First Path
 
-### :material-application-edit-outline: Coriolis Images
+The first target is a published appliance with a VMware source, OpenStack destination, and one minimal Linux VM. It initially excludes Jenkins and source/image builds. OpenStack-to-OpenStack and a clean Ubuntu 22.04 host path are deferred, not disproven.
 
-Coriolis-owned images share the `coriolis-common` base where applicable. Worker packages incorporate provider modules. The common image bundles the private replicator and writer. Application image registry and tags are configurable, but observed defaults are mutable.
+## :material-book-open-page-variant-outline: Appliance Publication
 
-### :material-application-edit-outline: External Inputs
+Publication base: `http://10.8.1.121/appliances/`
 
-Observed public base and runtime inputs include Ubuntu, Go, Node, Step CA, and InfluxDB. Kolla is a separate dependency image family rather than a Coriolis-owned application image family; its exact official public image mapping remains unresolved.
+Recommended fixed candidate: `coriolis-appliance-2608.0-rc2.ova`
 
-## :material-book-open-page-variant-outline: Investigation Target
+- OVA: `http://10.8.1.121/appliances/coriolis-appliance-2608.0-rc2.ova`
+- SHA-256 sidecar: `http://10.8.1.121/appliances/coriolis-appliance-2608.0-rc2.ova.sha256`
+- SHA-256: `33ce5b8d0ca3c35b95bd8da11842eb8193fee68706cfd182ae8a11e1831a347d`
+- Size: about 9.57 GB.
 
-The current intended deployment investigation targets a single Ubuntu 22.04 VM as a standard web appliance, with an OpenStack-to-OpenStack test migration and no Jenkins pipeline. The working assumption is a private registry for internally built Coriolis images and direct public pulls for public images. This is an investigation target, not a verified deployment recipe.
+Final `2608.0` was not present during research. `coriolis-appliance-latest.ova` is mutable. OVAs are external publication artifacts, not Jenkins archived artifacts.
 
-## :material-book-open-page-variant-outline: Confirmed Gaps And Blockers
+!!! warning
+    Verify the downloaded OVA against the SHA-256 above. Do not use `latest` for a repeatable exercise.
 
-- Kolla version/tag alignment conflicts, and the exact public Kolla image list, remain unresolved.
-- The private dependency closure is incomplete.
-- `coriolis_provider_vhi` is referenced, but no source location was identified.
-- The worker build unconditionally clones the Metal Hub client.
-- `libqemu` binary provenance is unresolved.
-- Logger Dockerfile behavior needs validation.
-- No public or community deployment artifact was found.
-- Source and image references lack immutable pinning.
-- No host sizing has been recorded.
-- Endpoint, DNS, TLS, and registry image availability remain decisions or audits.
+## :material-book-open-page-variant-outline: Deployment And Images
 
-## :material-book-open-page-variant-outline: Next Discovery Gates
+Application deployment uses Docker/Ansible. Kolla/Kolla-Ansible supplies selected support services. No product Helm or Kubernetes artifacts were found.
 
-1. Confirm private source access and required commits.
-2. Locate the `coriolis_provider_vhi` source.
-3. Align the Kolla release and identify the exact required images.
-4. Audit registry images, tags or digests, and entrypoints.
-5. Establish third-party and binary provenance.
-6. Perform a first controlled installation and migration test.
+Successful Jenkins setup evidence uses private `registry.cloudbase.it`, the `appliance` namespace, `kolla_branch: 2023.1-eol`, `kolla_openstack_release: 2023.1`, and Kolla tag `2023.1`. Observed private Kolla image families are Barbican API, Barbican Keystone listener, Barbican worker, cron, fluentd, Kolla toolbox, and RabbitMQ tagged `2023.1-ubuntu-jammy`. Keystone, MariaDB/Galera, Memcached, InfluxDB, and Step CA were configured/deployed, but their complete image names were not observed.
+
+Application and dependency digests are not yet inventoried. The desired public-image design is not Jenkins-validated because Jenkins used the private namespace. The registry was reachable over TLS, but supplied authentication returned `401` without a challenge; private registry image availability is therefore not confirmed.
+
+Local source shows public build/runtime inputs of Ubuntu 22.04, Go Alpine, Node 18, Step CA latest, and InfluxDB 1.7. Mutable references must be pinned for a source build.
+
+## :material-book-open-page-variant-outline: Future Build Version Evidence
+
+| Component | Requested ref | Observed resolved commit |
+| --- | --- | --- |
+| Stable pipeline Docker | `stable/2608` | Not observed |
+| Core | `master` | Not observed |
+| OpenStack provider | `1.2.9` | Not observed |
+| VMware provider | `1.2.4` | `591a34d0b75391138a2cc2c928f5e54b6f70e834` |
+| Replicator | `1.0.5` | Not observed |
+| Writer | `1.0.4` | Not observed |
+| Logger | `1.0.5` | Not observed |
+| Web | `1.8.1` | Not observed |
+| Python client | `1.2.5` | Not observed |
+| Metal Hub client | `1.0.1` | Not observed |
+| CI build | N/A | `0a38d27b3cb7bcd80b719ca9062b0ea44ec64242` |
+| Kolla-Ansible | N/A | `2714e566e2f5a284a0b994d0b9b034ff08c8292a` |
+
+These are requested refs; most resolved commits were not observed. No exact provider commit is asserted where it was not observed.
+
+## :material-book-open-page-variant-outline: Provider Scope
+
+The immediate scope is VMware export and OpenStack import only. VHI and Metal Hub are not on this path. `coriolis_provider_vhi` remains referenced in local configuration, but was not observed in Jenkins or OpenStack provider CI and requires no action unless it blocks the target path. The worker build unconditionally clones the Metal Hub client, but it is not part of the OVA-first path.
+
+## :material-book-open-page-variant-outline: Logger And Libqemu
+
+The logger image is a Go build environment that builds a static host binary run by systemd; its shell `CMD` is intentional. `libqemu.so.gz` is downloaded from `https://cloudbase.it/downloads/libqemu.so.gz`, with no configured Ansible checksum pin. Jenkins observed SHA-1 `46de5b0c05b3123a89a6eac8795813073708774b`; SHA-1 is not adequate provenance or pinning control and this does not verify the file.
+
+## :material-book-open-page-variant-outline: Migration Evidence
+
+Current Jenkins examples validated OLVM-to-OpenStack in CI build 1395. Historical tests covered VMware-to-LXD, VMware-to-Proxmox, and VMware-to-CloudStack. No recent validated OpenStack-to-OpenStack test was found. VMware-to-OpenStack is common and supported by observed provider configuration, but still needs its first controlled test.
+
+## :material-book-open-page-variant-outline: Confirmed Gaps
+
+- OVA import instructions and appliance default credentials, networking, DNS, and TLS.
+- Appliance host sizing.
+- Exact endpoint, permission, and quota requirements.
+- Registry authentication and image availability.
+- Source dependency closure and digests.
+- Public-equivalent Kolla images.
+- The first controlled VMware-to-OpenStack test.
+
+No public/community product deployment artifact was found; the internal OVA publication endpoint is available.
+
+## :material-book-open-page-variant-outline: Next Gates
+
+1. Verify the RC2 download and SHA-256 checksum.
+2. Determine VMware import requirements and appliance sizing.
+3. Determine initial appliance access, networking, DNS, and TLS.
+4. Configure VMware and OpenStack endpoints.
+5. Migrate one minimal Linux VM.
+6. Validate the result and capture cleanup steps.
+7. Separately resolve private Git/registry source-build closure.
