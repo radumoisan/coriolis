@@ -10,7 +10,7 @@ theme:
 
 nav:
   - 📄 Home: index.md
-  - 📄 Image Builds: image-builds.md
+  - ⏳ Discovery: discovery.md
 
 markdown_extensions:
   - tables

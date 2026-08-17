@@ -28,7 +28,7 @@ The open-source Coriolis product source repository. It contains the API, migrati
 
 ### :material-application-edit-outline: `coriolis-docker`
 
-Deployment automation for Coriolis. It builds container images, deploys Coriolis services, and deploys their dependencies. See [image build behavior and risks](image-builds.md). It uses upstream OpenStack Kolla and Kolla-Ansible for selected supporting services: Keystone, Barbican, RabbitMQ, and MariaDB. This is not a general-purpose OpenStack cloud deployment.
+Deployment automation for Coriolis. It builds container images, deploys Coriolis services, and deploys their dependencies. See [discovery](discovery.md). It uses upstream OpenStack Kolla and Kolla-Ansible for selected supporting services: Keystone, Barbican, RabbitMQ, and MariaDB. This is not a general-purpose OpenStack cloud deployment.
 
 ### :material-application-edit-outline: `coriolis-cd`
 
