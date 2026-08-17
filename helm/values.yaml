@@ -1,4 +1,4 @@
-# Default values for Canonical Kubernetes Explorer.
+# Default values for Coriolis documentation.
 replicaCount: 1
 logging: INFO
 certmanager:

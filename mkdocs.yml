@@ -1,5 +1,5 @@
-site_name: Canonical Kubernetes Explorer
-site_description: Training documentation for exploring Canonical Kubernetes.
+site_name: Coriolis Documentation
+site_description: Documentation for the Coriolis repository family.
 
 theme:
   name: material

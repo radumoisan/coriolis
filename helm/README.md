@@ -1,9 +1,11 @@
-# Canonical Kubernetes Explorer Helm Chart
+# Coriolis Documentation Helm Chart
+
+Deploys the Coriolis documentation site.
 
 ## Installation
 
 ```shell
-helm install kubernetes-explorer-docs ./helm --namespace mkdocs
+helm install coriolis-docs ./helm --namespace mkdocs
 ```
 
 ## Secret Management
