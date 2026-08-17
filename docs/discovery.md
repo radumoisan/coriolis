@@ -42,7 +42,7 @@ Publication base: `http://10.8.1.121/appliances/`
 Recommended fixed candidate: `coriolis-appliance-2608.0-rc2.ova`
 
 - OVA: `http://10.8.1.121/appliances/coriolis-appliance-2608.0-rc2.ova`
-- SHA-256 sidecar: `http://10.8.1.121/appliances/coriolis-appliance-2608.0-rc2.ova.sha256`
+- SHA-256 sidecar: `http://10.8.1.121/appliances/coriolis-appliance-2608.0-rc2.ova.sha256sum`
 - SHA-256: `33ce5b8d0ca3c35b95bd8da11842eb8193fee68706cfd182ae8a11e1831a347d`
 - Size: about 9.57 GB.
 
