@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Training documentation for exploring Canonical Kubernetes.">
+        <meta name="description" content="Documentation for the Coriolis repository family.">
       
       
       
@@ -18,7 +18,7 @@
     
     
       
-        <title>Canonical Kubernetes Explorer</title>
+        <title>Coriolis Documentation</title>
       
     
     
@@ -59,6 +59,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#coriolis" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -71,7 +76,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Canonical Kubernetes Explorer" class="md-header__button md-logo" aria-label="Canonical Kubernetes Explorer" data-md-component="logo">
+    <a href="." title="Coriolis Documentation" class="md-header__button md-logo" aria-label="Coriolis Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -85,7 +90,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Canonical Kubernetes Explorer
+            Coriolis Documentation
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -166,13 +171,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Canonical Kubernetes Explorer" class="md-nav__button md-logo" aria-label="Canonical Kubernetes Explorer" data-md-component="logo">
+    <a href="." title="Coriolis Documentation" class="md-nav__button md-logo" aria-label="Coriolis Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
 
     </a>
-    Canonical Kubernetes Explorer
+    Coriolis Documentation
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -190,6 +195,19 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    📄 Home
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="." class="md-nav__link md-nav__link--active">
         
@@ -200,6 +218,96 @@
   
 
       </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#repository-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+       Repository Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+       Repository Roles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repository Roles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-oss" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-oss
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-docker
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-cd" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-cd
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-ci
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auxiliary-client" class="md-nav__link">
+    <span class="md-ellipsis">
+       Auxiliary Client
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -224,6 +332,85 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#repository-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+       Repository Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+       Repository Roles
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Repository Roles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-oss" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-oss
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-docker
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-cd" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-cd
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coriolis-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+       coriolis-ci
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auxiliary-client" class="md-nav__link">
+    <span class="md-ellipsis">
+       Auxiliary Client
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -238,9 +425,26 @@
                   
 
 
-  <h1>📄 Home</h1>
-
-
+<h1 id="coriolis">Coriolis<a class="headerlink" href="#coriolis" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">Abstract</p>
+<p>Coriolis supports migration of workloads between clouds and virtualization platforms. Its repository family separates the core product, container packaging, deployment delivery, and continuous-integration responsibilities.</p>
+</div>
+<h2 id="repository-flow"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Repository Flow<a class="headerlink" href="#repository-flow" title="Permanent link">&para;</a></h2>
+<p>The high-level flow moves from product source to packaged runtime, deployment delivery, and validation:</p>
+<p><code>coriolis-oss</code> -&gt; <code>coriolis-docker</code> -&gt; <code>coriolis-cd</code> -&gt; <code>coriolis-ci</code></p>
+<p>The CI repository also exercises the deployment and appliance tooling as part of end-to-end validation.</p>
+<h2 id="repository-roles"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Repository Roles<a class="headerlink" href="#repository-roles" title="Permanent link">&para;</a></h2>
+<h3 id="coriolis-oss"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-oss</code><a class="headerlink" href="#coriolis-oss" title="Permanent link">&para;</a></h3>
+<p>The open-source Coriolis product source repository. It contains the API, migration workflows, workers, schedulers, provider integrations, and control-plane services that perform and manage migrations.</p>
+<h3 id="coriolis-docker"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-docker</code><a class="headerlink" href="#coriolis-docker" title="Permanent link">&para;</a></h3>
+<p>Deployment automation for Coriolis. It builds container images, deploys the Coriolis services, and configures supporting infrastructure such as the OpenStack services used by the control plane.</p>
+<h3 id="coriolis-cd"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-cd</code><a class="headerlink" href="#coriolis-cd" title="Permanent link">&para;</a></h3>
+<p>Appliance lifecycle and delivery tooling. Its CLI builds Coriolis components into appliance machines, deploys appliances, and supports appliance export, import, and test-machine operations.</p>
+<h3 id="coriolis-ci"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-ci</code><a class="headerlink" href="#coriolis-ci" title="Permanent link">&para;</a></h3>
+<p>Jenkins-based continuous integration. It provisions and configures appliances, deploys product components, runs migration tests, and collects results from complete workflows.</p>
+<h2 id="auxiliary-client"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Auxiliary Client<a class="headerlink" href="#auxiliary-client" title="Permanent link">&para;</a></h2>
+<p><code>python-coriolismetalhubclient</code> is an auxiliary Python client for bare-metal and Metal Hub integrations.</p>
 
 
 
