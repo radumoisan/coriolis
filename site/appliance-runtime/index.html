@@ -1,0 +1,1087 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the Coriolis repository family.">
+      
+      
+      
+      
+        <link rel="prev" href="../appliance-release-flow/">
+      
+      
+        <link rel="next" href="../discovery/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>⏳ Appliance Runtime - Coriolis Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#coriolis-appliance-runtime" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Coriolis Documentation" class="md-header__button md-logo" aria-label="Coriolis Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Coriolis Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ⏳ Appliance Runtime
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Coriolis Documentation" class="md-nav__button md-logo" aria-label="Coriolis Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Coriolis Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminology/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    📄 Terminology
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../appliance-release-flow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ⏳ Appliance Release
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    ⏳ Appliance Runtime
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    ⏳ Appliance Runtime
+  </span>
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#scope-and-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+       Scope And Evidence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runtime-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+       Runtime Architecture
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observed-component-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+       Observed Component Inventory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observed Component Inventory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#coriolis" class="md-nav__link">
+    <span class="md-ellipsis">
+       Coriolis
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kolla" class="md-nav__link">
+    <span class="md-ellipsis">
+       Kolla
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public" class="md-nav__link">
+    <span class="md-ellipsis">
+       Public
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-families-and-provenance" class="md-nav__link">
+    <span class="md-ellipsis">
+       Version Families And Provenance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-responsibilities" class="md-nav__link">
+    <span class="md-ellipsis">
+       Component Responsibilities
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#host-services-and-expected-absences" class="md-nav__link">
+    <span class="md-ellipsis">
+       Host Services And Expected Absences
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#host-networking" class="md-nav__link">
+    <span class="md-ellipsis">
+       Host Networking
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#health-creation-and-uptime" class="md-nav__link">
+    <span class="md-ellipsis">
+       Health, Creation, And Uptime
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ova-persistence-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+       OVA Persistence Implications
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-snapshot-does-not-prove" class="md-nav__link">
+    <span class="md-ellipsis">
+       What This Snapshot Does Not Prove
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safe-read-only-inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+       Safe Read-Only Inspection
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+       Open Questions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+       Implementation Evidence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-information" class="md-nav__link">
+    <span class="md-ellipsis">
+       Related Information
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../discovery/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ⏳ Discovery
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#scope-and-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+       Scope And Evidence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runtime-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+       Runtime Architecture
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observed-component-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+       Observed Component Inventory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observed Component Inventory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#coriolis" class="md-nav__link">
+    <span class="md-ellipsis">
+       Coriolis
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kolla" class="md-nav__link">
+    <span class="md-ellipsis">
+       Kolla
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public" class="md-nav__link">
+    <span class="md-ellipsis">
+       Public
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version-families-and-provenance" class="md-nav__link">
+    <span class="md-ellipsis">
+       Version Families And Provenance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-responsibilities" class="md-nav__link">
+    <span class="md-ellipsis">
+       Component Responsibilities
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#host-services-and-expected-absences" class="md-nav__link">
+    <span class="md-ellipsis">
+       Host Services And Expected Absences
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#host-networking" class="md-nav__link">
+    <span class="md-ellipsis">
+       Host Networking
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#health-creation-and-uptime" class="md-nav__link">
+    <span class="md-ellipsis">
+       Health, Creation, And Uptime
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ova-persistence-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+       OVA Persistence Implications
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-snapshot-does-not-prove" class="md-nav__link">
+    <span class="md-ellipsis">
+       What This Snapshot Does Not Prove
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safe-read-only-inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+       Safe Read-Only Inspection
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+       Open Questions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+       Implementation Evidence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-information" class="md-nav__link">
+    <span class="md-ellipsis">
+       Related Information
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="coriolis-appliance-runtime">Coriolis Appliance Runtime<a class="headerlink" href="#coriolis-appliance-runtime" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">Abstract</p>
+<p>This page maps one supplied <code>docker ps</code> snapshot to local implementation evidence and does not establish provenance or runtime readiness.</p>
+</div>
+<h2 id="scope-and-evidence"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Scope And Evidence<a class="headerlink" href="#scope-and-evidence" title="Permanent link">&para;</a></h2>
+<p>The snapshot records 25 running containers from one appliance of unknown origin. It could be a fresh import, in-place upgrade, or stateful build; no conclusion is justified. Every snapshot observation on this page is therefore an example from that one appliance and is not proof of current RC2 <code>2608.0</code> behavior.</p>
+<p>Observed runtime facts are container names, image references, tags, and status. Local-code corroboration is the deployment role and configuration evidence. Inference connects those two evidence types but is not runtime proof. No secrets were inspected.</p>
+<p>The observed application tag is <code>2603.4</code>; the Kolla tag is <code>2023.1-ubuntu-jammy</code>. This single appliance snapshot is explicitly not proof for <code>2608.0-rc2</code>.</p>
+<h2 id="runtime-architecture"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Runtime Architecture<a class="headerlink" href="#runtime-architecture" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>Coriolis appliance VM
+|
++-- Host operating system and systemd services
+|   +-- Docker
+|   +-- Coriolis logger
+|   +-- Network and certificate configuration
+|
++-- Coriolis application containers
+|
++-- Kolla-managed dependencies
+|
++-- Public supporting containers
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th style="text-align: right;">Observed count</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Coriolis application/admin</td>
+<td style="text-align: right;">13</td>
+<td>Application, workflow, data-plane, and appliance administration services.</td>
+</tr>
+<tr>
+<td>Kolla dependencies</td>
+<td style="text-align: right;">10</td>
+<td>Internal identity, secrets, messaging, cache, database, and utility services.</td>
+</tr>
+<tr>
+<td>Public support</td>
+<td style="text-align: right;">2</td>
+<td>Certificate authority and telemetry storage.</td>
+</tr>
+<tr>
+<td>Total</td>
+<td style="text-align: right;">25</td>
+<td>Running containers in the one supplied snapshot.</td>
+</tr>
+</tbody>
+</table>
+<p>The host layer supplies Docker, systemd-managed services, networking, and certificate configuration. Host services do not appear in <code>docker ps</code>; the three container layers do.</p>
+<h2 id="observed-component-inventory"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Observed Component Inventory<a class="headerlink" href="#observed-component-inventory" title="Permanent link">&para;</a></h2>
+<p>Names, images, tags, and status below are examples from one runtime snapshot of an appliance of unknown origin, not proof of current RC2 <code>2608.0</code> behavior. Role mappings are corroborated by Ansible role names, but exact workload behavior still needs operational testing.</p>
+<h3 id="coriolis"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Coriolis<a class="headerlink" href="#coriolis" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>Image</th>
+<th>Tag</th>
+<th>Role</th>
+<th>Observed health indicator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>coriolis-metal-hub</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-metal-hub</code></td>
+<td><code>2603.4</code></td>
+<td>Metal Hub integration</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-console-editor</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-console-editor</code></td>
+<td><code>2603.4</code></td>
+<td>Console/editor container, intentionally idle</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-licensing-server</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-licensing-server</code></td>
+<td><code>2603.4</code></td>
+<td>License backend</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-web-proxy</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-web-proxy</code></td>
+<td><code>2603.4</code></td>
+<td>Web/UI reverse proxy</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-web</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-web</code></td>
+<td><code>2603.4</code></td>
+<td>Web UI</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-worker</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-worker</code></td>
+<td><code>2603.4</code></td>
+<td>Migration/provider execution worker</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-deployer-manager</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-deployer-manager</code></td>
+<td><code>2603.4</code></td>
+<td>Deployment orchestration</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-minion-manager</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-minion-manager</code></td>
+<td><code>2603.4</code></td>
+<td>Temporary/minion worker management</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-scheduler</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-scheduler</code></td>
+<td><code>2603.4</code></td>
+<td>Transfer scheduling</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-transfer-cron</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-transfer-cron</code></td>
+<td><code>2603.4</code></td>
+<td>Periodic transfer work</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-conductor</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-conductor</code></td>
+<td><code>2603.4</code></td>
+<td>Core workflow coordination</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-api</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-api</code></td>
+<td><code>2603.4</code></td>
+<td>Coriolis API</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>coriolis-compressor</code></td>
+<td><code>registry.cloudbase.it/appliance/coriolis-compressor</code></td>
+<td><code>2603.4</code></td>
+<td>Compression/data processing</td>
+<td>Up</td>
+</tr>
+</tbody>
+</table>
+<h3 id="kolla"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Kolla<a class="headerlink" href="#kolla" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>Image</th>
+<th>Tag</th>
+<th>Role</th>
+<th>Observed health indicator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kolla_toolbox</code></td>
+<td><code>registry.cloudbase.it/appliance/kolla-toolbox</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Kolla administration/utilities</td>
+<td>Up</td>
+</tr>
+<tr>
+<td><code>barbican_worker</code></td>
+<td><code>registry.cloudbase.it/appliance/barbican-worker</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Secret-management worker</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>barbican_keystone_listener</code></td>
+<td><code>registry.cloudbase.it/appliance/barbican-keystone-listener</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Barbican/Keystone listener</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>barbican_api</code></td>
+<td><code>registry.cloudbase.it/appliance/barbican-api</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Secret-management API</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>keystone</code></td>
+<td><code>registry.cloudbase.it/appliance/keystone</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Internal identity service</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>keystone_fernet</code></td>
+<td><code>registry.cloudbase.it/appliance/keystone-fernet</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Fernet key management</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>keystone_ssh</code></td>
+<td><code>registry.cloudbase.it/appliance/keystone-ssh</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Keystone SSH support</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>rabbitmq</code></td>
+<td><code>registry.cloudbase.it/appliance/rabbitmq</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Message broker</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>memcached</code></td>
+<td><code>registry.cloudbase.it/appliance/memcached</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Cache</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>mariadb</code></td>
+<td><code>registry.cloudbase.it/appliance/mariadb-server</code></td>
+<td><code>2023.1-ubuntu-jammy</code></td>
+<td>Relational database</td>
+<td>Up (healthy)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="public"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Public<a class="headerlink" href="#public" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>Image</th>
+<th>Tag</th>
+<th>Role</th>
+<th>Observed health indicator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>step-ca</code></td>
+<td><code>smallstep/step-ca</code></td>
+<td><code>latest</code></td>
+<td>Local certificate authority</td>
+<td>Up (healthy)</td>
+</tr>
+<tr>
+<td><code>influxdb</code></td>
+<td><code>influxdb</code></td>
+<td><code>1.7</code></td>
+<td>Logging/telemetry database</td>
+<td>Up</td>
+</tr>
+</tbody>
+</table>
+<h2 id="version-families-and-provenance"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Version Families And Provenance<a class="headerlink" href="#version-families-and-provenance" title="Permanent link">&para;</a></h2>
+<p>One appliance snapshot of unknown origin shows this layered composition, not one image:</p>
+<div class="highlight"><pre><span></span><code>Application: 2603.4
+Kolla: 2023.1-ubuntu-jammy
+Certificate authority: smallstep/step-ca:latest
+Telemetry: influxdb:1.7
+</code></pre></div>
+<p>Matching application tags suggest coordinated application deployment, but do not prove a common source commit, build, deployment, or digest. Kolla dependency tags can remain stable across an application update. <code>latest</code> is mutable. Tags do not supply digests. These snapshot observations are not proof of current RC2 <code>2608.0</code> behavior.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The supplied snapshot does not establish image provenance, build history, or readiness. Restrict conclusions to its one appliance of unknown origin.</p>
+</div>
+<h2 id="component-responsibilities"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Component Responsibilities<a class="headerlink" href="#component-responsibilities" title="Permanent link">&para;</a></h2>
+<p>The flat groups are UI/API (<code>coriolis-web</code>, <code>coriolis-web-proxy</code>, <code>coriolis-api</code>); workflow (<code>coriolis-conductor</code>, <code>coriolis-scheduler</code>, <code>coriolis-transfer-cron</code>, and the managers); data plane (<code>coriolis-worker</code>, <code>coriolis-compressor</code>); appliance admin (<code>coriolis-console-editor</code>, <code>coriolis-licensing-server</code>, <code>coriolis-metal-hub</code>); identity/secrets (Keystone and Barbican); messaging/persistence (RabbitMQ, MariaDB, Memcached); PKI/telemetry (Step CA, InfluxDB); and Kolla toolbox.</p>
+<p>The worker is privileged and local role configuration mounts host device and kernel resources. This is important host interaction, not a generic low-privilege application container. This local implementation evidence corroborates the role mapping, while the single unknown-origin snapshot is not proof of current RC2 <code>2608.0</code> behavior.</p>
+<p>Per-stage implementation references are <code>coriolis-docker/coriolis_ansible/appliance.yml:1-87</code>, <code>roles/coriolis/worker/tasks/setup_worker_container.yml:2-29</code>, <code>roles/bootstrap/step-ca/vars/main.yml</code>, and <code>roles/coriolis/logger/vars/main.yml</code>.</p>
+<h2 id="host-services-and-expected-absences"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Host Services And Expected Absences<a class="headerlink" href="#host-services-and-expected-absences" title="Permanent link">&para;</a></h2>
+<p><code>coriolis-logger</code> is expected as a host systemd static binary; InfluxDB is a container. The absence of a logger container is not a discrepancy. The licensing UI can deploy to a separate host group, so its absence would also not be a discrepancy.</p>
+<p>HAProxy, Fluentd, and Redis are disabled by Kolla configuration, making their absence expected. A broad built-image set does not equal the running container set. Current image inventory does not prove which optional components are needed for the first VMware-to-OpenStack objective; this unknown-origin snapshot happens to show Metal Hub, licensing, and compressor running, though they are outside the current investigation scope and are not proof of current RC2 <code>2608.0</code> behavior.</p>
+<h2 id="host-networking"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Host Networking<a class="headerlink" href="#host-networking" title="Permanent link">&para;</a></h2>
+<p>An empty <code>PORTS</code> column does not mean services are unavailable. Local role configuration widely uses <code>network_mode: host</code>, so containers share the host namespace and bind host interfaces; Docker publishing is irrelevant, while host firewall rules and port conflicts apply. Host <code>ss</code> output is more relevant.</p>
+<p>The specific network mode must be confirmed with restricted inspection of the exact container, even though local roles show expected configuration. The single unknown-origin snapshot is not proof of current RC2 <code>2608.0</code> networking behavior.</p>
+<h2 id="health-creation-and-uptime"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Health, Creation, And Uptime<a class="headerlink" href="#health-creation-and-uptime" title="Permanent link">&para;</a></h2>
+<p><code>Up</code> means the container process is running. <code>Up (healthy)</code> is Docker health status. In this one unknown-origin appliance snapshot, most Kolla containers recorded healthy while most Coriolis containers recorded only Up; neither proves API, migration, endpoint, or cleanup correctness, and neither is proof of current RC2 <code>2608.0</code> behavior.</p>
+<p>Without repeating exact absolute times, the observed runtime lasted about half an hour, application container objects were roughly two weeks old, most Kolla objects roughly five months old, Step CA roughly three months old, and Kolla toolbox near the current runtime. <code>CREATED</code>, current uptime, and image build time are different values. The split could result from reboot, upgrade, stateful base, OVA preservation, or selective recreation. Unknown origin means no conclusion.</p>
+<h2 id="ova-persistence-implications"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> OVA Persistence Implications<a class="headerlink" href="#ova-persistence-implications" title="Permanent link">&para;</a></h2>
+<p>See <a href="../appliance-release-flow/">Appliance Release</a> for the observed release and export flow.</p>
+<p>A VM disk export can preserve images and layers, container definitions and creation times, database state, PKI, configuration, and services. Restart policy can start existing containers on boot. This snapshot does not prove that this appliance was imported from an OVA or that every container and layer persists the same way across releases; it is not proof of current RC2 <code>2608.0</code> behavior.</p>
+<h2 id="what-this-snapshot-does-not-prove"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> What This Snapshot Does Not Prove<a class="headerlink" href="#what-this-snapshot-does-not-prove" title="Permanent link">&para;</a></h2>
+<p>It does not prove image digests, source commits, image build time, import versus update history, stopped-container inventory, host listeners, license correctness, API correctness, endpoint correctness, migration correctness, cleanup correctness, or a relationship to RC2.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Container status and matching tags are not provenance or health proof. The one supplied appliance of unknown origin cannot establish current RC2 <code>2608.0</code> behavior.</p>
+</div>
+<h2 id="safe-read-only-inspection"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Safe Read-Only Inspection<a class="headerlink" href="#safe-read-only-inspection" title="Permanent link">&para;</a></h2>
+<p>Use restricted, read-only inspection when authorized:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>ps<span class="w"> </span>--format<span class="w"> </span><span class="s1">&#39;table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.CreatedAt}}&#39;</span>
+docker<span class="w"> </span>inspect<span class="w"> </span>--format<span class="w"> </span><span class="s1">&#39;{{.Name}} network={{.HostConfig.NetworkMode}} restart={{.HostConfig.RestartPolicy.Name}} image={{.Config.Image}}&#39;</span><span class="w"> </span>&lt;container&gt;
+docker<span class="w"> </span>port<span class="w"> </span>&lt;container&gt;
+docker<span class="w"> </span>image<span class="w"> </span>inspect<span class="w"> </span>--format<span class="w"> </span><span class="s1">&#39;{{.RepoTags}} {{.Id}} {{.Created}}&#39;</span><span class="w"> </span>&lt;image&gt;
+ss<span class="w"> </span>-lntup
+systemctl<span class="w"> </span>--no-pager<span class="w"> </span>--type<span class="o">=</span>service<span class="w"> </span>--state<span class="o">=</span>running
+systemctl<span class="w"> </span>--no-pager<span class="w"> </span>status<span class="w"> </span>coriolis-logger
+cat<span class="w"> </span>/etc/coriolis/coriolis.release
+cat<span class="w"> </span>/etc/os-release
+uptime<span class="w"> </span>-s
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not use unrestricted <code>docker inspect</code>, <code>docker exec env</code>, Kolla password files, generated configuration, or mounted secret files. Sensitive inspection can expose credentials, tokens, keys, or other private values.</p>
+</div>
+<h2 id="open-questions"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Appliance OS and release value.</li>
+<li>Import versus upgrade history.</li>
+<li>Full stopped-container inventory.</li>
+<li>Image digests.</li>
+<li>Host listeners.</li>
+<li>Logger status.</li>
+<li>Exact relation to <code>2608.0-rc2</code>.</li>
+<li>Whether optional components can safely be excluded.</li>
+</ul>
+<p>No claim is currently established for these questions.</p>
+<h2 id="implementation-evidence"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Implementation Evidence<a class="headerlink" href="#implementation-evidence" title="Permanent link">&para;</a></h2>
+<p>Local implementation references: <code>coriolis-docker/coriolis_ansible/appliance.yml:1-87</code>; <code>roles/coriolis/worker/tasks/setup_worker_container.yml:2-29</code>; <code>roles/common/console-editor/tasks/setup_console_editor_container.yml:7-17</code>; <code>roles/bootstrap/step-ca/tasks/setup_step_ca_container.yml:26-29</code>; <code>roles/bootstrap/step-ca/vars/main.yml</code>; <code>roles/coriolis/logger/vars/main.yml</code>; <code>coriolis-docker/kolla/deploy.sh:65-78</code>; and <code>coriolis-docker/coriolis_ansible/group_vars/all.yml:126-156</code>.</p>
+<p>These line and path mappings corroborate deployment design; the runtime snapshot is separate evidence.</p>
+<h2 id="related-information"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Related Information<a class="headerlink" href="#related-information" title="Permanent link">&para;</a></h2>
+<p><a href="../terminology/">Terminology</a>, <a href="../appliance-release-flow/">Appliance Release</a>, and <a href="../discovery/">Discovery</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>
