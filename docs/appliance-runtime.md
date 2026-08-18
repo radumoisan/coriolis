@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # Coriolis Appliance Runtime
 
 !!! abstract
@@ -36,6 +41,75 @@ Coriolis appliance VM
 | Total | 25 | Running containers in the one supplied snapshot. |
 
 The host layer supplies Docker, systemd-managed services, networking, and certificate configuration. Host services do not appear in `docker ps`; the three container layers do.
+
+## :material-book-open-page-variant-outline: Application Source Ownership
+
+A runtime component or image is distinct from the repository that supplies its application source. This map shows default source ownership and build inputs, not a deployed commit, image digest, image provenance, or current RC2 behavior.
+
+### :material-application-edit-outline: Core Application Repository
+
+These seven components come from the single open-source `cloudbase/coriolis` Git repository, checked out locally as `coriolis-oss`. They are distinct service entry points in one shared Python package, and none has a dedicated application-source repository.
+
+- `coriolis-api` - `coriolis.cmd.api:main`
+- `coriolis-conductor` - `coriolis.cmd.conductor:main`
+- `coriolis-worker` - `coriolis.cmd.worker:main`
+- `coriolis-scheduler` - `coriolis.cmd.scheduler:main`
+- `coriolis-transfer-cron` - `coriolis.cmd.transfer_cron:main`
+- `coriolis-minion-manager` - `coriolis.cmd.minion_manager:main`
+- `coriolis-deployer-manager` - `coriolis.cmd.deployer_manager:main`
+
+Exact source evidence is `coriolis-oss/setup.cfg:26-35`. Detailed architecture and coupling analysis is outside this source-ownership map.
+
+### :material-application-edit-outline: Dedicated Application Repositories
+
+Source ownership is distinct at the repository level for these four components.
+
+- `coriolis-web` - `cloudbase/coriolis-web` on GitHub; its source is not checked out locally.
+- `coriolis-licensing-server` - `cloudbase/coriolis-licensing-server` on Bitbucket; its source is not checked out locally.
+- `coriolis-metal-hub` - `cloudbase/coriolis-metal-hub` on Bitbucket; server source is not checked out locally. `python-coriolismetalhubclient` is a separate client library, not its server source.
+- `coriolis-compressor` - `cloudbase/coriolis-compressor` on GitHub; its source is not checked out locally.
+
+### :material-application-edit-outline: Appliance-Generated Components
+
+No independent application-source repository was identified in the local product source layout for these components.
+
+- `coriolis-web-proxy` - Generated local proxy configuration and startup behavior.
+- `coriolis-console-editor` - Generated appliance utility and intentionally idle.
+
+This establishes only that no source clone is used by their observed local roles; it does not prove that an external source repository never exists.
+
+### :material-application-edit-outline: Source Ownership Summary
+
+```
+Application source ownership
+|
++-- cloudbase/coriolis
+|   +-- coriolis-api
+|   +-- coriolis-conductor
+|   +-- coriolis-worker
+|   +-- coriolis-scheduler
+|   +-- coriolis-transfer-cron
+|   +-- coriolis-minion-manager
+|   +-- coriolis-deployer-manager
+|
++-- cloudbase/coriolis-web
+|   +-- coriolis-web
+|
++-- cloudbase/coriolis-licensing-server
+|   +-- coriolis-licensing-server
+|
++-- cloudbase/coriolis-metal-hub
+|   +-- coriolis-metal-hub
+|
++-- cloudbase/coriolis-compressor
+|   +-- coriolis-compressor
+|
+`-- Appliance-generated
+    +-- coriolis-web-proxy
+    `-- coriolis-console-editor
+```
+
+This is a source-ownership map rather than a deployment or CI/CD map.
 
 ## :material-book-open-page-variant-outline: Observed Component Inventory
 
