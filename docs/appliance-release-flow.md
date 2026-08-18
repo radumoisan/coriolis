@@ -207,6 +207,8 @@ Observed contents are virtual disks and a VMware-produced OVF descriptor; NVRAM 
 
 Not captured or proven are runtime memory, CPU, or process state; snapshots or external datastore files; NVRAM; and a manifest or signature.
 
+See [Appliance Runtime](appliance-runtime.md) for separate runtime evidence and its limitations.
+
 ### :material-application-edit-outline: Implementation Evidence
 
 `coriolis-cd/coriolis_cd/cli/export_instance.py:13-57`; `coriolis-cd/coriolis_cd/providers/vmware/provider.py:408-423`, `489-649`, `749-791`.
@@ -346,4 +348,4 @@ The separate Discovery page tracks registry and source pinning, platform compati
 
 ## :material-book-open-page-variant-outline: Related Information
 
-[Terminology](terminology.md) and [Discovery](discovery.md)
+[Terminology](terminology.md), [Appliance Runtime](appliance-runtime.md), and [Discovery](discovery.md)

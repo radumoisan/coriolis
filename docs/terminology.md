@@ -49,4 +49,4 @@ An OVA is not an ISO installer, Docker image, or Coriolis source code, and it is
 
 ## :material-book-open-page-variant-outline: Related Information
 
-See [Discovery](discovery.md) for discovery-related documentation.
+Terminology prose supports [Discovery](discovery.md) and [Appliance Runtime](appliance-runtime.md).
