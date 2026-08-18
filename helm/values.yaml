@@ -5,7 +5,7 @@ certmanager:
   cluster_issuer: letsencrypt
 image:
   repository: cr.virtomat.io/virtomat/cloudbase-coriolis-docs
-  tag: 0.5.0
+  tag: 0.6.0
   pullPolicy: IfNotPresent
 service:
   port: 80
