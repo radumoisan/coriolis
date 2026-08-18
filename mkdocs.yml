@@ -11,9 +11,9 @@ theme:
 nav:
   - 📄 Home: index.md
   - 📄 Terminology: terminology.md
-  - ⏳ Appliance Release: appliance-release-flow.md
-  - ⏳ Appliance Runtime: appliance-runtime.md
   - ⏳ Discovery: discovery.md
+  - ⏳ Appliance Runtime: appliance-runtime.md
+  - ⏳ Appliance Release: appliance-release-flow.md
 
 markdown_extensions:
   - tables
