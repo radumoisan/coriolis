@@ -166,6 +166,8 @@
           
             
               
+                
+              
               <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
@@ -315,6 +317,57 @@
        Runtime Architecture
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#application-source-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+       Application Source Ownership
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Application Source Ownership">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-application-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+       Core Application Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dedicated-application-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+       Dedicated Application Repositories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#appliance-generated-components" class="md-nav__link">
+    <span class="md-ellipsis">
+       Appliance-Generated Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-ownership-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+       Source Ownership Summary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -495,7 +548,9 @@
             
             
               
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
@@ -530,6 +585,57 @@
        Runtime Architecture
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#application-source-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+       Application Source Ownership
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Application Source Ownership">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-application-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+       Core Application Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dedicated-application-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+       Dedicated Application Repositories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#appliance-generated-components" class="md-nav__link">
+    <span class="md-ellipsis">
+       Appliance-Generated Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-ownership-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+       Source Ownership Summary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -744,6 +850,64 @@
 </tbody>
 </table>
 <p>The host layer supplies Docker, systemd-managed services, networking, and certificate configuration. Host services do not appear in <code>docker ps</code>; the three container layers do.</p>
+<h2 id="application-source-ownership"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Application Source Ownership<a class="headerlink" href="#application-source-ownership" title="Permanent link">&para;</a></h2>
+<p>A runtime component or image is distinct from the repository that supplies its application source. This map shows default source ownership and build inputs, not a deployed commit, image digest, image provenance, or current RC2 behavior.</p>
+<h3 id="core-application-repository"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Core Application Repository<a class="headerlink" href="#core-application-repository" title="Permanent link">&para;</a></h3>
+<p>These seven components come from the single open-source <code>cloudbase/coriolis</code> Git repository, checked out locally as <code>coriolis-oss</code>. They are distinct service entry points in one shared Python package, and none has a dedicated application-source repository.</p>
+<ul>
+<li><code>coriolis-api</code> - <code>coriolis.cmd.api:main</code></li>
+<li><code>coriolis-conductor</code> - <code>coriolis.cmd.conductor:main</code></li>
+<li><code>coriolis-worker</code> - <code>coriolis.cmd.worker:main</code></li>
+<li><code>coriolis-scheduler</code> - <code>coriolis.cmd.scheduler:main</code></li>
+<li><code>coriolis-transfer-cron</code> - <code>coriolis.cmd.transfer_cron:main</code></li>
+<li><code>coriolis-minion-manager</code> - <code>coriolis.cmd.minion_manager:main</code></li>
+<li><code>coriolis-deployer-manager</code> - <code>coriolis.cmd.deployer_manager:main</code></li>
+</ul>
+<p>Exact source evidence is <code>coriolis-oss/setup.cfg:26-35</code>. Detailed architecture and coupling analysis is outside this source-ownership map.</p>
+<h3 id="dedicated-application-repositories"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Dedicated Application Repositories<a class="headerlink" href="#dedicated-application-repositories" title="Permanent link">&para;</a></h3>
+<p>Source ownership is distinct at the repository level for these four components.</p>
+<ul>
+<li><code>coriolis-web</code> - <code>cloudbase/coriolis-web</code> on GitHub; its source is not checked out locally.</li>
+<li><code>coriolis-licensing-server</code> - <code>cloudbase/coriolis-licensing-server</code> on Bitbucket; its source is not checked out locally.</li>
+<li><code>coriolis-metal-hub</code> - <code>cloudbase/coriolis-metal-hub</code> on Bitbucket; server source is not checked out locally. <code>python-coriolismetalhubclient</code> is a separate client library, not its server source.</li>
+<li><code>coriolis-compressor</code> - <code>cloudbase/coriolis-compressor</code> on GitHub; its source is not checked out locally.</li>
+</ul>
+<h3 id="appliance-generated-components"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Appliance-Generated Components<a class="headerlink" href="#appliance-generated-components" title="Permanent link">&para;</a></h3>
+<p>No independent application-source repository was identified in the local product source layout for these components.</p>
+<ul>
+<li><code>coriolis-web-proxy</code> - Generated local proxy configuration and startup behavior.</li>
+<li><code>coriolis-console-editor</code> - Generated appliance utility and intentionally idle.</li>
+</ul>
+<p>This establishes only that no source clone is used by their observed local roles; it does not prove that an external source repository never exists.</p>
+<h3 id="source-ownership-summary"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Source Ownership Summary<a class="headerlink" href="#source-ownership-summary" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Application source ownership
+|
++-- cloudbase/coriolis
+|   +-- coriolis-api
+|   +-- coriolis-conductor
+|   +-- coriolis-worker
+|   +-- coriolis-scheduler
+|   +-- coriolis-transfer-cron
+|   +-- coriolis-minion-manager
+|   +-- coriolis-deployer-manager
+|
++-- cloudbase/coriolis-web
+|   +-- coriolis-web
+|
++-- cloudbase/coriolis-licensing-server
+|   +-- coriolis-licensing-server
+|
++-- cloudbase/coriolis-metal-hub
+|   +-- coriolis-metal-hub
+|
++-- cloudbase/coriolis-compressor
+|   +-- coriolis-compressor
+|
+`-- Appliance-generated
+    +-- coriolis-web-proxy
+    `-- coriolis-console-editor
+</code></pre></div>
+<p>This is a source-ownership map rather than a deployment or CI/CD map.</p>
 <h2 id="observed-component-inventory"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Observed Component Inventory<a class="headerlink" href="#observed-component-inventory" title="Permanent link">&para;</a></h2>
 <p>Names, images, tags, and status below are examples from one runtime snapshot of an appliance of unknown origin, not proof of current RC2 <code>2608.0</code> behavior. Role mappings are corroborated by Ansible role names, but exact workload behavior still needs operational testing.</p>
 <h3 id="coriolis"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Coriolis<a class="headerlink" href="#coriolis" title="Permanent link">&para;</a></h3>
@@ -1038,8 +1202,13 @@ uptime<span class="w"> </span>-s
 
 
 
+  
+  
 
 
+
+
+  
 
 
 
