@@ -308,9 +308,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#auxiliary-client" class="md-nav__link">
+  <a href="#documentation-map" class="md-nav__link">
     <span class="md-ellipsis">
-       Auxiliary Client
+       Documentation Map
     </span>
   </a>
   
@@ -351,11 +351,11 @@
   
   
     <li class="md-nav__item">
-      <a href="appliance-release-flow/" class="md-nav__link">
+      <a href="discovery/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    ⏳ Appliance Release
+    ⏳ Discovery
   </span>
   
 
@@ -391,11 +391,11 @@
   
   
     <li class="md-nav__item">
-      <a href="discovery/" class="md-nav__link">
+      <a href="appliance-release-flow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    ⏳ Discovery
+    ⏳ Appliance Release
   </span>
   
 
@@ -502,9 +502,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#auxiliary-client" class="md-nav__link">
+  <a href="#documentation-map" class="md-nav__link">
     <span class="md-ellipsis">
-       Auxiliary Client
+       Documentation Map
     </span>
   </a>
   
@@ -528,33 +528,29 @@
 <h1 id="coriolis">Coriolis<a class="headerlink" href="#coriolis" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Abstract</p>
-<p>Coriolis supports migration of workloads between clouds and virtualization platforms. Its repository family separates the core product, container packaging, deployment delivery, and continuous-integration responsibilities.</p>
+<p>Coriolis migrates workloads. Its repositories separate product source, appliance assembly, delivery, and CI.</p>
 </div>
 <h2 id="how-the-repositories-work-together"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> How The Repositories Work Together<a class="headerlink" href="#how-the-repositories-work-together" title="Permanent link">&para;</a></h2>
-<p>These repositories have different relationships; they are not a simple dependency graph. <code>coriolis-oss</code> supplies core Coriolis source that <code>coriolis-docker</code> can use while building service images. Other product repositories also contribute where needed.</p>
-<div class="highlight"><pre><span></span><code>Runtime call hierarchy:
-coriolis-ci
-  -&gt; coriolis-cd
-       -&gt; coriolis-docker
-            -&gt; Coriolis services and dependencies
-
-Artifact progression:
-Coriolis source -&gt; container images and services -&gt; appliance -&gt; CI migration validation
+<p>Repository relationship summary, not a dependency graph.</p>
+<div class="highlight"><pre><span></span><code>Build and delivery flow
+Coriolis source -&gt; packaging/deployment -&gt; appliance lifecycle -&gt; CI validation
 </code></pre></div>
-<p><code>coriolis-ci</code> is Jenkins orchestration that invokes the <code>coriolis-cd</code> appliance delivery and deployment CLI. In turn, that CLI invokes <code>coriolis-docker</code> to build or deploy Coriolis service containers and their dependencies. <code>coriolis-cd</code> can also be used independently of CI.</p>
 <h2 id="repository-roles"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Repository Roles<a class="headerlink" href="#repository-roles" title="Permanent link">&para;</a></h2>
 <h3 id="coriolis-oss"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-oss</code><a class="headerlink" href="#coriolis-oss" title="Permanent link">&para;</a></h3>
-<p>The open-source Coriolis product source repository. It contains the API, migration workflows, workers, schedulers, provider integrations, and control-plane services that perform and manage migrations.</p>
+<p>Product source for Coriolis APIs, workflows, workers, schedulers, and provider integrations.</p>
 <h3 id="coriolis-docker"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-docker</code><a class="headerlink" href="#coriolis-docker" title="Permanent link">&para;</a></h3>
-<p>Deployment automation for Coriolis. It builds container images, deploys Coriolis services, and deploys their dependencies. See <a href="discovery/">discovery</a>. It uses upstream OpenStack Kolla and Kolla-Ansible for selected supporting services: Keystone, Barbican, RabbitMQ, and MariaDB. This is not a general-purpose OpenStack cloud deployment.</p>
+<p>Docker and Ansible packaging and deployment for Coriolis and selected support services.</p>
 <h3 id="coriolis-cd"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-cd</code><a class="headerlink" href="#coriolis-cd" title="Permanent link">&para;</a></h3>
-<p>Appliance lifecycle and delivery tooling. Its CLI builds Coriolis components into appliance machines, deploys appliances, and supports appliance export, import, and test-machine operations.</p>
+<p>Appliance lifecycle tooling for build VMs, deployment, export, import, and testing.</p>
 <h3 id="coriolis-ci"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> <code>coriolis-ci</code><a class="headerlink" href="#coriolis-ci" title="Permanent link">&para;</a></h3>
-<p>Jenkins-based continuous integration. It provisions and configures appliances, deploys product components, runs migration tests, and collects results from complete workflows.</p>
+<p>Jenkins automation for appliance setup and migration validation.</p>
 <h2 id="kubernetes-and-helm"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Kubernetes And Helm<a class="headerlink" href="#kubernetes-and-helm" title="Permanent link">&para;</a></h2>
-<p>No Kubernetes or Helm deployment support was found for the Coriolis product. The Helm chart at this repository's root deploys only this MkDocs documentation site.</p>
-<h2 id="auxiliary-client"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Auxiliary Client<a class="headerlink" href="#auxiliary-client" title="Permanent link">&para;</a></h2>
-<p><code>python-coriolismetalhubclient</code> is an auxiliary Python client for bare-metal and Metal Hub integrations.</p>
+<p><strong>Observed:</strong> no Coriolis Kubernetes or Helm deployment artifacts were found in the inspected repositories. The root chart packages this documentation site.</p>
+<h2 id="documentation-map"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Documentation Map<a class="headerlink" href="#documentation-map" title="Permanent link">&para;</a></h2>
+<p><a href="discovery/">Discovery</a>: first-path evidence and gates.</p>
+<p><a href="appliance-runtime/">Appliance Runtime</a>: one snapshot and architecture.</p>
+<p><a href="appliance-release-flow/">Appliance Release</a>: implementation lifecycle.</p>
+<p><a href="terminology/">Terminology</a>: definitions.</p>
 
 
 

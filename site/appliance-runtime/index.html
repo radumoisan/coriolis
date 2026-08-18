@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../appliance-release-flow/">
+        <link rel="prev" href="../discovery/">
       
       
-        <link rel="next" href="../discovery/">
+        <link rel="next" href="../appliance-release-flow/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -235,11 +235,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../appliance-release-flow/" class="md-nav__link">
+      <a href="../discovery/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    ⏳ Appliance Release
+    ⏳ Discovery
   </span>
   
 
@@ -357,15 +357,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#source-ownership-summary" class="md-nav__link">
-    <span class="md-ellipsis">
-       Source Ownership Summary
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -400,9 +391,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#public" class="md-nav__link">
+  <a href="#third-party" class="md-nav__link">
     <span class="md-ellipsis">
-       Public
+       Third-Party
     </span>
   </a>
   
@@ -432,45 +423,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#host-services-and-expected-absences" class="md-nav__link">
+  <a href="#host-services-networking-and-expected-absences" class="md-nav__link">
     <span class="md-ellipsis">
-       Host Services And Expected Absences
+       Host Services, Networking, And Expected Absences
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#host-networking" class="md-nav__link">
+  <a href="#health-and-persistence-limits" class="md-nav__link">
     <span class="md-ellipsis">
-       Host Networking
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#health-creation-and-uptime" class="md-nav__link">
-    <span class="md-ellipsis">
-       Health, Creation, And Uptime
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ova-persistence-implications" class="md-nav__link">
-    <span class="md-ellipsis">
-       OVA Persistence Implications
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-this-snapshot-does-not-prove" class="md-nav__link">
-    <span class="md-ellipsis">
-       What This Snapshot Does Not Prove
+       Health And Persistence Limits
     </span>
   </a>
   
@@ -527,11 +491,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../discovery/" class="md-nav__link">
+      <a href="../appliance-release-flow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    ⏳ Discovery
+    ⏳ Appliance Release
   </span>
   
 
@@ -625,15 +589,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#source-ownership-summary" class="md-nav__link">
-    <span class="md-ellipsis">
-       Source Ownership Summary
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -668,9 +623,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#public" class="md-nav__link">
+  <a href="#third-party" class="md-nav__link">
     <span class="md-ellipsis">
-       Public
+       Third-Party
     </span>
   </a>
   
@@ -700,45 +655,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#host-services-and-expected-absences" class="md-nav__link">
+  <a href="#host-services-networking-and-expected-absences" class="md-nav__link">
     <span class="md-ellipsis">
-       Host Services And Expected Absences
+       Host Services, Networking, And Expected Absences
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#host-networking" class="md-nav__link">
+  <a href="#health-and-persistence-limits" class="md-nav__link">
     <span class="md-ellipsis">
-       Host Networking
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#health-creation-and-uptime" class="md-nav__link">
-    <span class="md-ellipsis">
-       Health, Creation, And Uptime
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ova-persistence-implications" class="md-nav__link">
-    <span class="md-ellipsis">
-       OVA Persistence Implications
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-this-snapshot-does-not-prove" class="md-nav__link">
-    <span class="md-ellipsis">
-       What This Snapshot Does Not Prove
+       Health And Persistence Limits
     </span>
   </a>
   
@@ -798,26 +726,22 @@
 <h1 id="coriolis-appliance-runtime">Coriolis Appliance Runtime<a class="headerlink" href="#coriolis-appliance-runtime" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Abstract</p>
-<p>This page maps one supplied <code>docker ps</code> snapshot to local implementation evidence and does not establish provenance or runtime readiness.</p>
+<p>Maps one supplied runtime snapshot to local implementation evidence; provenance and runtime readiness are unknown.</p>
 </div>
 <h2 id="scope-and-evidence"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Scope And Evidence<a class="headerlink" href="#scope-and-evidence" title="Permanent link">&para;</a></h2>
-<p>The snapshot records 25 running containers from one appliance of unknown origin. It could be a fresh import, in-place upgrade, or stateful build; no conclusion is justified. Every snapshot observation on this page is therefore an example from that one appliance and is not proof of current RC2 <code>2608.0</code> behavior.</p>
-<p>Observed runtime facts are container names, image references, tags, and status. Local-code corroboration is the deployment role and configuration evidence. Inference connects those two evidence types but is not runtime proof. No secrets were inspected.</p>
-<p>The observed application tag is <code>2603.4</code>; the Kolla tag is <code>2023.1-ubuntu-jammy</code>. This single appliance snapshot is explicitly not proof for <code>2608.0-rc2</code>.</p>
+<ul>
+<li><strong>Observed:</strong> one 25-running-container snapshot of unknown origin; application tag <code>2603.4</code>; Kolla tag <code>2023.1-ubuntu-jammy</code>.</li>
+<li><strong>Source evidence:</strong> local deployment roles and configuration.</li>
+<li><strong>Unknown:</strong> relation to RC2, source commits, digests, build history, and runtime readiness.</li>
+</ul>
 <h2 id="runtime-architecture"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Runtime Architecture<a class="headerlink" href="#runtime-architecture" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>Coriolis appliance VM
-|
-+-- Host operating system and systemd services
-|   +-- Docker
-|   +-- Coriolis logger
-|   +-- Network and certificate configuration
-|
-+-- Coriolis application containers
-|
-+-- Kolla-managed dependencies
-|
-+-- Public supporting containers
+|-- Host operating system and systemd services
+|-- Coriolis application containers
+|-- Kolla-managed dependencies
+`-- Third-party supporting containers
 </code></pre></div>
+<p>Conceptual grouping of the snapshot; host services are absent from <code>docker ps</code>.</p>
 <table>
 <thead>
 <tr>
@@ -830,30 +754,28 @@
 <tr>
 <td>Coriolis application/admin</td>
 <td style="text-align: right;">13</td>
-<td>Application, workflow, data-plane, and appliance administration services.</td>
+<td>Application, workflow, data-plane, and appliance administration.</td>
 </tr>
 <tr>
 <td>Kolla dependencies</td>
 <td style="text-align: right;">10</td>
-<td>Internal identity, secrets, messaging, cache, database, and utility services.</td>
+<td>Identity, secrets, messaging, cache, database, and utilities.</td>
 </tr>
 <tr>
-<td>Public support</td>
+<td>Third-party support</td>
 <td style="text-align: right;">2</td>
 <td>Certificate authority and telemetry storage.</td>
 </tr>
 <tr>
 <td>Total</td>
 <td style="text-align: right;">25</td>
-<td>Running containers in the one supplied snapshot.</td>
+<td>Running containers in one snapshot.</td>
 </tr>
 </tbody>
 </table>
-<p>The host layer supplies Docker, systemd-managed services, networking, and certificate configuration. Host services do not appear in <code>docker ps</code>; the three container layers do.</p>
 <h2 id="application-source-ownership"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Application Source Ownership<a class="headerlink" href="#application-source-ownership" title="Permanent link">&para;</a></h2>
-<p>A runtime component or image is distinct from the repository that supplies its application source. This map shows default source ownership and build inputs, not a deployed commit, image digest, image provenance, or current RC2 behavior.</p>
 <h3 id="core-application-repository"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Core Application Repository<a class="headerlink" href="#core-application-repository" title="Permanent link">&para;</a></h3>
-<p>These seven components come from the single open-source <code>cloudbase/coriolis</code> Git repository, checked out locally as <code>coriolis-oss</code>. They are distinct service entry points in one shared Python package, and none has a dedicated application-source repository.</p>
+<p><code>cloudbase/coriolis</code>, checked out locally as <code>coriolis-oss</code>, supplies these seven entry points:</p>
 <ul>
 <li><code>coriolis-api</code> - <code>coriolis.cmd.api:main</code></li>
 <li><code>coriolis-conductor</code> - <code>coriolis.cmd.conductor:main</code></li>
@@ -863,53 +785,21 @@
 <li><code>coriolis-minion-manager</code> - <code>coriolis.cmd.minion_manager:main</code></li>
 <li><code>coriolis-deployer-manager</code> - <code>coriolis.cmd.deployer_manager:main</code></li>
 </ul>
-<p>Exact source evidence is <code>coriolis-oss/setup.cfg:26-35</code>. Detailed architecture and coupling analysis is outside this source-ownership map.</p>
 <h3 id="dedicated-application-repositories"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Dedicated Application Repositories<a class="headerlink" href="#dedicated-application-repositories" title="Permanent link">&para;</a></h3>
-<p>Source ownership is distinct at the repository level for these four components.</p>
 <ul>
-<li><code>coriolis-web</code> - <code>cloudbase/coriolis-web</code> on GitHub; its source is not checked out locally.</li>
-<li><code>coriolis-licensing-server</code> - <code>cloudbase/coriolis-licensing-server</code> on Bitbucket; its source is not checked out locally.</li>
-<li><code>coriolis-metal-hub</code> - <code>cloudbase/coriolis-metal-hub</code> on Bitbucket; server source is not checked out locally. <code>python-coriolismetalhubclient</code> is a separate client library, not its server source.</li>
-<li><code>coriolis-compressor</code> - <code>cloudbase/coriolis-compressor</code> on GitHub; its source is not checked out locally.</li>
+<li><code>coriolis-web</code> - <code>cloudbase/coriolis-web</code>; source is not checked out locally.</li>
+<li><code>coriolis-licensing-server</code> - <code>cloudbase/coriolis-licensing-server</code>; source is not checked out locally.</li>
+<li><code>coriolis-metal-hub</code> - <code>cloudbase/coriolis-metal-hub</code>; server source is not checked out locally; <code>python-coriolismetalhubclient</code> is a separate client library.</li>
+<li><code>coriolis-compressor</code> - <code>cloudbase/coriolis-compressor</code>; source is not checked out locally.</li>
 </ul>
 <h3 id="appliance-generated-components"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Appliance-Generated Components<a class="headerlink" href="#appliance-generated-components" title="Permanent link">&para;</a></h3>
-<p>No independent application-source repository was identified in the local product source layout for these components.</p>
 <ul>
-<li><code>coriolis-web-proxy</code> - Generated local proxy configuration and startup behavior.</li>
-<li><code>coriolis-console-editor</code> - Generated appliance utility and intentionally idle.</li>
+<li><code>coriolis-web-proxy</code> - generated local proxy configuration and startup behavior.</li>
+<li><code>coriolis-console-editor</code> - generated appliance utility, intentionally idle.</li>
 </ul>
-<p>This establishes only that no source clone is used by their observed local roles; it does not prove that an external source repository never exists.</p>
-<h3 id="source-ownership-summary"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Source Ownership Summary<a class="headerlink" href="#source-ownership-summary" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>Application source ownership
-|
-+-- cloudbase/coriolis
-|   +-- coriolis-api
-|   +-- coriolis-conductor
-|   +-- coriolis-worker
-|   +-- coriolis-scheduler
-|   +-- coriolis-transfer-cron
-|   +-- coriolis-minion-manager
-|   +-- coriolis-deployer-manager
-|
-+-- cloudbase/coriolis-web
-|   +-- coriolis-web
-|
-+-- cloudbase/coriolis-licensing-server
-|   +-- coriolis-licensing-server
-|
-+-- cloudbase/coriolis-metal-hub
-|   +-- coriolis-metal-hub
-|
-+-- cloudbase/coriolis-compressor
-|   +-- coriolis-compressor
-|
-`-- Appliance-generated
-    +-- coriolis-web-proxy
-    `-- coriolis-console-editor
-</code></pre></div>
-<p>This is a source-ownership map rather than a deployment or CI/CD map.</p>
+<p>This maps source ownership, not deployed commits or image provenance.</p>
 <h2 id="observed-component-inventory"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Observed Component Inventory<a class="headerlink" href="#observed-component-inventory" title="Permanent link">&para;</a></h2>
-<p>Names, images, tags, and status below are examples from one runtime snapshot of an appliance of unknown origin, not proof of current RC2 <code>2608.0</code> behavior. Role mappings are corroborated by Ansible role names, but exact workload behavior still needs operational testing.</p>
+<p>Registry prefix for application and Kolla images: <code>registry.cloudbase.it/appliance/</code>.</p>
 <h3 id="coriolis"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Coriolis<a class="headerlink" href="#coriolis" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -918,97 +808,97 @@
 <th>Image</th>
 <th>Tag</th>
 <th>Role</th>
-<th>Observed health indicator</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>coriolis-metal-hub</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-metal-hub</code></td>
+<td><code>coriolis-metal-hub</code></td>
 <td><code>2603.4</code></td>
 <td>Metal Hub integration</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-console-editor</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-console-editor</code></td>
+<td><code>coriolis-console-editor</code></td>
 <td><code>2603.4</code></td>
-<td>Console/editor container, intentionally idle</td>
+<td>Console/editor, intentionally idle</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-licensing-server</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-licensing-server</code></td>
+<td><code>coriolis-licensing-server</code></td>
 <td><code>2603.4</code></td>
 <td>License backend</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-web-proxy</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-web-proxy</code></td>
+<td><code>coriolis-web-proxy</code></td>
 <td><code>2603.4</code></td>
 <td>Web/UI reverse proxy</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-web</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-web</code></td>
+<td><code>coriolis-web</code></td>
 <td><code>2603.4</code></td>
 <td>Web UI</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-worker</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-worker</code></td>
+<td><code>coriolis-worker</code></td>
 <td><code>2603.4</code></td>
 <td>Migration/provider execution worker</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-deployer-manager</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-deployer-manager</code></td>
+<td><code>coriolis-deployer-manager</code></td>
 <td><code>2603.4</code></td>
 <td>Deployment orchestration</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-minion-manager</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-minion-manager</code></td>
+<td><code>coriolis-minion-manager</code></td>
 <td><code>2603.4</code></td>
 <td>Temporary/minion worker management</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-scheduler</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-scheduler</code></td>
+<td><code>coriolis-scheduler</code></td>
 <td><code>2603.4</code></td>
 <td>Transfer scheduling</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-transfer-cron</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-transfer-cron</code></td>
+<td><code>coriolis-transfer-cron</code></td>
 <td><code>2603.4</code></td>
 <td>Periodic transfer work</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-conductor</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-conductor</code></td>
+<td><code>coriolis-conductor</code></td>
 <td><code>2603.4</code></td>
 <td>Core workflow coordination</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-api</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-api</code></td>
+<td><code>coriolis-api</code></td>
 <td><code>2603.4</code></td>
 <td>Coriolis API</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>coriolis-compressor</code></td>
-<td><code>registry.cloudbase.it/appliance/coriolis-compressor</code></td>
+<td><code>coriolis-compressor</code></td>
 <td><code>2603.4</code></td>
 <td>Compression/data processing</td>
 <td>Up</td>
@@ -1023,83 +913,83 @@
 <th>Image</th>
 <th>Tag</th>
 <th>Role</th>
-<th>Observed health indicator</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>kolla_toolbox</code></td>
-<td><code>registry.cloudbase.it/appliance/kolla-toolbox</code></td>
+<td><code>kolla-toolbox</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Kolla administration/utilities</td>
 <td>Up</td>
 </tr>
 <tr>
 <td><code>barbican_worker</code></td>
-<td><code>registry.cloudbase.it/appliance/barbican-worker</code></td>
+<td><code>barbican-worker</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Secret-management worker</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>barbican_keystone_listener</code></td>
-<td><code>registry.cloudbase.it/appliance/barbican-keystone-listener</code></td>
+<td><code>barbican-keystone-listener</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Barbican/Keystone listener</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>barbican_api</code></td>
-<td><code>registry.cloudbase.it/appliance/barbican-api</code></td>
+<td><code>barbican-api</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Secret-management API</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>keystone</code></td>
-<td><code>registry.cloudbase.it/appliance/keystone</code></td>
+<td><code>keystone</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Internal identity service</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>keystone_fernet</code></td>
-<td><code>registry.cloudbase.it/appliance/keystone-fernet</code></td>
+<td><code>keystone-fernet</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Fernet key management</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>keystone_ssh</code></td>
-<td><code>registry.cloudbase.it/appliance/keystone-ssh</code></td>
+<td><code>keystone-ssh</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Keystone SSH support</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>rabbitmq</code></td>
-<td><code>registry.cloudbase.it/appliance/rabbitmq</code></td>
+<td><code>rabbitmq</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Message broker</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>memcached</code></td>
-<td><code>registry.cloudbase.it/appliance/memcached</code></td>
+<td><code>memcached</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Cache</td>
 <td>Up (healthy)</td>
 </tr>
 <tr>
 <td><code>mariadb</code></td>
-<td><code>registry.cloudbase.it/appliance/mariadb-server</code></td>
+<td><code>mariadb-server</code></td>
 <td><code>2023.1-ubuntu-jammy</code></td>
 <td>Relational database</td>
 <td>Up (healthy)</td>
 </tr>
 </tbody>
 </table>
-<h3 id="public"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Public<a class="headerlink" href="#public" title="Permanent link">&para;</a></h3>
+<h3 id="third-party"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> Third-Party<a class="headerlink" href="#third-party" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1107,7 +997,7 @@
 <th>Image</th>
 <th>Tag</th>
 <th>Role</th>
-<th>Observed health indicator</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
@@ -1128,47 +1018,53 @@
 </tbody>
 </table>
 <h2 id="version-families-and-provenance"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Version Families And Provenance<a class="headerlink" href="#version-families-and-provenance" title="Permanent link">&para;</a></h2>
-<p>One appliance snapshot of unknown origin shows this layered composition, not one image:</p>
-<div class="highlight"><pre><span></span><code>Application: 2603.4
-Kolla: 2023.1-ubuntu-jammy
-Certificate authority: smallstep/step-ca:latest
-Telemetry: influxdb:1.7
-</code></pre></div>
-<p>Matching application tags suggest coordinated application deployment, but do not prove a common source commit, build, deployment, or digest. Kolla dependency tags can remain stable across an application update. <code>latest</code> is mutable. Tags do not supply digests. These snapshot observations are not proof of current RC2 <code>2608.0</code> behavior.</p>
+<ul>
+<li>Matching application tags show the observed application family, not a common source commit or build.</li>
+<li>Kolla tags can differ from, or remain stable across, application versions.</li>
+<li><code>latest</code> is mutable.</li>
+<li>Tags do not provide digests.</li>
+</ul>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The supplied snapshot does not establish image provenance, build history, or readiness. Restrict conclusions to its one appliance of unknown origin.</p>
+<p>The snapshot does not establish provenance or readiness.</p>
 </div>
 <h2 id="component-responsibilities"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Component Responsibilities<a class="headerlink" href="#component-responsibilities" title="Permanent link">&para;</a></h2>
-<p>The flat groups are UI/API (<code>coriolis-web</code>, <code>coriolis-web-proxy</code>, <code>coriolis-api</code>); workflow (<code>coriolis-conductor</code>, <code>coriolis-scheduler</code>, <code>coriolis-transfer-cron</code>, and the managers); data plane (<code>coriolis-worker</code>, <code>coriolis-compressor</code>); appliance admin (<code>coriolis-console-editor</code>, <code>coriolis-licensing-server</code>, <code>coriolis-metal-hub</code>); identity/secrets (Keystone and Barbican); messaging/persistence (RabbitMQ, MariaDB, Memcached); PKI/telemetry (Step CA, InfluxDB); and Kolla toolbox.</p>
-<p>The worker is privileged and local role configuration mounts host device and kernel resources. This is important host interaction, not a generic low-privilege application container. This local implementation evidence corroborates the role mapping, while the single unknown-origin snapshot is not proof of current RC2 <code>2608.0</code> behavior.</p>
-<p>Per-stage implementation references are <code>coriolis-docker/coriolis_ansible/appliance.yml:1-87</code>, <code>roles/coriolis/worker/tasks/setup_worker_container.yml:2-29</code>, <code>roles/bootstrap/step-ca/vars/main.yml</code>, and <code>roles/coriolis/logger/vars/main.yml</code>.</p>
-<h2 id="host-services-and-expected-absences"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Host Services And Expected Absences<a class="headerlink" href="#host-services-and-expected-absences" title="Permanent link">&para;</a></h2>
-<p><code>coriolis-logger</code> is expected as a host systemd static binary; InfluxDB is a container. The absence of a logger container is not a discrepancy. The licensing UI can deploy to a separate host group, so its absence would also not be a discrepancy.</p>
-<p>HAProxy, Fluentd, and Redis are disabled by Kolla configuration, making their absence expected. A broad built-image set does not equal the running container set. Current image inventory does not prove which optional components are needed for the first VMware-to-OpenStack objective; this unknown-origin snapshot happens to show Metal Hub, licensing, and compressor running, though they are outside the current investigation scope and are not proof of current RC2 <code>2608.0</code> behavior.</p>
-<h2 id="host-networking"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Host Networking<a class="headerlink" href="#host-networking" title="Permanent link">&para;</a></h2>
-<p>An empty <code>PORTS</code> column does not mean services are unavailable. Local role configuration widely uses <code>network_mode: host</code>, so containers share the host namespace and bind host interfaces; Docker publishing is irrelevant, while host firewall rules and port conflicts apply. Host <code>ss</code> output is more relevant.</p>
-<p>The specific network mode must be confirmed with restricted inspection of the exact container, even though local roles show expected configuration. The single unknown-origin snapshot is not proof of current RC2 <code>2608.0</code> networking behavior.</p>
-<h2 id="health-creation-and-uptime"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Health, Creation, And Uptime<a class="headerlink" href="#health-creation-and-uptime" title="Permanent link">&para;</a></h2>
-<p><code>Up</code> means the container process is running. <code>Up (healthy)</code> is Docker health status. In this one unknown-origin appliance snapshot, most Kolla containers recorded healthy while most Coriolis containers recorded only Up; neither proves API, migration, endpoint, or cleanup correctness, and neither is proof of current RC2 <code>2608.0</code> behavior.</p>
-<p>Without repeating exact absolute times, the observed runtime lasted about half an hour, application container objects were roughly two weeks old, most Kolla objects roughly five months old, Step CA roughly three months old, and Kolla toolbox near the current runtime. <code>CREATED</code>, current uptime, and image build time are different values. The split could result from reboot, upgrade, stateful base, OVA preservation, or selective recreation. Unknown origin means no conclusion.</p>
-<h2 id="ova-persistence-implications"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> OVA Persistence Implications<a class="headerlink" href="#ova-persistence-implications" title="Permanent link">&para;</a></h2>
-<p>See <a href="../appliance-release-flow/">Appliance Release</a> for the observed release and export flow.</p>
-<p>A VM disk export can preserve images and layers, container definitions and creation times, database state, PKI, configuration, and services. Restart policy can start existing containers on boot. This snapshot does not prove that this appliance was imported from an OVA or that every container and layer persists the same way across releases; it is not proof of current RC2 <code>2608.0</code> behavior.</p>
-<h2 id="what-this-snapshot-does-not-prove"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> What This Snapshot Does Not Prove<a class="headerlink" href="#what-this-snapshot-does-not-prove" title="Permanent link">&para;</a></h2>
-<p>It does not prove image digests, source commits, image build time, import versus update history, stopped-container inventory, host listeners, license correctness, API correctness, endpoint correctness, migration correctness, cleanup correctness, or a relationship to RC2.</p>
+<ul>
+<li>UI/API: web, web proxy, API.</li>
+<li>Workflow: conductor, scheduler, transfer cron, minion manager, deployer manager.</li>
+<li>Data plane: worker, compressor.</li>
+<li>Appliance admin: console editor, licensing server, Metal Hub.</li>
+<li>Identity/secrets: Keystone and Barbican.</li>
+<li>Messaging/persistence: RabbitMQ, MariaDB, Memcached.</li>
+<li>PKI/telemetry: Step CA, InfluxDB.</li>
+<li>Kolla toolbox: administration utilities.</li>
+</ul>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Container status and matching tags are not provenance or health proof. The one supplied appliance of unknown origin cannot establish current RC2 <code>2608.0</code> behavior.</p>
+<p>The worker is privileged and mounts host device and kernel resources.</p>
 </div>
+<h2 id="host-services-networking-and-expected-absences"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Host Services, Networking, And Expected Absences<a class="headerlink" href="#host-services-networking-and-expected-absences" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Logger is a host systemd binary; InfluxDB is a container.</li>
+<li>Licensing UI can use a separate host.</li>
+<li>HAProxy, Fluentd, and Redis are disabled and expected absent.</li>
+<li>Built images do not imply running containers; empty <code>PORTS</code> does not imply unavailability.</li>
+<li>Local roles generally use host networking; host <code>ss</code> is relevant.</li>
+<li><strong>Unknown:</strong> exact networking mode requires restricted inspection.</li>
+</ul>
+<h2 id="health-and-persistence-limits"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Health And Persistence Limits<a class="headerlink" href="#health-and-persistence-limits" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>Up</code> means process running; <code>Up (healthy)</code> means Docker health status.</li>
+<li>Kolla reported healthy while Coriolis reported Up in the snapshot; this is process proof only.</li>
+<li>Creation time, uptime, and image build time differ; causes are unknown.</li>
+<li>VM disk export can preserve persistent state; the snapshot does not establish import origin or persistence across releases.</li>
+</ul>
+<p>See <a href="../appliance-release-flow/">Appliance Release</a>.</p>
 <h2 id="safe-read-only-inspection"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Safe Read-Only Inspection<a class="headerlink" href="#safe-read-only-inspection" title="Permanent link">&para;</a></h2>
-<p>Use restricted, read-only inspection when authorized:</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>ps<span class="w"> </span>--format<span class="w"> </span><span class="s1">&#39;table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.CreatedAt}}&#39;</span>
 docker<span class="w"> </span>inspect<span class="w"> </span>--format<span class="w"> </span><span class="s1">&#39;{{.Name}} network={{.HostConfig.NetworkMode}} restart={{.HostConfig.RestartPolicy.Name}} image={{.Config.Image}}&#39;</span><span class="w"> </span>&lt;container&gt;
-docker<span class="w"> </span>port<span class="w"> </span>&lt;container&gt;
 docker<span class="w"> </span>image<span class="w"> </span>inspect<span class="w"> </span>--format<span class="w"> </span><span class="s1">&#39;{{.RepoTags}} {{.Id}} {{.Created}}&#39;</span><span class="w"> </span>&lt;image&gt;
 ss<span class="w"> </span>-lntup
-systemctl<span class="w"> </span>--no-pager<span class="w"> </span>--type<span class="o">=</span>service<span class="w"> </span>--state<span class="o">=</span>running
 systemctl<span class="w"> </span>--no-pager<span class="w"> </span>status<span class="w"> </span>coriolis-logger
 cat<span class="w"> </span>/etc/coriolis/coriolis.release
 cat<span class="w"> </span>/etc/os-release
@@ -1176,7 +1072,7 @@ uptime<span class="w"> </span>-s
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Do not use unrestricted <code>docker inspect</code>, <code>docker exec env</code>, Kolla password files, generated configuration, or mounted secret files. Sensitive inspection can expose credentials, tokens, keys, or other private values.</p>
+<p>Do not use unrestricted <code>docker inspect</code>, secret files, generated configuration, or mounted secret files.</p>
 </div>
 <h2 id="open-questions"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1189,12 +1085,11 @@ uptime<span class="w"> </span>-s
 <li>Exact relation to <code>2608.0-rc2</code>.</li>
 <li>Whether optional components can safely be excluded.</li>
 </ul>
-<p>No claim is currently established for these questions.</p>
 <h2 id="implementation-evidence"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Implementation Evidence<a class="headerlink" href="#implementation-evidence" title="Permanent link">&para;</a></h2>
-<p>Local implementation references: <code>coriolis-docker/coriolis_ansible/appliance.yml:1-87</code>; <code>roles/coriolis/worker/tasks/setup_worker_container.yml:2-29</code>; <code>roles/common/console-editor/tasks/setup_console_editor_container.yml:7-17</code>; <code>roles/bootstrap/step-ca/tasks/setup_step_ca_container.yml:26-29</code>; <code>roles/bootstrap/step-ca/vars/main.yml</code>; <code>roles/coriolis/logger/vars/main.yml</code>; <code>coriolis-docker/kolla/deploy.sh:65-78</code>; and <code>coriolis-docker/coriolis_ansible/group_vars/all.yml:126-156</code>.</p>
-<p>These line and path mappings corroborate deployment design; the runtime snapshot is separate evidence.</p>
+<p><code>coriolis-docker/coriolis_ansible/appliance.yml:1-87</code>; <code>roles/coriolis/worker/tasks/setup_worker_container.yml:2-29</code>; <code>roles/common/console-editor/tasks/setup_console_editor_container.yml:7-17</code>; <code>roles/bootstrap/step-ca/tasks/setup_step_ca_container.yml:26-29</code>; <code>roles/bootstrap/step-ca/vars/main.yml</code>; <code>roles/coriolis/logger/vars/main.yml</code>; <code>coriolis-docker/kolla/deploy.sh:65-78</code>; <code>coriolis-docker/coriolis_ansible/group_vars/all.yml:126-156</code>.</p>
+<p>Local paths corroborate design; the snapshot is separate evidence.</p>
 <h2 id="related-information"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Related Information<a class="headerlink" href="#related-information" title="Permanent link">&para;</a></h2>
-<p><a href="../terminology/">Terminology</a>, <a href="../appliance-release-flow/">Appliance Release</a>, and <a href="../discovery/">Discovery</a></p>
+<p><a href="../terminology/">Terminology</a>, <a href="../appliance-release-flow/">Appliance Release</a>, and <a href="../discovery/">Discovery</a>.</p>
 
 
 

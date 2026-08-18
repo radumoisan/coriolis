@@ -14,7 +14,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../appliance-release-flow/">
+        <link rel="next" href="../discovery/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -294,27 +294,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ova-on-openstack" class="md-nav__link">
-    <span class="md-ellipsis">
-       OVA On OpenStack
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#terms-often-confused" class="md-nav__link">
     <span class="md-ellipsis">
        Terms Often Confused
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-an-ova-is-not" class="md-nav__link">
-    <span class="md-ellipsis">
-       What An OVA Is Not
     </span>
   </a>
   
@@ -344,11 +326,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../appliance-release-flow/" class="md-nav__link">
+      <a href="../discovery/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    ⏳ Appliance Release
+    ⏳ Discovery
   </span>
   
 
@@ -384,11 +366,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../discovery/" class="md-nav__link">
+      <a href="../appliance-release-flow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    ⏳ Discovery
+    ⏳ Appliance Release
   </span>
   
 
@@ -459,27 +441,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ova-on-openstack" class="md-nav__link">
-    <span class="md-ellipsis">
-       OVA On OpenStack
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#terms-often-confused" class="md-nav__link">
     <span class="md-ellipsis">
        Terms Often Confused
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-an-ova-is-not" class="md-nav__link">
-    <span class="md-ellipsis">
-       What An OVA Is Not
     </span>
   </a>
   
@@ -512,26 +476,16 @@
 <h1 id="terminology">Terminology<a class="headerlink" href="#terminology" title="Permanent link">&para;</a></h1>
 <div class="admonition abstract">
 <p class="admonition-title">Abstract</p>
-<p>This page defines terms used by Coriolis appliance deployment and VMware-to-OpenStack migration documentation.</p>
+<p>Definitions for Coriolis appliance deployment and VMware-to-OpenStack migration.</p>
 </div>
 <h2 id="virtual-appliance-and-coriolis-appliance"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Virtual Appliance And Coriolis Appliance<a class="headerlink" href="#virtual-appliance-and-coriolis-appliance" title="Permanent link">&para;</a></h2>
-<p><strong>Virtual appliance</strong> is a prebuilt virtual machine (VM) for a specific workload. It contains a guest operating system, the Coriolis application, its dependencies, and initial configuration. Coriolis supporting services run as containers inside the appliance VM.</p>
-<p><strong>Coriolis appliance</strong> can mean either the configured VM before it is exported, or the VM after an OVA is imported and deployed.</p>
+<p>A <strong>virtual appliance</strong> is a prebuilt VM containing an operating system, application, and configuration.</p>
+<p>A <strong>Coriolis appliance</strong> is a VM running Coriolis and its support containers.</p>
 <h2 id="ova"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> OVA<a class="headerlink" href="#ova" title="Permanent link">&para;</a></h2>
-<p><strong>OVA</strong>, commonly called Open Virtual Appliance, is a single archive used to distribute a virtual appliance. It generally contains an OVF descriptor, virtual disks (often VMDK), and optional manifest, checksum, or signature files. An OVA is commonly a TAR archive of an OVF package and is not directly executable.</p>
+<p>An <strong>OVA</strong> is an archive containing an OVF descriptor and virtual disks, commonly VMDK files; it is not directly executable. A checksum verifies integrity only when its source is trusted.</p>
 <h3 id="ova-lifecycle"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 20v2H3c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h18c1.1 0 2 .9 2 2v8.1l-.2-.2c-.5-.5-1.1-.8-1.8-.8V6H3v14h8m10.4-6.7 1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2s.3.1.4.2m-.3 3.6-6 6.1H13v-2.1l6.1-6.1 2 2.1Z"/></svg></span> OVA Lifecycle<a class="headerlink" href="#ova-lifecycle" title="Permanent link">&para;</a></h3>
-<p>The usual lifecycle is:</p>
-<ol>
-<li>Base VMware template</li>
-<li>Configured appliance build VM</li>
-<li>Exported or published OVA and checksum</li>
-<li>Verified download</li>
-<li>VMware OVA or OVF import</li>
-<li>Booted deployed appliance</li>
-</ol>
-<p>OVA import may require a supported target hypervisor and does not guarantee compatibility across hypervisors.</p>
-<h2 id="ova-on-openstack"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> OVA On OpenStack<a class="headerlink" href="#ova-on-openstack" title="Permanent link">&para;</a></h2>
-<p>OpenStack usually does not consume an OVA directly. The documented path is to extract the OVA, obtain the VMDK, convert it to QCOW2, upload it to Glance, and create a VM. This is separate from the selected OVA-on-VMware-first path.</p>
+<p><code>base template -&gt; build VM -&gt; OVA -&gt; verified import -&gt; deployed appliance</code></p>
+<p>Import compatibility depends on the target hypervisor.</p>
 <h2 id="terms-often-confused"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Terms Often Confused<a class="headerlink" href="#terms-often-confused" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -543,42 +497,40 @@
 <tbody>
 <tr>
 <td>Base appliance template</td>
-<td>The starting VMware template used to build an appliance.</td>
+<td>Starting VMware template for an appliance build.</td>
 </tr>
 <tr>
 <td>Appliance build VM</td>
-<td>The configured VM created from the base template before export.</td>
+<td>Configured template clone before export.</td>
 </tr>
 <tr>
 <td>OVA artifact</td>
-<td>The distributable OVA archive produced from an appliance build VM.</td>
+<td>Distributable archive exported from a build VM.</td>
 </tr>
 <tr>
 <td>Deployed appliance</td>
-<td>The appliance VM after import and boot on a target platform.</td>
+<td>Imported and booted appliance VM.</td>
 </tr>
 <tr>
 <td>OVA import</td>
-<td>Importing an OVA or OVF package into a supported hypervisor.</td>
+<td>Import of an OVA or OVF package into a supported hypervisor.</td>
 </tr>
 <tr>
 <td>OpenStack import provider</td>
-<td>A Coriolis component that migrates workloads into OpenStack; it is unrelated to OVA import.</td>
+<td>Coriolis migration component, unrelated to OVA import.</td>
 </tr>
 <tr>
 <td>Source / destination</td>
-<td>The origin environment and target environment of a migration.</td>
+<td>Migration origin and target environments.</td>
 </tr>
 <tr>
 <td>Migration / replica</td>
-<td>A migration moves a workload to its destination; a replica continuously synchronizes it for disaster recovery and later deployment.</td>
+<td>Migration moves a workload; replica synchronizes it for later deployment.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="what-an-ova-is-not"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> What An OVA Is Not<a class="headerlink" href="#what-an-ova-is-not" title="Permanent link">&para;</a></h2>
-<p>An OVA is not an ISO installer, Docker image, or Coriolis source code, and it is normally not executed directly. A checksum verifies integrity only when the checksum source is trusted.</p>
 <h2 id="related-information"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Related Information<a class="headerlink" href="#related-information" title="Permanent link">&para;</a></h2>
-<p>Terminology prose supports <a href="../discovery/">Discovery</a> and <a href="../appliance-runtime/">Appliance Runtime</a>.</p>
+<p><a href="../discovery/">Discovery</a>, <a href="../appliance-runtime/">Appliance Runtime</a>, and <a href="../appliance-release-flow/">Appliance Release</a>.</p>
 
 
 
