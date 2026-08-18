@@ -35,6 +35,46 @@ Evidence: [appliance setup build](http://10.8.1.121:8080/job/1_coriolis-applianc
 
 The first target is a published appliance with a VMware source, OpenStack destination, and one minimal Linux VM. It initially excludes Jenkins and source/image builds. OpenStack-to-OpenStack and a clean Ubuntu 22.04 host path are deferred, not disproven.
 
+The first-path bootstrap also requires a license before starting a Migration or Replica.
+
+## :material-book-open-page-variant-outline: Confluence Evidence
+
+The Confluence evidence mixes current 2026 appliance pages with 2019-2020 provider-plugin documentation. Current planning also keeps VMware-to-OpenStack endpoint and environment validation in the backlog, so this path remains partially unvalidated.
+
+- [Deploying the Coriolis appliance image](https://cloudbasedev.atlassian.net/wiki/spaces/CDS/pages/3526787074/Deploying+the+Coriolis+appliance+image) (created February 2026).
+- [Coriolis Trial Appliance info](https://cloudbasedev.atlassian.net/wiki/spaces/COR/pages/595524/Coriolis+Trial+Appliance+info) (updated April 2026).
+- [VMWare vSphere Coriolis plugin](https://cloudbasedev.atlassian.net/wiki/spaces/COR/pages/1845147/VMWare+vSphere+Coriolis+plugin) (last updated 2020).
+- [OpenStack Coriolis plugin](https://cloudbasedev.atlassian.net/wiki/spaces/COR/pages/1840996/OpenStack+Coriolis+plugin) (last updated 2020).
+- [Coriolis 2026 Roadmap](https://cloudbasedev.atlassian.net/wiki/spaces/CDD/pages/3454599169/Coriolis+2026+Roadmap) (current planning evidence).
+
+## :material-book-open-page-variant-outline: Appliance Bootstrap Evidence
+
+The current 2026 OpenStack appliance-image guide gives a concrete minimum of 4 vCPU, 6144 MB RAM, and 40 GB disk. This is evidence for that deployment path, not a confirmed VMware RC2 sizing requirement. The same page requires EULA acceptance before login and says console option 2 reveals Web UI login details; no credentials are recorded here.
+
+Older appliance guidance requires at least one network interface and exposes network configuration and access through the Coriolis Console. It describes DHCP and static configuration through console or serial access, but current RC2 network behavior is unverified. The Web UI is reached through the appliance IP over HTTPS. Historical documentation describes ports 80/443, HTTP redirection to HTTPS, and a unique self-signed certificate; verify this TLS and port behavior on RC2.
+
+No dedicated current VMware Deploy OVF Template procedure or current vSphere compatibility matrix was found.
+
+## :material-book-open-page-variant-outline: VMware Source Evidence
+
+[VMware-to-OpenStack](https://cloudbasedev.atlassian.net/wiki/spaces/COR/pages/1520693/Coriolis+Cloud+Migration) is described as a common use case in general migration documentation from 2020. Historical provider documentation requires vCenter/ESXi API access, normally TCP 443; CBT-based paths additionally need TCP 902 to every candidate ESXi host. Endpoint hostnames require name resolution.
+
+For the first test, prefer a Linux VM with ordinary virtual disks. Historical source requirements mark raw and passthrough disks unsupported for CBT paths. Do not infer that CBT is required for migrations: the current 2608 migration mode and default are unverified.
+
+Historically documented privileges include read visibility for the relevant datacenter, network, DVS, and port groups; snapshot creation/removal; and read-only disk access. Power-off and change-tracking privileges are optional depending on configuration. Matching VDDK/vixDiskLib to the ESXi version is a historical recommendation and remains an RC2 compatibility gap.
+
+## :material-book-open-page-variant-outline: OpenStack Destination Evidence
+
+The older OpenStack provider documentation identifies conceptual endpoint fields for identity API version, auth URL, username/password, project, user/project domains for v3, Glance API version, region or service-specific regions, catalog interface, and untrusted-certificate toggles. Validate the RC2 UI, schema, and defaults rather than relying on those historical field names or defaults.
+
+The destination needs API reachability to Keystone, Glance, Nova, Neutron, and Cinder. It does not require Ceph, Swift, or Cinder Backup. Before a migration, precreate every mapped destination Neutron network, required security groups, a suitable final VM flavor, and required Cinder volume types. Coriolis selects and maps this infrastructure; it does not recreate the source infrastructure.
+
+Temporary destination workers need a Linux Glance image configured with cloud-init, a compatible flavor, and a migration network. They also need either appliance-to-fixed-IP routing or a reachable external network/floating-IP pool. A config drive may be necessary where no metadata service is available.
+
+Required project API capabilities include listing images, networks, security groups, flavors, and keypairs; creating/deleting Cinder volumes and snapshots; and creating/deleting ports, security groups/rules, temporary Nova VMs, keypairs, and possibly floating IPs. This is an API capability set, not a universal named role.
+
+The migration sequence creates target volumes, temporary disk-copy workers, temporary OSMorphing workers, then the final VM and Neutron ports. Coriolis is intended to clean temporary resources, but Cinder backends can leave residual snapshots; inspect cleanup. Exact numeric quotas are not documented: assess capacity for final VM/disks plus transient workers, ports, snapshots, volumes, keypairs, and optional floating IPs.
+
 ## :material-book-open-page-variant-outline: Appliance Publication
 
 Publication base: `http://10.8.1.121/appliances/`
@@ -94,9 +134,10 @@ Current Jenkins examples validated OLVM-to-OpenStack in CI build 1395. Historica
 
 ## :material-book-open-page-variant-outline: Confirmed Gaps
 
-- OVA import instructions and appliance default credentials, networking, DNS, and TLS.
-- Appliance host sizing.
-- Exact endpoint, permission, and quota requirements.
+- OVA integrity can be validated, but the VMware import procedure and compatibility remain unconfirmed.
+- RC2 appliance sizing, first boot, console, network, port/TLS, and licensing behavior need controlled-environment validation.
+- Current RC2 endpoint field names, destination options, VMware API/CBT access, permissions, and VDDK compatibility need validation.
+- OpenStack API reachability, project API capabilities, quota, worker image/flavor/network, mappings, and temporary-worker connectivity need preflight.
 - Registry authentication and image availability.
 - Source dependency closure and digests.
 - Public-equivalent Kolla images.
@@ -107,9 +148,10 @@ No public/community product deployment artifact was found; the internal OVA publ
 ## :material-book-open-page-variant-outline: Next Gates
 
 1. Verify the RC2 download and SHA-256 checksum.
-2. Determine VMware import requirements and appliance sizing.
-3. Determine initial appliance access, networking, DNS, and TLS.
-4. Configure VMware and OpenStack endpoints.
-5. Migrate one minimal Linux VM.
-6. Validate the result and capture cleanup steps.
-7. Separately resolve private Git/registry source-build closure.
+2. Import the verified OVA to VMware using the local platform procedure; confirm the import procedure and compatibility.
+3. Establish RC2 sizing, first boot, console, network, port/TLS, and licensing behavior in a controlled environment.
+4. Confirm vCenter/ESXi API and CBT network access, permissions, and RC2 VDDK compatibility.
+5. Validate RC2 endpoint field names and destination-environment options rather than historical defaults.
+6. Preflight OpenStack APIs, project API capabilities, quota, worker image/flavor/network, mappings, and temporary-worker connectivity.
+7. Run one controlled Linux VMware-to-OpenStack migration, validate the result, and inspect cleanup.
+8. Separately resolve private Git/registry source-build closure and dependency work.
