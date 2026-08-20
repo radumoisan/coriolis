@@ -1,7 +1,7 @@
 # Terminology
 
 !!! abstract
-    Definitions for Coriolis appliance deployment and VMware-to-OpenStack migration.
+    Definitions for Coriolis appliance deployment and provider-based migration or replication.
 
 ## :material-book-open-page-variant-outline: Virtual Appliance And Coriolis Appliance
 
@@ -29,9 +29,15 @@ Import compatibility depends on the target hypervisor.
 | Deployed appliance | Imported and booted appliance VM. |
 | OVA import | Import of an OVA or OVF package into a supported hypervisor. |
 | OpenStack import provider | Coriolis migration component, unrelated to OVA import. |
-| Source / destination | Migration origin and target environments. |
+| Coriolis endpoint | Provider connection and its environment-specific configuration. |
+| Source environment | Origin environment from which Coriolis reads a workload. |
+| Destination environment | Target environment to which Coriolis deploys a workload. |
+| Migration worker / minion | Temporary provider VM used for transfer or morphing work. |
+| OSMorphing | Guest operating-system changes required for the destination platform. |
+| CBT | VMware Changed Block Tracking, used to identify changed disk blocks. |
+| VDDK | VMware Virtual Disk Development Kit, used for VMware virtual-disk access. |
 | Migration / replica | Migration moves a workload; replica synchronizes it for later deployment. |
 
 ## :material-book-open-page-variant-outline: Related Information
 
-[Discovery](discovery.md), [Appliance Runtime](appliance-runtime.md), and [Appliance Release](appliance-release-flow.md).
+[Discovery](discovery.md), [OpenStack Provider Reference](openstack-provider.md), [VMware Provider Reference](vmware-provider.md), [Appliance Runtime](appliance-runtime.md), and [Appliance Release](appliance-release-flow.md).

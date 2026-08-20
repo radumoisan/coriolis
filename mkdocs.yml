@@ -12,6 +12,8 @@ nav:
   - 📄 Home: index.md
   - 📄 Terminology: terminology.md
   - ⏳ Discovery: discovery.md
+  - ⏳ OpenStack Provider: openstack-provider.md
+  - ⏳ VMware Provider: vmware-provider.md
   - ⏳ Appliance Runtime: appliance-runtime.md
   - ⏳ Appliance Release: appliance-release-flow.md
 

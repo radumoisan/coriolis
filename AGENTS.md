@@ -15,6 +15,7 @@ Before the first inspection, debugging, or implementation tool call, classify th
 - For analysis, gather evidence with `explore` first, then delegate reasoning to `general`.
 - For active changes, delegate implementation to `general` when context is clear and instructions are not risky. The main agent may edit directly only when the work is trivial, urgent, or unsafe to delegate.
 - `explore` performs read-only discovery, including repository inspection, documentation review, pattern analysis, and observational diagnostics of remote environments. `general` performs active changes and external operations with side effects.
+- `/home/radu/Dev/cb-coriolis` is the single project root; all repositories live beneath it, nested repositories do not redefine it, and filesystem access outside it is prohibited and unnecessary.
 - The main agent may directly inspect only narrow follow-up paths tied to a known edit, verification step, or scoped task. It must not do broad discovery or active external work when delegation is appropriate.
 - The main agent retains responsibility for orchestration: review results, decide whether evidence is sufficient, choose follow-ups, and provide the final response.
 - Every delegation prompt must state the resolved absolute repository root; that the root and all descendants at any depth are allowed; that nested working directories do not redefine the root; that filesystem access outside the root is prohibited; and that recursive delegations must propagate these requirements. Include the exact target, objective, known constraints, relevant commands or files, safety limits, and expected behavior.
@@ -33,6 +34,11 @@ Before the first inspection, debugging, or implementation tool call, classify th
 
 - `docs/` is the MkDocs documentation source.
 - Keep documentation assets in `docs/assets/`.
+
+## Confluence Documentation
+
+- Use the authenticated Atlassian MCP server to query documentation in Confluence.
+- Use the `Coriolis Docs Support` space (key: `CDS`): `https://cloudbasedev.atlassian.net/wiki/spaces/CDS`.
 
 ## Student-Facing Documentation
 

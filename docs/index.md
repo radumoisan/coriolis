@@ -30,6 +30,14 @@ Appliance lifecycle tooling for build VMs, deployment, export, import, and testi
 
 Jenkins automation for appliance setup and migration validation.
 
+### :material-application-edit-outline: `coriolis-provider-openstack`
+
+OpenStack provider implementation for Coriolis source and destination workflows.
+
+### :material-application-edit-outline: `coriolis-provider-vmware`
+
+VMware vSphere provider implementation for Coriolis source and destination workflows.
+
 ## :material-book-open-page-variant-outline: Kubernetes And Helm
 
 **Observed:** no Coriolis Kubernetes or Helm deployment artifacts were found in the inspected repositories. The root chart packages this documentation site.
@@ -37,6 +45,10 @@ Jenkins automation for appliance setup and migration validation.
 ## :material-book-open-page-variant-outline: Documentation Map
 
 [Discovery](discovery.md): first-path evidence and gates.
+
+[OpenStack Provider Reference](openstack-provider.md): unvalidated local provider behavior.
+
+[VMware Provider Reference](vmware-provider.md): unvalidated local provider behavior.
 
 [Appliance Runtime](appliance-runtime.md): one snapshot and architecture.
 

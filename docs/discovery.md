@@ -15,8 +15,8 @@ See [Home](index.md) for the repository map and [Appliance Release](appliance-re
 
 - **Observed:** 2026 appliance documentation covers OpenStack image deployment, login, and initial sizing.
 - **Historical evidence:** 2019-2020 VMware and OpenStack provider documentation.
-- **Source evidence:** local build and deployment code.
-- **Unknown:** current RC2 VMware import compatibility and endpoint schema.
+- **Source evidence:** local build/deployment code and the OpenStack and VMware provider repositories.
+- **Unknown:** current RC2 appliance runtime compatibility, UI exposure, and provider behavior.
 
 - [Deploying the Coriolis appliance image](https://cloudbasedev.atlassian.net/wiki/spaces/CDS/pages/3526787074/Deploying+the+Coriolis+appliance+image) (2026-02)
 - [Coriolis Trial Appliance info](https://cloudbasedev.atlassian.net/wiki/spaces/COR/pages/595524/Coriolis+Trial+Appliance+info) (2026-04)
@@ -38,24 +38,24 @@ See [Home](index.md) for the repository map and [Appliance Release](appliance-re
 
 - vCenter/ESXi API access typically uses TCP 443; CBT candidates need TCP 902; names resolve.
 - First test: minimal Linux VM with ordinary virtual disks.
-- Raw and passthrough disks are unsupported for CBT.
+- CBT/VDDK does not support raw or passthrough disks. Local code has a datastore-HTTPS fallback for independent-persistent and multi-writer disks, but the VM must be powered off.
 - Relevant inventory, network, DVS, port-group, snapshot, and disk-read access is required.
 - Power and change-tracking access is configuration dependent.
 - Match VDDK to the ESXi version.
 
-**Unknown:** RC2 migration mode, CBT default, permissions, and VDDK compatibility.
+**Unknown:** RC2 migration mode, CBT default, permissions, and VDDK compatibility. See [VMware Provider Reference](vmware-provider.md).
 
 ## :material-book-open-page-variant-outline: OpenStack Destination Preflight
 
-Historical evidence: provider material identifies endpoint fields, API reachability/capabilities, mapped destination resources, temporary workers, and cleanup behavior; validate the RC2 UI and schema. It also states that Ceph, Swift, and Cinder Backup are not required.
+Historical and source evidence identify endpoint fields, API reachability/capabilities, mapped destination resources, temporary workers, and cleanup behavior; validate the RC2 UI and runtime behavior. Ceph and Swift are source export mechanisms, not requirements for an OpenStack destination-only flow.
 
 - Reach Keystone, Glance, Nova, Neutron, and Cinder.
 - Precreate mapped networks, security groups, final flavor, and volume types.
-- Provide a temporary worker cloud-init Linux image, flavor, migration network, and routing or floating IP; use a config drive where no metadata is available.
+- Provide a temporary worker image with cloud-init or Cloudbase-init as appropriate, flavor, migration network, and routing or floating IP; use a config drive where no metadata is available.
 - Permit list/create/delete operations for images, networks, security groups, flavors, keypairs, Cinder volumes, snapshots, ports, temporary VMs, and floating IPs.
 - Inspect residual snapshots after cleanup.
 
-**Unknown:** numeric quotas; plan for the final workload plus transient resources.
+**Unknown:** numeric quotas; plan for the final workload plus transient resources. See [OpenStack Provider Reference](openstack-provider.md).
 
 ## :material-book-open-page-variant-outline: Appliance Publication Research Snapshot
 
@@ -95,4 +95,4 @@ Build closure is separate scope.
 
 ## :material-book-open-page-variant-outline: Related Information
 
-[Home](index.md), [Terminology](terminology.md), [Appliance Runtime](appliance-runtime.md), and [Appliance Release](appliance-release-flow.md).
+[Home](index.md), [OpenStack Provider Reference](openstack-provider.md), [VMware Provider Reference](vmware-provider.md), [Terminology](terminology.md), [Appliance Runtime](appliance-runtime.md), and [Appliance Release](appliance-release-flow.md).

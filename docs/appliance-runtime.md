@@ -49,6 +49,8 @@ Conceptual grouping of the snapshot; host services are absent from `docker ps`.
 
 ### :material-application-edit-outline: Dedicated Application Repositories
 
+- `coriolis-provider-openstack` - local OpenStack provider implementation; provider framework remains in core.
+- `coriolis-provider-vmware` - local VMware vSphere provider implementation; provider framework remains in core.
 - `coriolis-web` - `cloudbase/coriolis-web`; source is not checked out locally.
 - `coriolis-licensing-server` - `cloudbase/coriolis-licensing-server`; source is not checked out locally.
 - `coriolis-metal-hub` - `cloudbase/coriolis-metal-hub`; server source is not checked out locally; `python-coriolismetalhubclient` is a separate client library.
