@@ -22,7 +22,8 @@ Separate current operator evidence, independent of the snapshot above.
 - All 26 approved images were mirrored to `cr.virtomat.io/virtomat/coriolis`, and all 21 initial-runtime image pulls passed in `virt-infra-dev-buc-hq` namespace `coriolis`.
 - The local API-only `core` slice is committed at `ab9df83` but not pushed or deployed; the deployed operator `0.5.3` remains marker-only.
 - The metadata-only helper slice (`appliance_resource_name`, `appliance_identity`, `build_resource_metadata`) is committed locally at `fbab6e5` but not pushed or deployed; 44 tests pass, and the deployed marker `0.5.3` is unchanged and carries no standard labels.
-- No core runtime workloads are implemented or deployed; the foundational resource contract is documented locally, and collision/migration behavior (a separate API-layer slice) is next.
+- The collision/migration marker API-layer slice is committed locally at `d8df00f` on `dev` but **not pushed or deployed** (70 unit tests pass; ConfigMap RBAC gains only `get`): reconciliation pre-reads the marker ConfigMap before SSA and normalizes a compatible legacy `0.5.2`/`0.5.3` marker in place, treating conflicting metadata as a `ResourceCollision` that is never patched/adopted/deleted/renamed. The deployed operator `0.5.3` remains marker-only and lacks these semantics.
+- No core runtime workloads are implemented or deployed; retained-resource adoption remains an unresolved authorization safety gate, and the Secret/configuration/storage/readiness contracts must be resolved before any MariaDB vertical slice.
 
 This section records current operator state and does not establish snapshot provenance or runtime readiness.
 
