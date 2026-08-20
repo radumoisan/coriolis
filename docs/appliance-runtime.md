@@ -20,8 +20,9 @@ Separate current operator evidence, independent of the snapshot above.
 
 - RC4 is blocked/OVA-only for Kubernetes; the approved fallback is exact official release `2603.4`.
 - All 26 approved images were mirrored to `cr.virtomat.io/virtomat/coriolis`, and all 21 initial-runtime image pulls passed in `virt-infra-dev-buc-hq` namespace `coriolis`.
-- The local API-only `core` slice is implemented but uncommitted and not deployed; the deployed operator `0.5.3` remains marker-only.
-- No core runtime workloads are implemented or deployed; foundational resource contracts/construction is the next milestone.
+- The local API-only `core` slice is committed at `ab9df83` but not pushed or deployed; the deployed operator `0.5.3` remains marker-only.
+- The metadata-only helper slice (`appliance_resource_name`, `appliance_identity`, `build_resource_metadata`) is committed locally at `fbab6e5` but not pushed or deployed; 44 tests pass, and the deployed marker `0.5.3` is unchanged and carries no standard labels.
+- No core runtime workloads are implemented or deployed; the foundational resource contract is documented locally, and collision/migration behavior (a separate API-layer slice) is next.
 
 This section records current operator state and does not establish snapshot provenance or runtime readiness.
 
