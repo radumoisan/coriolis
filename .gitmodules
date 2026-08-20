@@ -1,0 +1,21 @@
+[submodule "coriolis-cd"]
+	path = coriolis-cd
+	url = git@bitbucket.org:cloudbase/coriolis-cd.git
+[submodule "coriolis-ci"]
+	path = coriolis-ci
+	url = git@bitbucket.org:cloudbase/coriolis-ci.git
+[submodule "coriolis-docker"]
+	path = coriolis-docker
+	url = git@bitbucket.org:cloudbase/coriolis-docker.git
+[submodule "coriolis-provider-openstack"]
+	path = coriolis-provider-openstack
+	url = git@bitbucket.org:cloudbase/coriolis-provider-openstack.git
+[submodule "coriolis-provider-vmware"]
+	path = coriolis-provider-vmware
+	url = git@bitbucket.org:cloudbase/coriolis-provider-vmware.git
+[submodule "coriolis-oss"]
+	path = coriolis-oss
+	url = git@github.com:radumoisan/coriolis-oss.git
+[submodule "python-coriolismetalhubclient"]
+	path = python-coriolismetalhubclient
+	url = git@bitbucket.org:cloudbase/python-coriolismetalhubclient.git
