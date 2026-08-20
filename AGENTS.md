@@ -11,21 +11,22 @@ Before the first inspection, debugging, or implementation tool call, classify th
 
 ## Task Routing And Delegation
 
-- For discovery, delegate the first pass to `explore`.
-- For analysis, gather evidence with `explore` first, then delegate reasoning to `general`.
-- For active changes, delegate implementation to `general` when context is clear and instructions are not risky. The main agent may edit directly only when the work is trivial, urgent, or unsafe to delegate.
-- `explore` performs read-only discovery, including repository inspection, documentation review, pattern analysis, and observational diagnostics of remote environments. `general` performs active changes and external operations with side effects.
+- The only roles are `main agent` and `subagent`. "Calling agent" means the main agent.
+- Only the main agent may delegate. Each subagent performs only its assigned bounded task and must never delegate or spawn other agents.
+- Only the main agent routes work: for discovery, it may delegate the first pass to `explore`; for analysis, it may gather evidence with `explore` then delegate reasoning to `general`; for active changes, it may delegate implementation to `general` when context is clear and instructions are not risky. This does not require delegating the entire user task. The main agent may edit directly only when work is trivial, urgent, or unsafe to delegate.
+- `explore` subagents perform read-only discovery, including repository inspection, documentation review, pattern analysis, and observational diagnostics of remote environments. `general` subagents perform active changes and external operations with side effects.
 - `/home/radu/Dev/cb-coriolis` is the single project root; all repositories live beneath it, nested repositories do not redefine it, and filesystem access outside it is prohibited and unnecessary.
 - The main agent may directly inspect only narrow follow-up paths tied to a known edit, verification step, or scoped task. It must not do broad discovery or active external work when delegation is appropriate.
-- The main agent retains responsibility for orchestration: review results, decide whether evidence is sufficient, choose follow-ups, and provide the final response.
-- Every delegation prompt must state the resolved absolute repository root; that the root and all descendants at any depth are allowed; that nested working directories do not redefine the root; that filesystem access outside the root is prohibited; and that recursive delegations must propagate these requirements. Include the exact target, objective, known constraints, relevant commands or files, safety limits, and expected behavior.
-- Delegate the smallest safe unit. Do not ask sub-agents to guess targets, credentials, command syntax, deployment details, or environment assumptions. Run independent delegations in parallel and dependent work sequentially.
+- The main agent retains decomposition, integration, ambiguity and risk decisions, user communication, and the final response.
+- Every delegation prompt must identify the recipient as a subagent and state that no further delegation is allowed. It must state the resolved absolute repository root; that the root and all descendants at any depth are allowed; that nested working directories do not redefine the root; that filesystem access outside the root is prohibited; the exact target, objective, known constraints, relevant commands or files, safety limits, and expected behavior.
+- Decompose work with subagent capability and context limits in mind: scope small, independently reviewable objectives, and do not delegate an entire user request or large undivided chunk when practical decomposition exists. Do not ask subagents to guess targets, credentials, command syntax, deployment details, or environment assumptions. Run independent delegations in parallel and dependent work sequentially.
+- After every `general` subagent result, the main agent must perform a lightweight sanity review before accepting it, choosing follow-ups, or completing the task. Inspect the relevant diff, output, or state and run one targeted practical check without duplicating the full assignment.
 - Request concise factual results: inspected or changed files, commands run, important output, errors, and current state.
 
 ## Execution And Safety
 
 - Use targeted searches for symbols, filenames, commands, or keywords; avoid loading broad references unless necessary.
-- After a manageable failure caused by syntax, quoting, missing tools, or minor environment mismatch, a sub-agent may make a small number of clear, low-risk corrective attempts.
+- After a manageable failure caused by syntax, quoting, missing tools, or minor environment mismatch, a subagent may make a small number of clear, low-risk corrective attempts only within its assigned scope.
 - Stop and report exact failures when errors indicate permissions, unexpected state, unclear prompts, target ambiguity, or side-effect risk. Do not make environment assumptions or continue repeated failures without corrected instructions.
 - Protect secrets: never print, log, echo, or expose their values. Prefer non-interactive secret handling and avoid prompts that may reveal them.
 - Failure reports must include the attempted action or command, exact error, corrective attempts, relevant output, and observed state. The main agent reviews failures before proceeding.
@@ -62,7 +63,7 @@ The rules in this section apply only to student-facing documentation under `docs
 
 ## Git
 
-When the user requests a commit under this repository's required commit-and-publish workflow, delegate execution to a `general` sub-agent and run `git add`, `git commit`, `git pull --rebase`, then `git push`, each with appropriate arguments and only after the preceding command succeeds.
+In this repository, any user request to commit, run `git commit`, or create a commit authorizes and requires the full commit-and-publish workflow unless the user explicitly says not to push. The main agent must first inspect and review the intended changes, then delegate execution to a `general` subagent to run `git add`, `git commit`, `git pull --rebase`, then `git push`, each with appropriate arguments and only after the preceding command succeeds. Accept delegated execution only after the mandatory `general`-subagent sanity review.
 
 ## CI And Release Versioning
 
