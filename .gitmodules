@@ -19,3 +19,6 @@
 [submodule "python-coriolismetalhubclient"]
 	path = python-coriolismetalhubclient
 	url = git@bitbucket.org:cloudbase/python-coriolismetalhubclient.git
+[submodule "coriolis-operator"]
+	path = coriolis-operator
+	url = git@github.com:radumoisan/coriolis-operator.git
