@@ -14,7 +14,7 @@
         <link rel="prev" href="../terminology/">
       
       
-        <link rel="next" href="../appliance-runtime/">
+        <link rel="next" href="../openstack-provider/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -376,6 +376,46 @@
   
   
     <li class="md-nav__item">
+      <a href="../openstack-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ⏳ OpenStack Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vmware-provider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ⏳ VMware Provider
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../appliance-runtime/" class="md-nav__link">
         
   
@@ -546,9 +586,9 @@
 <ul>
 <li><strong>Observed:</strong> 2026 appliance documentation covers OpenStack image deployment, login, and initial sizing.</li>
 <li><strong>Historical evidence:</strong> 2019-2020 VMware and OpenStack provider documentation.</li>
-<li><strong>Source evidence:</strong> local build and deployment code.</li>
+<li><strong>Source evidence:</strong> local build/deployment code and the OpenStack and VMware provider repositories.</li>
 <li>
-<p><strong>Unknown:</strong> current RC2 VMware import compatibility and endpoint schema.</p>
+<p><strong>Unknown:</strong> current RC2 appliance runtime compatibility, UI exposure, and provider behavior.</p>
 </li>
 <li>
 <p><a href="https://cloudbasedev.atlassian.net/wiki/spaces/CDS/pages/3526787074/Deploying+the+Coriolis+appliance+image">Deploying the Coriolis appliance image</a> (2026-02)</p>
@@ -571,22 +611,22 @@
 <ul>
 <li>vCenter/ESXi API access typically uses TCP 443; CBT candidates need TCP 902; names resolve.</li>
 <li>First test: minimal Linux VM with ordinary virtual disks.</li>
-<li>Raw and passthrough disks are unsupported for CBT.</li>
+<li>CBT/VDDK does not support raw or passthrough disks. Local code has a datastore-HTTPS fallback for independent-persistent and multi-writer disks, but the VM must be powered off.</li>
 <li>Relevant inventory, network, DVS, port-group, snapshot, and disk-read access is required.</li>
 <li>Power and change-tracking access is configuration dependent.</li>
 <li>Match VDDK to the ESXi version.</li>
 </ul>
-<p><strong>Unknown:</strong> RC2 migration mode, CBT default, permissions, and VDDK compatibility.</p>
+<p><strong>Unknown:</strong> RC2 migration mode, CBT default, permissions, and VDDK compatibility. See <a href="../vmware-provider/">VMware Provider Reference</a>.</p>
 <h2 id="openstack-destination-preflight"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> OpenStack Destination Preflight<a class="headerlink" href="#openstack-destination-preflight" title="Permanent link">&para;</a></h2>
-<p>Historical evidence: provider material identifies endpoint fields, API reachability/capabilities, mapped destination resources, temporary workers, and cleanup behavior; validate the RC2 UI and schema. It also states that Ceph, Swift, and Cinder Backup are not required.</p>
+<p>Historical and source evidence identify endpoint fields, API reachability/capabilities, mapped destination resources, temporary workers, and cleanup behavior; validate the RC2 UI and runtime behavior. Ceph and Swift are source export mechanisms, not requirements for an OpenStack destination-only flow.</p>
 <ul>
 <li>Reach Keystone, Glance, Nova, Neutron, and Cinder.</li>
 <li>Precreate mapped networks, security groups, final flavor, and volume types.</li>
-<li>Provide a temporary worker cloud-init Linux image, flavor, migration network, and routing or floating IP; use a config drive where no metadata is available.</li>
+<li>Provide a temporary worker image with cloud-init or Cloudbase-init as appropriate, flavor, migration network, and routing or floating IP; use a config drive where no metadata is available.</li>
 <li>Permit list/create/delete operations for images, networks, security groups, flavors, keypairs, Cinder volumes, snapshots, ports, temporary VMs, and floating IPs.</li>
 <li>Inspect residual snapshots after cleanup.</li>
 </ul>
-<p><strong>Unknown:</strong> numeric quotas; plan for the final workload plus transient resources.</p>
+<p><strong>Unknown:</strong> numeric quotas; plan for the final workload plus transient resources. See <a href="../openstack-provider/">OpenStack Provider Reference</a>.</p>
 <h2 id="appliance-publication-research-snapshot"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Appliance Publication Research Snapshot<a class="headerlink" href="#appliance-publication-research-snapshot" title="Permanent link">&para;</a></h2>
 <p><strong>Observed during research; current availability is unknown.</strong></p>
 <ul>
@@ -621,7 +661,7 @@
 </ol>
 <p>Build closure is separate scope.</p>
 <h2 id="related-information"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m19 1-5 5v11l5-4.5V1m2 4v13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V6c-1.45-1.1-3.55-1.5-5.5-1.5-1.95 0-4.05.4-5.5 1.5v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1M10 18.41C8.75 18.09 7.5 18 6.5 18c-1.06 0-2.32.19-3.5.5V7.13c.91-.4 2.14-.63 3.5-.63 1.36 0 2.59.23 3.5.63v11.28Z"/></svg></span> Related Information<a class="headerlink" href="#related-information" title="Permanent link">&para;</a></h2>
-<p><a href="../">Home</a>, <a href="../terminology/">Terminology</a>, <a href="../appliance-runtime/">Appliance Runtime</a>, and <a href="../appliance-release-flow/">Appliance Release</a>.</p>
+<p><a href="../">Home</a>, <a href="../openstack-provider/">OpenStack Provider Reference</a>, <a href="../vmware-provider/">VMware Provider Reference</a>, <a href="../terminology/">Terminology</a>, <a href="../appliance-runtime/">Appliance Runtime</a>, and <a href="../appliance-release-flow/">Appliance Release</a>.</p>
 
 
 
