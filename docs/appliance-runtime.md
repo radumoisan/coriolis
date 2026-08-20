@@ -14,6 +14,17 @@ hide:
 - **Source evidence:** local deployment roles and configuration.
 - **Unknown:** relation to RC2, source commits, digests, build history, and runtime readiness.
 
+## :material-book-open-page-variant-outline: Operator Status
+
+Separate current operator evidence, independent of the snapshot above.
+
+- RC4 is blocked/OVA-only for Kubernetes; the approved fallback is exact official release `2603.4`.
+- All 26 approved images were mirrored to `cr.virtomat.io/virtomat/coriolis`, and all 21 initial-runtime image pulls passed in `virt-infra-dev-buc-hq` namespace `coriolis`.
+- The local API-only `core` slice is implemented but uncommitted and not deployed; the deployed operator `0.5.3` remains marker-only.
+- No core runtime workloads are implemented or deployed; foundational resource contracts/construction is the next milestone.
+
+This section records current operator state and does not establish snapshot provenance or runtime readiness.
+
 ## :material-book-open-page-variant-outline: Runtime Architecture
 
 ```text
