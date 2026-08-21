@@ -22,3 +22,6 @@
 [submodule "coriolis-operator"]
 	path = coriolis-operator
 	url = git@github.com:radumoisan/coriolis-operator.git
+[submodule "coriolis-web"]
+	path = coriolis-web
+	url = git@github.com:cloudbase/coriolis-web.git
