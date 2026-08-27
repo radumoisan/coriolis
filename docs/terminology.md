@@ -1,43 +1,26 @@
 # Terminology
 
 !!! abstract
-    Definitions for Coriolis appliance deployment and provider-based migration or replication.
+    Definitions for the current OpenStack-to-OpenStack Coriolis documentation path.
 
-## :material-book-open-page-variant-outline: Virtual Appliance And Coriolis Appliance
+For component roles, see [Coriolis Architecture](architecture.md). For the execution sequence, see [Migration Flow](migration-flow.md). For Kubernetes deployment and lifecycle, see [Coriolis Operator](operator.md). For platform-specific behavior, see [OpenStack Context](openstack-provider.md).
 
-A **virtual appliance** is a prebuilt VM containing an operating system, application, and configuration.
-
-A **Coriolis appliance** is a VM running Coriolis and its support containers.
-
-## :material-book-open-page-variant-outline: OVA
-
-An **OVA** is an archive containing an OVF descriptor and virtual disks, commonly VMDK files; it is not directly executable. A checksum verifies integrity only when its source is trusted.
-
-### :material-application-edit-outline: OVA Lifecycle
-
-`base template -> build VM -> OVA -> verified import -> deployed appliance`
-
-Import compatibility depends on the target hypervisor.
-
-## :material-book-open-page-variant-outline: Terms Often Confused
+## :material-book-open-page-variant-outline: Glossary
 
 | Term | Definition |
 | --- | --- |
-| Base appliance template | Starting VMware template for an appliance build. |
-| Appliance build VM | Configured template clone before export. |
-| OVA artifact | Distributable archive exported from a build VM. |
-| Deployed appliance | Imported and booted appliance VM. |
-| OVA import | Import of an OVA or OVF package into a supported hypervisor. |
-| OpenStack import provider | Coriolis migration component, unrelated to OVA import. |
-| Coriolis endpoint | Provider connection and its environment-specific configuration. |
-| Source environment | Origin environment from which Coriolis reads a workload. |
-| Destination environment | Target environment to which Coriolis deploys a workload. |
-| Migration worker / minion | Temporary provider VM used for transfer or morphing work. |
-| OSMorphing | Guest operating-system changes required for the destination platform. |
-| CBT | VMware Changed Block Tracking, used to identify changed disk blocks. |
-| VDDK | VMware Virtual Disk Development Kit, used for VMware virtual-disk access. |
-| Migration / replica | Migration moves a workload; replica synchronizes it for later deployment. |
-
-## :material-book-open-page-variant-outline: Related Information
-
-[Discovery](discovery.md), [OpenStack Provider Reference](openstack-provider.md), [VMware Provider Reference](vmware-provider.md), [Appliance Runtime](appliance-runtime.md), and [Appliance Release](appliance-release-flow.md).
+| **Coriolis runtime** | The Coriolis migration services, supporting services, and configuration that run the product. The runtime performs migration work. |
+| **`CoriolisAppliance`** | A namespaced Kubernetes custom resource watched by the Coriolis Operator. It declares a desired Kubernetes-hosted Coriolis runtime; the operator manages that runtime. |
+| **Endpoint** | A provider connection and its environment-specific configuration. Endpoints identify where Coriolis reads source workloads or writes destination resources. |
+| **Source environment** | The environment that contains the workload and disk data Coriolis reads. |
+| **Destination environment** | The environment where Coriolis prepares transferred disk state and creates the destination VM. |
+| **Provider plugin** | A platform-specific component that implements endpoint, export, and import operations. |
+| **Migration** | A move workflow. A migration transfer prepares workload data for a move to the destination environment. |
+| **Replica** | Destination disk state maintained by a replica transfer. A replica transfer can run again later to synchronize newer source data. |
+| **Transfer** | An execution that copies or synchronizes workload disks between endpoints. Completing a transfer makes disk state available but does not create a destination VM. |
+| **Deployment** | A separate execution that uses transferred disk state to prepare destination resources and create the destination VM. |
+| **Worker service** | A Coriolis service that registers provider capabilities and runs migration tasks. |
+| **Minion** | A pool-managed Worker service instance that Minion Manager allocates for a task. |
+| **Minion pool** | A configured set of Minions from which Minion Manager allocates task capacity. |
+| **Temporary worker VM** | An operation-scoped VM created directly by an OpenStack provider plugin for export, disk copy, or OS morphing. It is not necessarily a Minion. |
+| **OS morphing** | Optional offline guest operating-system changes that adapt a disk for the destination environment during deployment. |

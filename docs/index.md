@@ -1,57 +1,27 @@
 # Coriolis
 
 !!! abstract
-    Coriolis migrates workloads. Its repositories separate product source, appliance assembly, delivery, and CI.
+    Coriolis is a workload migration product. This documentation initially focuses on OpenStack-to-OpenStack migrations.
 
-## :material-book-open-page-variant-outline: How The Repositories Work Together
+## :material-book-open-page-variant-outline: What Coriolis Does
 
-Repository relationship summary, not a dependency graph.
+Coriolis provides a Web UI and API for defining endpoints, transfers, and deployments. Its control services coordinate work, Worker services run migration tasks, and provider plugins implement platform-specific operations.
 
-```text
-Build and delivery flow
-Coriolis source -> packaging/deployment -> appliance lifecycle -> CI validation
-```
+The Kubernetes operator is separate from the migration product. It reconciles a `CoriolisAppliance` resource into a Kubernetes-hosted Coriolis runtime and its dependencies; it does not replace the product's migration services.
 
-## :material-book-open-page-variant-outline: Repository Roles
+## :material-book-open-page-variant-outline: Current Scope
 
-### :material-application-edit-outline: `coriolis-oss`
+OpenStack is the initial documentation focus. OpenStack provider plugins implement source export and destination import operations.
 
-Product source for Coriolis APIs, workflows, workers, schedulers, and provider integrations.
+!!! warning
+    End-to-end OpenStack-to-OpenStack migration validation remains pending. This documentation describes the implemented architecture, not a production-readiness claim.
 
-### :material-application-edit-outline: `coriolis-docker`
+## :material-book-open-page-variant-outline: Architecture
 
-Docker and Ansible packaging and deployment for Coriolis and selected support services.
+Learn how the product services, provider plugins, supporting services, and Kubernetes operator fit together in the [Coriolis Architecture](architecture.md).
 
-### :material-application-edit-outline: `coriolis-cd`
+Follow the [Migration Flow](migration-flow.md) from endpoint definition through separate transfer and deployment executions.
 
-Appliance lifecycle tooling for build VMs, deployment, export, import, and testing.
+See the [Coriolis Operator](operator.md) for its Kubernetes lifecycle scope, validated boundaries, and current limitations.
 
-### :material-application-edit-outline: `coriolis-ci`
-
-Jenkins automation for appliance setup and migration validation.
-
-### :material-application-edit-outline: `coriolis-provider-openstack`
-
-OpenStack provider implementation for Coriolis source and destination workflows.
-
-### :material-application-edit-outline: `coriolis-provider-vmware`
-
-VMware vSphere provider implementation for Coriolis source and destination workflows.
-
-## :material-book-open-page-variant-outline: Kubernetes And Helm
-
-**Observed:** no Coriolis Kubernetes or Helm deployment artifacts were found in the inspected repositories. The root chart packages this documentation site.
-
-## :material-book-open-page-variant-outline: Documentation Map
-
-[Discovery](discovery.md): first-path evidence and gates.
-
-[OpenStack Provider Reference](openstack-provider.md): unvalidated local provider behavior.
-
-[VMware Provider Reference](vmware-provider.md): unvalidated local provider behavior.
-
-[Appliance Runtime](appliance-runtime.md): one snapshot and architecture.
-
-[Appliance Release](appliance-release-flow.md): implementation lifecycle.
-
-[Terminology](terminology.md): definitions.
+Prepare the two-cloud prerequisites described in the [OpenStack Context](openstack-provider.md), and use the focused [Terminology](terminology.md) when terms need clarification.

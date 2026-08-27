@@ -1,5 +1,5 @@
 site_name: Coriolis Documentation
-site_description: Documentation for the Coriolis repository family.
+site_description: Documentation for the Coriolis workload migration product and Kubernetes operator.
 
 theme:
   name: material
@@ -9,13 +9,12 @@ theme:
     - content.code.copy
 
 nav:
-  - 📄 Home: index.md
+  - 📋 Overview: index.md
+  - 📋 Coriolis Architecture: architecture.md
+  - 📋 Migration Flow: migration-flow.md
+  - 📋 Coriolis Operator: operator.md
+  - ⏳ OpenStack Context: openstack-provider.md
   - 📄 Terminology: terminology.md
-  - ⏳ Discovery: discovery.md
-  - ⏳ OpenStack Provider: openstack-provider.md
-  - ⏳ VMware Provider: vmware-provider.md
-  - ⏳ Appliance Runtime: appliance-runtime.md
-  - ⏳ Appliance Release: appliance-release-flow.md
 
 markdown_extensions:
   - tables

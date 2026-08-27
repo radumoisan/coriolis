@@ -1,99 +1,62 @@
-# OpenStack Provider Reference
+# OpenStack Context
 
 !!! abstract
-    Unvalidated reference derived from local OpenStack provider source. It covers OpenStack source and destination workflows for migrations and replicas; validate appliance runtime behavior before use.
+    This page covers the initial OpenStack-to-OpenStack migration path. A transfer copies or synchronizes disks; deployment is a separate step described in [Migration Flow](migration-flow.md).
 
-## :material-book-open-page-variant-outline: Connection
+## :material-book-open-page-variant-outline: Current Scope
 
-The local provider platform ID is `openstack`.
+Use this guidance to prepare one source workload and its destination resources. It is not an exhaustive provider reference or a production-readiness claim.
 
-| Setting | Source-code evidence |
+See [Terminology](terminology.md) for definitions used on this page.
+
+## :material-book-open-page-variant-outline: Cloud Prerequisites
+
+Connect both endpoints with project-scoped permissions required by the selected transfer and deployment path and permitted by cloud policy. The identity and policy model is cloud-specific, but the project must allow Coriolis to perform the required read and lifecycle actions on the resources below.
+
+| Service | Required access for the selected path |
 | --- | --- |
-| Required direct fields | `identity_api_version` (`2` or `3`), `username`, `password`, `project_name`, and `auth_url` |
-| Optional identity scope | User and project domain name or ID |
-| Image service | Glance API version `1` or `2` |
-| Endpoint selection | Global or per-service region and interface |
-| TLS behavior | `allow_untrusted` and `allow_untrusted_swift` |
-| Secret alternative | `secret_ref` instead of direct connection values; its semantics depend on installed appliance support |
+| Nova | Read the source instance and attachments; create, inspect, and remove temporary worker VMs and create the destination Nova server during deployment. |
+| Neutron | Read source and destination networking; create, inspect, attach, and remove temporary worker VM ports or destination ports and floating IPs when used. |
+| Glance | Read source images and temporary worker VM images; create and remove temporary images when the path requires them. |
+| Cinder | Read source volumes and create, attach, snapshot, clone, back up, and remove volumes as required by the selected disk path. |
 
-```json
-{
-  "identity_api_version": 3,
-  "auth_url": "https://<identity-host>/v3",
-  "username": "<username>",
-  "password": "<secret-managed-value>",
-  "project_name": "<project-name>",
-  "region_name": "<region>"
-}
-```
+Verify that the source and destination projects expose the selected images, networks, flavors, volume types, security groups, keypairs, and availability zones. Shared resources are usable only when visible to the endpoint project.
+
+## :material-book-open-page-variant-outline: Source Disk Access
+
+First decide whether the transfer is a migration or a repeatable replica, because their source disk-access prerequisites differ. The source boot method further limits the usable path.
+
+| Source disk path | When it applies | Access and temporary resources |
+| --- | --- | --- |
+| Cinder backup through object storage | Replica of Cinder-backed disks | Requires Cinder backup access and object-storage access. |
+| Ceph-backed Cinder backup or snapshot | Replica of Cinder-backed disks | Requires Cinder snapshot or backup access plus Coriolis Worker service reachability to the source Ceph cluster. |
+| Temporary source worker VM | Migration path or selected replica path; required for a Glance-rooted replica source | Creates source snapshots and temporary storage resources, then uses a temporary worker VM to export disk data. |
+
+A Glance-rooted instance has an image root disk. For a volume-backed instance, exactly one attached Cinder volume must be marked bootable for normal source inventory and export. Select the disk path before requesting permissions or connectivity.
+
+## :material-book-open-page-variant-outline: Destination Mappings
+
+Prepare and confirm the required destination resources, mappings, quotas, and visibility before validation.
+
+1. Map every source network interface to a destination Neutron network. A missing mapping for any source interface prevents deployment.
+2. Confirm each mapped network can support the intended ports, security groups, and IP behavior. Preserving an address requires a compatible destination subnet.
+3. Select visible destination storage for every required disk where storage placement is needed.
+4. Confirm any selected destination flavor, security groups, keypair, server group, or floating-IP pool already exists and is visible.
+
+Deployment creates the destination VM. See [Migration Flow](migration-flow.md#lifecycle) for the execution boundary.
+
+## :material-book-open-page-variant-outline: Temporary Worker VMs And Connectivity
+
+The selected path can create temporary export, disk-copy, or operating-system-morphing worker VMs. These provider-created VMs are distinct from the Coriolis Worker service. Before starting, provide a visible temporary worker VM image, network, and flavor on each side that needs a temporary worker VM. If temporary worker VMs boot from volumes, the required volume type must also be visible.
+
+Temporary worker VM images must initialize on first boot. Use an image with the appropriate initialization support, and use a configuration drive where cloud metadata is unavailable. Ensure security controls permit the Coriolis runtime to reach OpenStack APIs and each temporary worker VM over the required management and data paths. For Ceph-based source access, the Coriolis Worker service also needs a route to the source Ceph cluster.
+
+## :material-book-open-page-variant-outline: Cleanup And Validation
+
+1. Validate endpoint API access, source disk access, resource visibility, per-network mappings, and temporary worker VM initialization before a workload transfer.
+2. Run a small controlled transfer, then separately deploy and verify the destination VM, disks, and networking.
+3. Confirm cleanup of temporary worker VMs, ports, floating IPs, snapshots, cloned volumes, backups, and temporary images created by the selected path.
+4. Do not classify the destination VM, its disks, or its intended network resources as temporary artifacts.
 
 !!! warning
-    Validate the installed release before relying on schema defaults. Local code and schema text differ for the Glance API and Swift TLS verification defaults.
-
-## :material-book-open-page-variant-outline: OpenStack Source
-
-The export provider supports migration and replica workflows. Replica export mechanisms have distinct constraints:
-
-| Mechanism | Source-code evidence |
-| --- | --- |
-| `swift_backups` | Requires Cinder-backed volumes and uses Cinder backups stored in Swift. |
-| `ceph_backups` | Requires Cinder-backed volumes and Ceph access. |
-| `ceph_snapshots` | Requires Cinder-backed volumes and Ceph access. |
-| `coriolis_backups` | The only mechanism for Glance-booted instances; uses temporary source export workers. |
-
-Ceph mechanisms require RADOS connectivity from Coriolis and appropriate read access. Confirm the needed access in the target cloud rather than treating this reference as an exhaustive permission list.
-
-Coriolis export workers require pre-existing image, network, and flavor resources. Config drive, floating IP, boot-from-volume behavior, volume type, and volume size are optional worker settings.
-
-```json
-{
-  "replica_export_mechanism": "<replica-export-mechanism>",
-  "export_image": "<export-image>",
-  "export_network": "<export-network>",
-  "export_flavor_name": "<export-flavor-name>"
-}
-```
-
-## :material-book-open-page-variant-outline: OpenStack Destination
-
-`network_map`, `migr_network`, and `migr_flavor_name` are required. `migr_network` and `migr_flavor_name` configure temporary migration workers.
-
-```json
-{
-  "network_map": {
-    "<source-network>": "<destination-network>"
-  },
-   "migr_network": "<worker-network>",
-   "migr_flavor_name": "<worker-flavor>",
-   "migr_image_map": {
-    "linux": "<linux-worker-image>",
-    "windows": "<windows-worker-image>"
-   }
- }
-```
-
-Optional destination settings cover storage and security groups; final flavor, keypair, server group, fixed or floating IP, availability zone, config drive, disk bus, and machine type. The final flavor may be omitted for automatic minimum-viable selection.
-
-Port policies are `keep_mac`, `reuse_ports`, and `replace_mac`. A fixed IP needs a suitable subnet and CIDR. Security groups cannot be requested on a network with port security disabled. Final-instance tags allow at most 50 entries; each is at most 60 characters and cannot contain `/` or `,`.
-
-## :material-book-open-page-variant-outline: Workers And Minions
-
-Worker images must already exist and use cloud-init or Cloudbase-init as appropriate. The worker network must be project-visible, shared, or external, and it must be routable when no floating IP is used. Requested volume types must exist, and volume size must be positive.
-
-The provider also exposes source and destination minion-pool support. Validate pool schema and appliance UI support against the installed release before relying on it for a migration or replica.
-
-## :material-book-open-page-variant-outline: Validation And Cleanup
-
-1. Validate credentials, service reachability, resource visibility, mappings, and temporary-worker connectivity in the installed appliance.
-2. Run a controlled minimal workload and validate the deployed guest, disks, and networking.
-3. Confirm removal of temporary source export artifacts, including artifacts created by the selected export mechanism.
-4. Confirm cleanup of destination workers and their temporary ports, floating IPs, images, volumes, snapshots, and related resources without treating final workload resources as temporary.
-
-!!! warning
-    Local implementation uses HTTPS transfer TCP/5566, while current target schema text describes TCP/4433. Do not open a port from this reference until verifying the installed provider release.
-
-## :material-book-open-page-variant-outline: Evidence
-
-**Source-code evidence:** `coriolis-provider-openstack/coriolis_provider_openstack/common.py`, `exp.py`, `imp.py`, `replica_syncers.py`, and the provider schemas under `coriolis-provider-openstack/`.
-
-**Historical supporting evidence:** [OpenStack Coriolis plugin](https://cloudbasedev.atlassian.net/wiki/spaces/COR/pages/1840996/OpenStack+Coriolis+plugin). Historical documentation is not runtime confirmation.
+    OpenStack provider qualification and end-to-end migration validation remain pending. Verify the installed release and your cloud policies with a controlled workload before relying on this path.
