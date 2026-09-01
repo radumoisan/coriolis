@@ -25,3 +25,9 @@
 [submodule "coriolis-web"]
 	path = coriolis-web
 	url = git@github.com:cloudbase/coriolis-web.git
+[submodule "coriolis-logger"]
+	path = coriolis-logger
+	url = git@github.com:cloudbase/coriolis-logger.git
+[submodule "coriolis-logs-api-adaptor"]
+	path = coriolis-logs-api-adaptor
+	url = git@github.com:radumoisan/coriolis-logs-api-adaptor.git

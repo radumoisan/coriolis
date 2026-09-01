@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""Create one guarded, unexecuted Coriolis live-migration transfer."""
+
+import argparse
+import json
+import sys
+import urllib.error
+import urllib.request
+
+
+SOURCE_ENDPOINT = "c09be736-e04b-424d-bee8-e477d4b9ecab"
+DESTINATION_ENDPOINT = "0067286c-656c-4d7d-b6b8-96f475238172"
+INSTANCE = "2d4a485c-560e-4abc-b3d2-f41d0b25c82a"
+NOTES = "coriolis-m7-20260828T031125Z"
+
+TRANSFER = {
+    "transfer": {
+        "scenario": "live_migration",
+        "origin_endpoint_id": SOURCE_ENDPOINT,
+        "destination_endpoint_id": DESTINATION_ENDPOINT,
+        "instances": [INSTANCE],
+        "source_environment": {"replica_export_mechanism": "swift_backups"},
+        "destination_environment": {
+            "migr_image_map": {"linux": "b480e10c-edc9-400a-8b70-49883cb68392"},
+            "migr_network": "8b1d447d-a1f4-4bd1-bc47-6e3b79cb0389",
+            "migr_flavor_name": "c1.small",
+            "migr_worker_use_fip": True,
+            "migr_fip_pool_name": "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c",
+            "migr_worker_volume_type": "__DEFAULT__",
+            "security_groups": ["coriolis-m7-ssh-20260828T031125Z"],
+            "keypair_name": "coriolis-m7-20260828T031125Z",
+            "use_floating_ip": True,
+            "floating_ip_pool": "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c",
+            "preserve_fixed_ips": False,
+        },
+        "network_map": {"ext_net_gts": "8b1d447d-a1f4-4bd1-bc47-6e3b79cb0389"},
+        "storage_mappings": {
+            "default": "__DEFAULT__",
+            "backend_mappings": [{"source": "rbd1", "destination": "__DEFAULT__"}],
+        },
+        "clone_disks": True,
+        "skip_os_morphing": True,
+        "notes": NOTES,
+    }
+}
+
+
+def output(**fields):
+    for key, value in fields.items():
+        if isinstance(value, bool):
+            value = str(value).lower()
+        print(f"{key}={value}")
+
+
+def category(status):
+    if status in (400, 401, 403, 404, 409, 422):
+        return "api_rejected"
+    if status >= 500:
+        return "api_server_error"
+    return "api_error"
+
+
+def request(url, method="GET", token=None, body=None):
+    headers = {"Accept": "application/json"}
+    if token:
+        headers["X-Auth-Token"] = token
+    if body is not None:
+        headers["Content-Type"] = "application/json"
+        body = json.dumps(body, separators=(",", ":")).encode("ascii")
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
+    with urllib.request.urlopen(req, timeout=30) as response:
+        data = response.read()
+        return response.status, json.loads(data) if data else {}
+
+
+def authenticate(keystone_url, password):
+    body = {
+        "auth": {
+            "identity": {
+                "methods": ["password"],
+                "password": {"user": {"name": "coriolis", "password": password,
+                                      "domain": {"name": "Default"}}},
+            },
+            "scope": {"project": {"name": "service", "domain": {"name": "Default"}}},
+        }
+    }
+    req = urllib.request.Request(
+        keystone_url.rstrip("/") + "/v3/auth/tokens",
+        data=json.dumps(body, separators=(",", ":")).encode("ascii"),
+        headers={"Accept": "application/json", "Content-Type": "application/json"},
+        method="POST")
+    with urllib.request.urlopen(req, timeout=30) as response:
+        token = response.headers["X-Subject-Token"]
+        result = json.loads(response.read())
+    return token, result["token"]["project"]["id"]
+
+
+def transfer_matches(transfer):
+    expected = TRANSFER["transfer"]
+    destination = transfer.get("destination_environment", {})
+    storage = transfer.get("storage_mappings", {})
+    return {
+        "scenario_exact": transfer.get("scenario") == expected["scenario"],
+        "endpoint_ids_exact": (
+            transfer.get("origin_endpoint_id") == SOURCE_ENDPOINT and
+            transfer.get("destination_endpoint_id") == DESTINATION_ENDPOINT),
+        "instance_exact": transfer.get("instances") == [INSTANCE],
+        "source_mechanism_exact": (
+            transfer.get("source_environment", {}).get("replica_export_mechanism") == "swift_backups"),
+        "network_map_exact": transfer.get("network_map") == expected["network_map"],
+        "fip_fields_exact": (
+            destination.get("migr_worker_use_fip") is True and
+            destination.get("migr_fip_pool_name") == expected["destination_environment"]["migr_fip_pool_name"] and
+            destination.get("use_floating_ip") is True and
+            destination.get("floating_ip_pool") == expected["destination_environment"]["floating_ip_pool"]),
+        "storage_default_exact": storage.get("default") == "__DEFAULT__",
+        "storage_backend_exact": storage.get("backend_mappings") == [{"source": "rbd1", "destination": "__DEFAULT__"}],
+        "flags_exact": (
+            transfer.get("clone_disks") is True and
+            transfer.get("skip_os_morphing") is True),
+        "notes_exact": transfer.get("notes") == NOTES,
+    }
+
+
+def existing_matching_transfer(transfers):
+    matches = []
+    for transfer in transfers:
+        if (transfer.get("notes") == NOTES and
+                transfer.get("origin_endpoint_id") == SOURCE_ENDPOINT and
+                transfer.get("destination_endpoint_id") == DESTINATION_ENDPOINT):
+            matches.append(transfer)
+    return matches
+
+
+def main():
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--api-base", required=True)
+    parser.add_argument("--keystone-base", required=True)
+    args = parser.parse_args()
+    password = sys.stdin.buffer.read().decode("utf-8").strip()
+    if not password:
+        output(http_status="none", error_category="missing_password")
+        return 2
+
+    try:
+        token, project_id = authenticate(args.keystone_base, password)
+        base = args.api_base.rstrip("/") + "/v1/" + project_id
+        _, endpoints = request(base + "/endpoints", token=token)
+        _, transfers = request(base + "/transfers", token=token)
+        _, deployments = request(base + "/deployments", token=token)
+    except urllib.error.HTTPError as error:
+        output(http_status=error.code, error_category=category(error.code))
+        return 2
+    except (urllib.error.URLError, TimeoutError, ValueError, KeyError):
+        output(http_status="none", error_category="preflight_unavailable")
+        return 2
+
+    endpoint_ids = {endpoint.get("id") for endpoint in endpoints.get("endpoints", [])}
+    transfer_list = transfers.get("transfers", [])
+    deployment_list = deployments.get("deployments", [])
+    if (endpoint_ids != {SOURCE_ENDPOINT, DESTINATION_ENDPOINT} or
+            len(endpoint_ids) != 2 or len(transfer_list) != 0 or
+            len(deployment_list) != 0):
+        output(http_status="none", error_category="precondition_failed",
+               transfer_count=len(transfer_list), deployment_count=len(deployment_list),
+               endpoints_exact=endpoint_ids == {SOURCE_ENDPOINT, DESTINATION_ENDPOINT})
+        return 2
+
+    try:
+        post_status, posted = request(base + "/transfers", method="POST", token=token, body=TRANSFER)
+    except urllib.error.HTTPError as error:
+        output(http_status=error.code, error_category=category(error.code))
+        return 2
+    except (urllib.error.URLError, TimeoutError):
+        # The POST may have reached the server. Read only the exact identity;
+        # never retry a write whose outcome is unknown.
+        try:
+            _, transfers = request(base + "/transfers", token=token)
+            matches = existing_matching_transfer(transfers.get("transfers", []))
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError, KeyError):
+            output(http_status="none", error_category="post_ambiguous")
+            return 2
+        if len(matches) != 1:
+            output(http_status="none", error_category="post_ambiguous")
+            return 2
+        post_status = "ambiguous_confirmed"
+        posted = {"transfer": matches[0]}
+
+    transfer = posted.get("transfer", {})
+    transfer_id = transfer.get("id")
+    if not transfer_id:
+        output(http_status=post_status, error_category="invalid_post_response")
+        return 2
+    try:
+        _, transfers = request(base + "/transfers", token=token)
+        _, deployments = request(base + "/deployments", token=token)
+        _, executions = request(base + "/transfers/" + transfer_id + "/executions", token=token)
+    except urllib.error.HTTPError as error:
+        output(http_status=error.code, error_category=category(error.code))
+        return 2
+    except (urllib.error.URLError, TimeoutError, ValueError, KeyError):
+        output(http_status="none", error_category="verification_unavailable")
+        return 2
+
+    matches = existing_matching_transfer(transfers.get("transfers", []))
+    if len(matches) != 1:
+        output(http_status=post_status, error_category="verification_failed")
+        return 2
+    transfer = matches[0]
+    checks = transfer_matches(transfer)
+    output(
+        http_status=post_status,
+        transfer_id=transfer.get("id", "none"),
+        transfer_status=transfer.get("last_execution_status", transfer.get("status", "none")),
+        execution_count=len(executions.get("executions", [])),
+        transfer_count=len(transfers.get("transfers", [])),
+        deployment_count=len(deployments.get("deployments", [])),
+        **checks,
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except Exception:
+        output(http_status="none", error_category="unexpected_failure")
+        sys.exit(2)

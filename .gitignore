@@ -1,2 +1,4 @@
 .env
+.openstack/
 site/
+__pycache__/
