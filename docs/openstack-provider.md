@@ -59,4 +59,4 @@ Temporary worker VM images must initialize on first boot. Use an image with the 
 4. Do not classify the destination VM, its disks, or its intended network resources as temporary artifacts.
 
 !!! warning
-    OpenStack provider qualification and end-to-end migration validation remain pending. Verify the installed release and your cloud policies with a controlled workload before relying on this path.
+    One bounded development Web UI OpenStack-to-OpenStack migration proof of concept has passed on released operator 0.5.54. Broader provider qualification, the 0.5.59 walkthrough in the [Advanced Operator Tutorial](operator-advanced-tutorial.md), and all production-readiness claims remain unvalidated and in progress. Verify the installed release and your cloud policies with a controlled workload before relying on this path.

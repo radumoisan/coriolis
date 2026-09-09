@@ -1,0 +1,55 @@
+# Optional Helm values override for the coriolis-operator chart.
+#
+# This file is an EXAMPLE of the operational controls currently live in the
+# approved dev environment. Passing it with `helm upgrade --install -f` or via
+# an Argo CD Application `helm.values` / `helm.valueFiles` entry is OPTIONAL:
+# the deployed chart already uses these values as defaults.
+#
+# Do NOT add `image.repository` or `image.tag` here. CIXpress/CI owns Helm
+# chart versioning, application versioning, and container image tags, so this
+# example deliberately pins no CI-owned versions.
+#
+# Every key below must remain valid against helm/values.schema.json of the
+# coriolis-operator chart.
+
+# Registry pull secret expected to exist in the target namespace.
+imagePullSecrets:
+  - name: regcred
+
+# Stable resource name prefix used by the live deployment.
+fullnameOverride: "coriolis-operator"
+
+# Operator log level.
+logLevel: INFO
+
+# Compute resource bounds for the operator container.
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Pod-level security: the operator must not run as root.
+podSecurityContext:
+  runAsNonRoot: true
+
+# Container-level security: no privilege escalation, read-only root
+# filesystem, and all Linux capabilities dropped.
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+# Liveness probe served on port 8080 path /healthz in the live deployment.
+liveness:
+  port: 8080
+  path: /healthz
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3

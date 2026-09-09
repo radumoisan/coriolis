@@ -14,7 +14,7 @@ The Kubernetes operator is separate from the migration product. It reconciles a 
 OpenStack is the initial documentation focus. OpenStack provider plugins implement source export and destination import operations.
 
 !!! warning
-    End-to-end OpenStack-to-OpenStack migration validation remains pending. This documentation describes the implemented architecture, not a production-readiness claim.
+    One bounded actual-browser Web UI OpenStack-to-OpenStack migration proof of concept has passed on released operator 0.5.54 in the development environment. The 0.5.59 walkthrough in the [Advanced Operator Tutorial](operator-advanced-tutorial.md) and all production-readiness claims remain unvalidated and in progress.
 
 ## :material-book-open-page-variant-outline: Architecture
 
@@ -23,5 +23,7 @@ Learn how the product services, provider plugins, supporting services, and Kuber
 Follow the [Migration Flow](migration-flow.md) from endpoint definition through separate transfer and deployment executions.
 
 See the [Coriolis Operator](operator.md) for its Kubernetes lifecycle scope, validated boundaries, and current limitations.
+
+For a hands-on walkthrough from appliance bring-up through a Web UI migration, follow the in-progress [Advanced Operator Tutorial](operator-advanced-tutorial.md).
 
 Prepare the two-cloud prerequisites described in the [OpenStack Context](openstack-provider.md), and use the focused [Terminology](terminology.md) when terms need clarification.

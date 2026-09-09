@@ -51,4 +51,4 @@ Transfers and deployments have separate executions and statuses. A completed tra
 Cleanup is distributed across transfer, deployment, and provider plugin tasks. It can release allocated minions, remove temporary worker VMs and other source or destination artifacts, remove snapshots, or clean up failed deployment artifacts, depending on the path taken. It is not a single final phase common to every execution.
 
 !!! warning
-    End-to-end OpenStack-to-OpenStack validation remains pending.
+    End-to-end validation is bounded: one actual-browser development Web UI OpenStack-to-OpenStack migration proof of concept has passed on released operator 0.5.54. The 0.5.59 walkthrough in the [Advanced Operator Tutorial](operator-advanced-tutorial.md) and all production-readiness claims remain unvalidated and in progress.
