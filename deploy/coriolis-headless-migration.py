@@ -9,9 +9,11 @@ v1 and Keystone v3 bases (for example the public ingress paths
 URLs ending in '/v1' and '/v3'); the helper appends only the remaining
 resource paths and never duplicates version segments. This helper only:
 
-1. Authenticates to the appliance Keystone with the 'coriolis' service
-   user in the 'service' project. The password is read from stdin and is
-   never printed or stored beyond the single authentication request.
+1. Authenticates to the appliance Keystone. The '--username' and
+   '--project-name' arguments select the authentication user and the
+   project scope (defaulting to the 'coriolis' service user in the
+   'service' project). The password is read from stdin and is never
+   printed or stored beyond the single authentication request.
 2. Preflights the configured endpoint IDs and transfer uniqueness.
 3. Creates one Transfer and starts one execution.
 4. Polls the exact execution to a terminal state and, when
@@ -36,6 +38,8 @@ from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 HTTP_REQUEST_TIMEOUT: int = 30
 DEFAULT_TIMEOUT: int = 1800
 DEFAULT_POLL_INTERVAL: int = 10
+DEFAULT_USERNAME: str = "coriolis"
+DEFAULT_PROJECT_NAME: str = "service"
 # GET-only polling reads may tolerate a small number of consecutive
 # transient network failures before giving up. POST/write requests and
 # non-network API errors are never retried.
@@ -191,9 +195,15 @@ def read_password_from_stdin() -> str:
 class CoriolisClient:
     """Minimal TLS-verified Coriolis/Keystone REST client."""
 
-    def __init__(self, api_base: str, keystone_base: str) -> None:
+    def __init__(
+            self, api_base: str, keystone_base: str,
+            username: str = DEFAULT_USERNAME,
+            project_name: str = DEFAULT_PROJECT_NAME,
+    ) -> None:
         self._api_base: str = api_base.rstrip("/")
         self._keystone_base: str = keystone_base.rstrip("/")
+        self._username: str = username
+        self._project_name: str = project_name
         self._token: Optional[str] = None
         self.base_url: Optional[str] = None
 
@@ -236,13 +246,13 @@ class CoriolisClient:
                 "identity": {
                     "methods": ["password"],
                     "password": {"user": {
-                        "name": "coriolis",
+                        "name": self._username,
                         "password": password,
                         "domain": {"name": "Default"},
                     }},
                 },
                 "scope": {"project": {
-                    "name": "service",
+                    "name": self._project_name,
                     "domain": {"name": "Default"},
                 }},
             }
@@ -498,7 +508,8 @@ def run_migration(args: argparse.Namespace) -> int:
     transfer = config["transfer"]
     execution = config["execution"]
     password = read_password_from_stdin()
-    client = CoriolisClient(api_base, keystone_base)
+    client = CoriolisClient(
+        api_base, keystone_base, args.username, args.project_name)
     client.authenticate(password)
     password = None
     preflight(client, transfer)
@@ -543,6 +554,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--config", required=True,
         help="Path to the JSON migration config (see "
              "docs/assets/manifests/headless-migration.example.json).")
+    parser.add_argument(
+        "--username", default=DEFAULT_USERNAME,
+        help="Keystone user name to authenticate as (default: "
+             "%(default)s).")
+    parser.add_argument(
+        "--project-name", default=DEFAULT_PROJECT_NAME,
+        help="Keystone project name to scope the token to "
+             "(default: %(default)s).")
     parser.add_argument(
         "--timeout", type=int, default=DEFAULT_TIMEOUT,
         help="Overall poll timeout in seconds per phase "

@@ -233,6 +233,60 @@ class HelperTestCase(unittest.TestCase):
             recorder.calls.count(
                 ("GET", PROJECT_PATH + "/deployments")), 2)
 
+    def test_cli_username_and_project_override_keystone_auth(self):
+        with tempfile.NamedTemporaryFile(
+                "w", suffix=".json", delete=False) as handle:
+            json.dump(valid_config(), handle)
+            config_path = handle.name
+        self.addCleanup(os.unlink, config_path)
+        recorder = RecordingUrlopen(success_routes())
+        argv = [
+            "--api-base", API_BASE,
+            "--keystone-base", KEYSTONE_BASE,
+            "--config", config_path,
+            "--timeout", "60",
+            "--poll-interval", "1",
+            "--username", "admin",
+            "--project-name", "admin",
+            "--run",
+        ]
+        stdin = mock.Mock(buffer=io.BytesIO(b"admin-password\n"))
+        stdout = io.StringIO()
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(
+                urllib.request, "urlopen", recorder))
+            stack.enter_context(mock.patch(
+                "time.sleep", lambda seconds: None))
+            stack.enter_context(mock.patch.object(sys, "stdin", stdin))
+            stack.enter_context(contextlib.redirect_stdout(stdout))
+            code = HELPER.main(argv)
+        self.assertEqual(code, 0)
+        auth = recorder.bodies[("POST", AUTH_PATH)][0]["auth"]
+        user = auth["identity"]["password"]["user"]
+        self.assertEqual(user["name"], "admin")
+        self.assertEqual(user["domain"]["name"], "Default")
+        self.assertEqual(auth["scope"]["project"]["name"], "admin")
+        self.assertEqual(
+            auth["scope"]["project"]["domain"]["name"], "Default")
+        out = stdout.getvalue()
+        self.assertNotIn("admin-password", out)
+        self.assertNotIn("TOKEN-VALUE-DO-NOT-PRINT", out)
+
+    def test_client_auth_defaults_remain_coriolis_service(self):
+        recorder = RecordingUrlopen({
+            ("POST", AUTH_PATH): [FakeResponse(
+                201,
+                {"token": {"project": {"id": "proj-1"}}},
+                {"X-Subject-Token": "TOKEN-VALUE-DO-NOT-PRINT"})],
+        })
+        with mock.patch.object(urllib.request, "urlopen", recorder):
+            client = HELPER.CoriolisClient(API_BASE, KEYSTONE_BASE)
+            client.authenticate("service-password")
+        auth = recorder.bodies[("POST", AUTH_PATH)][0]["auth"]
+        self.assertEqual(
+            auth["identity"]["password"]["user"]["name"], "coriolis")
+        self.assertEqual(auth["scope"]["project"]["name"], "service")
+
     def test_post_bodies_use_transfer_and_execution_wrapping(self):
         config = valid_config()
         code, out, recorder = self.run_cli(config, success_routes())

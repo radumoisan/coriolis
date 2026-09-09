@@ -3,6 +3,9 @@
 !!! abstract
     This tutorial takes you from an already-installed Coriolis operator in the approved development cluster to a fully Ready, LoggingReady Coriolis appliance you can log into from a browser. The complete tutorial covers appliance bring-up, an optional headless migration, a Web UI migration with observation, and cleanup.
 
+!!! info "Validation record"
+    This walkthrough was followed end to end on operator `0.5.59` with runtime `2603.4` in the approved development cluster on 2026-09-09, covering the headless and Web UI OpenStack-to-OpenStack migrations and full cleanup. Execution is tracked checkpoint by checkpoint in the [Coriolis Operator Tutorial Validation Record](operator-tutorial-validation.md). Follow that page's recording rules when you run the tutorial.
+
 !!! info "Estimated time"
     Appliance bring-up typically converges in 5 to 15 minutes. A small migration takes 10 to 30+ minutes, depending on the source and destination cloud. The operator install reference adds time only if you choose to read it closely.
 
@@ -155,8 +158,8 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get storageclass local-path
 ??? example "Expected result"
 
     ```text
-    NAME         PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION
-    local-path   rancher.io/local-path   Delete          WaitForFirstConsumer   false
+    NAME                   PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+    local-path (default)   rancher.io/local-path   Delete          WaitForFirstConsumer   false                  <AGE>
     ```
 
 <!-- Verify the nginx IngressClass exists. -->
@@ -312,25 +315,25 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudba
 ??? example "Expected result"
 
     ```text
-    NAME                                                           READY   STATUS      RESTARTS   AGE
-    coriolis-appliance-advanced-mariadb-0                          1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-rabbitmq-0                         1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-loki-0                             2/2     Running     0          <AGE>
-    coriolis-appliance-advanced-memcached-...                      1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-keystone-...                       1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-barbican-api-...                   1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-barbican-worker-...                1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-common-bootstrap-...-...           0/1     Completed   0          <AGE>
-    coriolis-appliance-advanced-conductor-...                      1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-scheduler-...                      1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-transfer-cron-...                  1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-minion-manager-...                 1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-deployer-manager-...               1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-worker-...                         1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-api-...                            1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-web-...                            1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-alloy-...                          1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-adaptor-...                        1/1     Running     0          <AGE>
+    NAME                                                        READY   STATUS      RESTARTS   AGE
+    coriolis-appliance-advanced-adaptor-...                     1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-alloy-...                       1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-barbican-api-...                1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-barbican-worker-...             1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-common-bootstrap-v3-...         0/1     Completed   0          <AGE>
+    coriolis-appliance-advanced-coriolis-api-...                1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-conductor-...          1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-deployer-manager-...   1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-minion-manager-...     1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-scheduler-...          1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-transfer-cron-...      1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-web-...                1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-coriolis-worker-...             1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-keystone-...                    1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-loki-0                          2/2     Running     0          <AGE>
+    coriolis-appliance-advanced-mariadb-0                       1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-memcached-...                   1/1     Running     0          <AGE>
+    coriolis-appliance-advanced-rabbitmq-0                      1/1     Running     0          <AGE>
     ```
 
 The label filter must return **18 appliance Pods: 17 `Running` plus exactly one `Completed` (phase `Succeeded`) bootstrap Job Pod, with zero restarts**. The namespace-wide total is 19 Pods because the already-running operator Pod joins it but carries operator labels, not the appliance label. Any `CrashLoopBackOff`, restart, or missing appliance Pod blocks the tutorial; read the relevant condition and Pod logs before acting.
@@ -345,13 +348,13 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc
 ??? example "Expected result"
 
     ```text
-    NAME                                              STATUS   VOLUME   CAPACITY   STORAGECLASS   AGE
-    coriolis-appliance-advanced-mariadb-data          Bound    <PV>     10Gi       local-path     <AGE>
-    coriolis-appliance-advanced-rabbitmq-data         Bound    <PV>     1Gi        local-path     <AGE>
-    coriolis-appliance-advanced-loki-data             Bound    <PV>     10Gi       local-path     <AGE>
+    NAME                                        STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+    coriolis-appliance-advanced-loki-data       Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
+    coriolis-appliance-advanced-mariadb-data    Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
+    coriolis-appliance-advanced-rabbitmq-data   Bound    <PV>       1Gi        RWO            local-path     <unset>                 <AGE>
     ```
 
-Exactly **three Bound PVCs**, created as direct resources with the names above (MariaDB, RabbitMQ, and Loki data). They are retained ownerless claims, so same-name recreation reuses them instead of reprovisioning.
+Exactly **three Bound PVCs**, created as direct resources with the names above (MariaDB, RabbitMQ, and Loki data), each `RWO` on `local-path` with `VOLUMEATTRIBUTESCLASS` `<unset>`. They are retained ownerless claims, so same-name recreation reuses them instead of reprovisioning.
 
 <!-- List the appliance Ingress resources. -->
 ```bash
@@ -362,11 +365,11 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get ingress
 
     ```text
     NAME                                          CLASS   HOSTS                          ADDRESS        PORTS     AGE
+    coriolis-appliance-advanced-adaptor           nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
     coriolis-appliance-advanced-barbican-api      nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
     coriolis-appliance-advanced-coriolis-api      nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
     coriolis-appliance-advanced-coriolis-web      nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
     coriolis-appliance-advanced-keystone          nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
-    coriolis-appliance-advanced-adaptor           nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
     ```
 
 Five Ingress resources, all on the same host, one per routed service. Only the `coriolis-appliance-advanced-coriolis-web` Ingress carries the cert-manager ClusterIssuer annotation, so it is the resource that drives certificate issuance; the `coriolis-appliance-advanced-adaptor` Ingress serves the `/logs` and `/log-stream` routes.
@@ -379,11 +382,11 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate
 ??? example "Expected result"
 
     ```text
-    NAME                              READY   SECRET                            ISSUER        AGE
-    coriolis.app.cloudbase.wiki-tls   True    coriolis.app.cloudbase.wiki-tls   letsencrypt   <AGE>
+    NAME                              READY   SECRET                            AGE
+    coriolis.app.cloudbase.wiki-tls   True    coriolis.app.cloudbase.wiki-tls   <AGE>
     ```
 
-The gate is one `Ready=True` Certificate whose `SECRET` is the TLS Secret for the configured host; the ingressed Secret name follows the ingress-shim `<host>-tls` convention.
+The gate is one `Ready=True` Certificate whose `SECRET` is the TLS Secret for the configured host; the ingressed Secret name follows the ingress-shim `<host>-tls` convention. The issuer behind it is the `letsencrypt` ClusterIssuer annotated on the web Ingress (see above); the `get certificate` table itself does not show an `ISSUER` column.
 
 ### :material-application-edit-outline: HTTPS And Routes
 
@@ -427,18 +430,21 @@ The operator generates this credential once and retains it across same-name appl
 ## :material-book-open-page-variant-outline: Web Login And Visual Inspection
 
 1. Open `https://coriolis.app.cloudbase.wiki/` in a browser.
-   **Expected outcome:** the Coriolis web UI loads with a valid TLS certificate (no browser warning) and presents an end-user agreement prompt on first visit.
-2. Accept the end-user agreements.
-   **Expected outcome:** the agreement dialog closes and the login form appears.
-3. Log in with user `admin`, domain `Default`, and the `keystone_admin_password` you just displayed.
-   **Expected outcome:** authentication succeeds and the dashboard (instance/migration overview) is shown with an empty or near-empty state, because this fresh appliance has no endpoints or transfers yet.
-4. Open the migrations/endpoints areas without creating anything.
-   **Expected outcome:** pages render without error banners; endpoint and transfer lists are empty. This confirms the UI can talk to the Coriolis API and Keystone through the ingress.
-5. From the already-loaded and authenticated web UI, click the Logs navigation item rather than browsing directly to the host `/logs` path (those adaptor APIs require the UI's authenticated session).
+   **Expected outcome:** the Coriolis web UI loads over HTTPS with a valid TLS certificate (no browser warning) and presents a Welcome screen with privacy and end-user license agreement (EULA) checkboxes and a **Submit** button.
+2. Select both the privacy and EULA checkboxes, then click **Submit**.
+   **Expected outcome:** the UI proceeds to `/login`, which offers only `Username` and `Password` fields and a **Login** button (there is no domain field on this form).
+3. Log in with username `admin` and the `keystone_admin_password` you just displayed.
+   **Expected outcome:** authentication succeeds and the Dashboard loads with a Signed in indicator, in an empty or near-empty state, because this fresh appliance has no endpoints or transfers yet.
+4. Use the sidebar navigation labels **Transfers**, **Deployments**, and **Cloud Endpoints** to open each area without creating anything.
+   **Expected outcome:** pages render without error banners; the transfer, deployment, and endpoint lists are empty. This confirms the UI can talk to the Coriolis API and Keystone through the ingress.
+5. From the already-loaded and authenticated web UI, click the **Logs** navigation item (UI route `/logging`) rather than browsing directly to the host `/logs` path (those adaptor APIs require the UI's authenticated session).
    **Expected outcome:** the log viewer loads and queries the adaptor successfully, listing the appliance components (for example conductor, scheduler, API, web), confirming the Loki-backed logging path end to end.
 
+!!! note "Licence Card In This Core Profile"
+    The Dashboard's **Current Licence** card reports an error in this deployment: `/licensing/appliances` falls through to the Web UI and returns HTML, not a licensing API response. The core operator profile does not deploy a licensing backend or configure `LICENSING_SERVER_BASE_URL` for the conductor. Do not treat HTTP 200 on `/licensing` as a healthy licensing service or generalize this development configuration to a licensed production deployment.
+
 !!! tip "Checkpoint"
-    At this point you have a Ready and LoggingReady appliance with zero-restart Pods, three Bound PVCs, a trusted HTTPS endpoint, and a working browser login. Stop here for now; endpoint registration and the first migration continue in the next section.
+    At this point you have a Ready and LoggingReady appliance with zero-restart Pods, three Bound PVCs, a trusted HTTPS endpoint, and a working browser login to the Dashboard with empty Transfers, Deployments, and Cloud Endpoints lists and a reachable Logs page. Stop here for now; endpoint registration and the first migration continue in the next section.
 
 ## :material-book-open-page-variant-outline: OpenStack Migration Prerequisites
 
@@ -449,8 +455,8 @@ The migration path here is a single OpenStack-to-OpenStack live migration of one
 
 | Input | Why it is needed | Expected preflight result |
 | --- | --- | --- |
-| One small disposable volume-backed source VM with a known marker (a unique file on its boot volume) | Proves the disk actually moved and the destination boots your state | VM is `ACTIVE`, exactly one attached volume is marked bootable, marker is readable. |
-| Source project permission for Cinder backups plus Swift object storage | The selected export mechanism (`swift_backups`) stages disk data through Cinder backups read from Swift | A manual backup of a scratch volume succeeds and is visible in Swift without Coriolis involved. |
+| One small disposable volume-backed source VM with a known marker (a unique file on its boot volume) | Proves the disk actually moved and the destination boots your state | VM is `ACTIVE`, exactly one attached volume is marked bootable and `in-use`, and the marker is verified -- either read inside the guest (for example over SSH) or proven hypervisor-side from the server's serial console output (for example a cloud-init `runcmd` line plus a `final_message` completion line fetched through the Compute API). |
+| Source project permission for Cinder backups plus Swift object storage | The selected export mechanism (`swift_backups`) stages disk data through Cinder backups read from Swift | Both APIs are available to the endpoint project. The controlled fixture migration must then demonstrate successful Cinder-backup/Swift replication in its task progress; API discovery alone is not data-path proof. |
 | Destination project quota for volumes, snapshots, ports, floating IPs, and temporary worker VMs | Transfer and deployment create real destination and temporary resources | Quota headroom covers the fixture disks plus one temporary worker VM and its port. |
 | Visible destination Linux image for temporary workers | Worker VMs boot from it and must initialize on first boot (cloud-init or config drive) | Image is shared to or present in the endpoint project and boots. |
 | Visible destination worker network, flavor, and security group | The temporary worker VM needs a management path back to the OpenStack APIs | Each resource exists in the endpoint project; the security group permits the required API and data paths. |
@@ -463,16 +469,19 @@ The migration path here is a single OpenStack-to-OpenStack live migration of one
 !!! note
     Confirm source and destination resource visibility with project-scoped credentials before creating endpoints. The endpoint project, not an administrator account, must see every image, network, flavor, security group, keypair, pool, and volume type listed above.
 
+!!! note "Source Floating IPs Are Not Required By `swift_backups`"
+    Coriolis requests source Cinder backups and reads the staged data through Swift APIs; this path does not require SSH into the source VM. Verify the source marker through a guest read or a serial-console check without borrowing an unrelated floating IP. The destination pool still needs free addresses for temporary workers and the migrated guest. Quota headroom alone does not prove that its external subnet allocation pool has free addresses.
+
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
 Create both endpoints through the Web UI before any headless test: the headless helper only works against existing, validated endpoints.
 
-1. In the web UI, open the **Cloud Endpoints** area and choose **New Endpoint**, then select the **OpenStack** type.
+1. In the web UI, open **Cloud Endpoints**, choose **Add Endpoint** on an empty list or **New > Endpoint**, then select the **OpenStack** logo.
    **Expected outcome:** the endpoint creation form appears with OpenStack connection fields.
-2. Fill in the connection fields for the source cloud: select **Identity API version v3**, then provide username, password, project name, auth URL (the Keystone v3 base URL, normally ending `/v3`), user domain, and project domain; supply region and interface only when the cloud requires them.
+2. Give the endpoint a distinct name. Change **Identity API Version** from its default `2` to `3`, then provide the source username, password, project name, auth URL (normally ending `/v3`), user domain, and project domain. Domain fields appear after selecting version `3`; use domain names when the selector says **Name**. Supply region and interface in **Advanced** only when required.
    **Expected outcome:** all required fields are accepted and the **Validate and save** button becomes enabled.
-3. Click **Validate and save**.
-   **Expected outcome:** the UI shows the exact visual result `Endpoint is Valid` and the endpoint appears in the list.
+3. Click **Validate and save**, open the saved endpoint's details, and click **Validate Endpoint**.
+   **Expected outcome:** the creation form closes and the endpoint appears in the list. The explicit validation dialog then shows `Endpoint is Valid` and `All tests passed succesfully.` Click **Dismiss** and use the details back arrow to return to the list.
 4. Repeat steps 1 to 3 for the destination cloud with its own credentials.
    **Expected outcome:** a second endpoint listed with `Endpoint is Valid`.
 5. Open each endpoint's details page and record the non-secret endpoint ID shown in the page URL or details for the headless config file.
@@ -490,9 +499,11 @@ The helper `deploy/coriolis-headless-migration.py` works only against the two ex
 
 ### :material-application-edit-outline: Prepare The Config File
 
-<!-- Copy the example config to a private scratch location outside the repository. -->
+The edited config contains real cloud identifiers, so keep it in `.openstack/tutorial-validation/` at the repository root. The `.openstack/` directory is repository-ignored; never force-add private files or include their contents in documentation.
+
+<!-- Create the private, repository-ignored tutorial workspace. -->
 ```bash
-cp docs/assets/manifests/headless-migration.example.json /tmp/coriolis-headless-migration.json
+mkdir -p .openstack/tutorial-validation
 ```
 
 ??? example "Expected result"
@@ -501,7 +512,18 @@ cp docs/assets/manifests/headless-migration.example.json /tmp/coriolis-headless-
     No output.
     ```
 
-In `/tmp/coriolis-headless-migration.json`, replace **every** `<...>` placeholder with a real value; the helper refuses to run while any placeholder remains (`config_unresolved_placeholder`). The keys mean:
+<!-- Copy the example config into the private ignored workspace. -->
+```bash
+cp docs/assets/manifests/headless-migration.example.json .openstack/tutorial-validation/headless-migration.json
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+In `.openstack/tutorial-validation/headless-migration.json`, replace **every** `<...>` placeholder with a real value; the helper refuses to run while any placeholder remains (`config_unresolved_placeholder`). The keys mean:
 
 | Key | What to set |
 | --- | --- |
@@ -519,7 +541,7 @@ In `/tmp/coriolis-headless-migration.json`, replace **every** `<...>` placeholde
 
 <!-- Parse the edited config to catch JSON syntax errors before any API call. -->
 ```bash
-python3 -m json.tool /tmp/coriolis-headless-migration.json > /dev/null
+python3 -m json.tool .openstack/tutorial-validation/headless-migration.json > /dev/null
 ```
 
 ??? example "Expected result"
@@ -530,11 +552,13 @@ python3 -m json.tool /tmp/coriolis-headless-migration.json > /dev/null
 
 ### :material-application-edit-outline: Run The Headless Migration
 
-One pipeline supplies the `coriolis` service password over stdin and starts the migration. The password is read directly from the retained credentials Secret through a base64 decode into the helper's stdin; it is never stored in a variable, file, or printed value. The public `/identity` and `/coriolis` bases are already the external Keystone v3 and Coriolis v1 URLs because the Ingress rewrites each path once, so the helper appends only `/auth/tokens` and `/<project_id>` itself.
+Use the same Keystone project as the Web UI: this walkthrough logs in as `admin` in project `admin`. The helper defaults to `coriolis` in project `service`, which cannot see these UI-created endpoints; the explicit `--username admin --project-name admin` options below are required. The pipeline reads the corresponding admin password from the retained infrastructure Secret directly into stdin without printing it. The public `/identity` and `/coriolis` bases already include the Ingress version rewrites, so the helper appends only `/auth/tokens` and `/<project_id>` itself.
 
-<!-- Feed the decoded Keystone service password into the helper and run one real migration. -->
+The helper currently authenticates both the user and project in Keystone's `Default` domain; other domains are outside this example's supported scope.
+
+<!-- Feed the Keystone admin password into the helper in the same project as the Web UI. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-coriolis-credentials -o jsonpath='{.data.coriolis_keystone_password}' | base64 -d | python3 deploy/coriolis-headless-migration.py --api-base https://coriolis.app.cloudbase.wiki/coriolis --keystone-base https://coriolis.app.cloudbase.wiki/identity --config /tmp/coriolis-headless-migration.json --timeout 1800 --poll-interval 10 --run
+kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d | python3 deploy/coriolis-headless-migration.py --api-base https://coriolis.app.cloudbase.wiki/coriolis --keystone-base https://coriolis.app.cloudbase.wiki/identity --username admin --project-name admin --config .openstack/tutorial-validation/headless-migration.json --timeout 1800 --poll-interval 10 --run
 ```
 
 ??? example "Expected result"
@@ -571,8 +595,8 @@ Verify the same facts a UI-driven run would show, through the Web UI and the clo
    **Expected outcome:** every task is completed; no task is in `ERROR`.
 5. Check the source VM in the source cloud.
    **Expected outcome:** it is `SHUTOFF`, because `shutdown_instances` was `true`.
-6. Check the destination VM in the destination cloud: power state, attached cloned boot disk, mapped networks, floating IP if requested, and the marker file inside the guest.
-   **Expected outcome:** the VM is `ACTIVE` with the expected disks and networking, and the marker is reachable (for example over its floating IP and keypair).
+6. Check the destination VM in the destination cloud: power state, attached cloned boot disk, mapped networks, floating IP if requested, security groups, and the marker file inside the guest.
+   **Expected outcome:** the VM is `ACTIVE` with the expected disks and networking, and the marker is reachable (for example over its floating IP and keypair). In this run the guest security groups contained the dedicated group plus the existing default group, and the cloned boot volume reported 9Gi on the destination against a nominal 8Gi source disk because the provider rounds sizes up: compare disk content and layout, not the exact nominal size.
 7. Open the Logs navigation and browse the appliance components around the migration window.
    **Expected outcome:** conductor, scheduler, worker, and deployer activity is visible for the run; you never search logs for secret values to confirm any of this.
 
@@ -583,8 +607,8 @@ Verify the same facts a UI-driven run would show, through the Web UI and the clo
 
 If you ran the headless migration, do not start the walkthrough below on top of its leftovers.
 
-1. Perform the [Migration Cleanup](#migration-cleanup) section first, for the headless transfer, deployment, disks, and cloud artifacts.
-   **Expected outcome:** no transfer or deployment from the headless run remains, and both clouds are back to the pre-migration baseline.
+1. Perform the [Migration Cleanup](#migration-cleanup) section first, for the headless transfer, deployment, disks, and cloud artifacts, but intentionally skip its endpoint-deletion step: this reset keeps both endpoints.
+   **Expected outcome:** no headless transfer, deployment, or migration artifacts remain. Keep the fixture infrastructure and both endpoints; an empty run-created Swift export container may also be kept for the repeat, then removed during final cleanup.
 2. Intentionally restore the fixture: restart, recreate, or rebuild the disposable source VM so it is `ACTIVE` with the marker again, on the same source network.
    **Expected outcome:** the source VM matches the prerequisites table again.
 3. Remove or keep the destination VM according to who owns the test result; it is a real VM, not an automatic leftover.
@@ -594,38 +618,45 @@ If you ran the headless migration, do not start the walkthrough below on top of 
 
 ## :material-book-open-page-variant-outline: Full Web UI Migration Walkthrough
 
+!!! note "Session and URL cautions"
+    A long pause anywhere in the wizard can expire the authenticated session; treat step failures that look like lost state as a session problem rather than a wizard bug. Never share the wizard's URL between steps: it encodes wizard state that contains resource IDs and references.
+
 1. From the dashboard choose **New > Transfer**.
-   **Expected outcome:** the transfer wizard opens on the scenario step.
-2. Choose **Migration** (the `live_migration` scenario) rather than Replica.
-   **Expected outcome:** the wizard proceeds; remember a migration is a move, not a zero-downtime live re-place, and the backup-based disk path stages source data through Cinder backups in Swift.
-3. Select the source endpoint.
+   **Expected outcome:** the transfer wizard opens with the **Coriolis Migration** scenario selected by default (the `live_migration` scenario).
+2. Keep **Migration** selected and click **Next**.
+   **Expected outcome:** the source cloud step appears. Remember a migration is a move, not a zero-downtime live re-place, and the backup-based disk path stages source data through Cinder backups in Swift.
+3. On the source cloud step, pick the existing source endpoint from the **Select** dropdown under the OpenStack logo, then click **Next**; do not click the logo itself.
    **Expected outcome:** the source options step appears for that endpoint.
-4. In the source options, select the `swift_backups` export mechanism.
-   **Expected outcome:** the wizard accepts the mechanism consistent with the permissions you preflighted.
-5. Select the fixture VM as the instance to transfer.
-   **Expected outcome:** the destination endpoint step appears with the instance inventory (disks and NICs) loaded.
-6. Select the destination endpoint.
-   **Expected outcome:** destination options appear.
-7. Provide the destination worker settings: Linux worker image, worker network, worker flavor, floating-IP pool, worker security group, keypair, and worker volume type where required.
+4. Confirm the source options show the **Swift Backups** export mechanism, then click **Next**.
+   **Expected outcome:** the wizard presents the mechanism consistent with the permissions you preflighted.
+5. On the VM selection step, choose only the disposable fixture, verify **1 instance selected**, and click **Next**.
+   **Expected outcome:** the destination cloud step appears with the instance inventory (disks and NICs) loaded.
+6. On the destination cloud step, pick the existing destination endpoint from its **Select** dropdown and click **Next**.
+   **Expected outcome:** the target options step appears.
+7. In the simple target options set: a unique **Title** (this run's notes), the worker **Migration Flavor** name `c1.small` (a searchable field), the Linux entry of the **Migration Image Map** (in this validated run the `ubuntu-24.04` image, matching the source and destination guest OS), and the dedicated **Migration Network**.
    **Expected outcome:** the form accepts every worker field.
-8. Map every source NIC to a destination network; no interface may be left unmapped.
-   **Expected outcome:** each source network has a destination mapping.
-9. Set the storage mapping to the `__DEFAULT__` placement for all disks.
-   **Expected outcome:** storage mappings show the default.
-10. Optionally add user scripts (guest customization).
-    **Expected outcome:** scripts attach to the deployment; leaving this step empty is fine for the fixture.
-11. On the schedule step, choose to execute now.
-    **Expected outcome:** the execution and deployment options step appears.
-12. Set the execution and deployment options to the accepted POC values: `clone_disks` true, `skip_os_morphing` true only for the known-compatible fixture (otherwise false), `shutdown_instances` true, and `auto_deploy` true.
-    **Expected outcome:** the wizard shows the review/finish state with those options.
-13. Confirm to finish.
-    **Expected outcome:** a success toast appears and the UI navigates to the transfer; the execution starts on its own.
-14. Watch the transfer execution timeline until it completes, then the automatic deployment and its timeline.
-    **Expected outcome:** the transfer execution reaches `COMPLETED`, then the deployment reaches `COMPLETED`.
-15. If any task or execution shows an `ERROR` status, stop.
+8. Expand the target options **Advanced** section to reach the remaining fields: **Keypair Name**, **Security Groups**, **Floating IP Pool**, **Use Floating IP**, **Migration Floating IP Pool Name**, **Migration Worker Use FIP**, **Migration Worker Volume Type** (set `__DEFAULT__`), and **Preserve Fixed IPs**. Wherever a pool dropdown lists candidates, its labels are network/subnet pairs (for example `ext_net_gts/ext_subnet_gts`); choose the IPv4 entry, not the IPv6 one.
+   **Expected outcome:** every advanced field is accepted and each pool selection resolves to an IPv4 network/subnet label.
+9. Set the tri-state toggles: both **Use Floating IP** and **Migration Worker Use FIP** to **Yes**, and **Preserve Fixed IPs** to **No**. The switch reads left = No, middle = not set, right = Yes; verify each displayed value, then click **Next**.
+   **Expected outcome:** each toggle's visible text matches its intended value.
+10. On the networks step, map every source NIC: each source network name is matched to a destination network selection; no interface may be left unmapped.
+    **Expected outcome:** each source network has a destination mapping.
+11. On the storage step, set **Default Storage** to `__DEFAULT__` and leave backend and per-disk entries at their **Default**, which inherits it.
+    **Expected outcome:** storage mappings show the default everywhere.
+12. Skip the scripts step (empty is fine for the fixture) and the schedule step without clicking **Add Schedule**.
+    **Expected outcome:** the wizard advances to the execute step with no scripts and no schedule.
+13. On the execute step choose **Execute Now**. **Clone Disks** starts at **Yes**; **Shutdown Instances**, **Auto Deploy**, and **Skip OS Morphing** start at **No** -- set all three to **Yes** only for the known-compatible fixture, otherwise leave `Skip OS Morphing` at **No**.
+    **Expected outcome:** the summary review step appears with those options.
+14. On the summary, verify exactly one instance is listed, then click the **Finish** button (it is Finish, not Confirm).
+    **Expected outcome:** the wizard submits the transfer.
+15. Verify the new transfer has the correct endpoints and one instance, and its **Execution #1** starts. Browser network inspection can additionally confirm the successful creation request; a transient toast is not required evidence.
+    **Expected outcome:** the UI opens the transfer's Executions tab and shows the running execution, not merely a saved transfer record.
+16. Watch **Executions** until the transfer reaches `COMPLETED`, then open the correlated entry in **Deployments** and inspect its **Tasks** tab.
+    **Expected outcome:** both execution and deployment reach `COMPLETED`, with no failed tasks. Completion alone does not prove guest usability; perform the observation checks below.
+17. If any task or execution shows an `ERROR` status, stop.
     **Expected outcome:** you diagnose through the task details and the Logs navigation before touching anything; a failed execution is not blindly re-run.
 
-Then repeat the observation checks from [Observe The Headless Result](#observe-the-headless-result) against the clouds.
+Then, once your execution actually completes, repeat the observation checks from [Observe The Headless Result](#observe-the-headless-result) against the clouds.
 
 ## :material-book-open-page-variant-outline: Log Observation
 
@@ -645,15 +676,17 @@ Delete through the Web UI in this order; each step gates the next.
 1. If any execution or deployment is still active, cancel it. Use the normal cancel first; force only if the UI workflow explicitly requires it after you diagnosed why the normal cancel did not settle, and never reach for Kubernetes force-deletion as a substitute.
    **Expected outcome:** the operation reaches a canceled terminal state before you delete anything.
 2. Delete the deployment record, then handle the destination VM as a separate deliberate decision.
-   **Expected outcome:** the deployment record is gone from the UI; record deletion says nothing about the VM, so you independently inspect the destination cloud and intentionally retain or remove the VM according to who owns the test result, never assuming the record removal handled it.
-3. On the transfer, choose **Delete Transfer Disks** and wait for the new cleanup execution it creates to show `COMPLETED`.
+   **Expected outcome:** the deployment record is gone from the UI; record deletion says nothing about the VM, so you independently inspect the destination cloud and intentionally retain or remove the VM according to who owns the test result, never assuming the record removal handled it. When you do remove the guest, note that in this run a normal Nova deletion automatically removed the attached cloned boot volume but left the floating IP and the detached precreated Neutron port behind: verify those two by their exact IDs and delete them only if still present. Never delete the default security group.
+3. On the transfer, open **Actions** and choose **Delete Disks**, then click **Yes** in the **Delete Transferred Disks?** confirmation dialog. The cleanup spawns a new execution visible under the transfer's **Executions**; wait for it to show `COMPLETED` before deleting the transfer itself.
    **Expected outcome:** destination disks created by the transfer are removed and the cleanup execution reaches `COMPLETED`.
 4. Delete the transfer itself.
    **Expected outcome:** the transfer no longer appears in the UI.
-5. Delete both endpoints.
+5. Delete both endpoints. This is the full final cleanup and is the step deliberately skipped during the headless reset above.
    **Expected outcome:** the endpoint list is empty and, because each endpoint's connection payload lives in Barbican behind a `secret_ref`, the Barbican-backed endpoint credentials are removed with them.
 6. Independently verify both clouds are back to the baseline: no temporary worker VMs, no leftover ports or floating IPs from workers, no Cinder backups or Swift objects from the export path, no snapshots or temporary images, and only the intentional source and destination VMs remain.
    **Expected outcome:** every artifact you can attribute to the run is gone or explicitly kept by decision.
+
+An empty Swift export container can remain after disk cleanup. In this run the source container `coriolis` was absent before validation and empty afterward; final reset removed it. Delete an empty container only when the baseline and migration evidence establish that this run created it. Never remove a pre-existing/shared container or delete unknown objects to make it empty. Also remove any disposable fixture infrastructure you created, restoring only your recorded router interfaces and leaving pre-existing networks, keys, security groups, and floating IP bindings untouched.
 
 ## :material-book-open-page-variant-outline: Optional Runtime Removal
 
@@ -690,13 +723,139 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc coriolis-appliance-a
 ??? example "Expected result"
 
     ```text
-    NAME                                              STATUS   VOLUME   CAPACITY   STORAGECLASS   AGE
-    coriolis-appliance-advanced-mariadb-data          Bound    <PV>     10Gi       local-path     <AGE>
-    coriolis-appliance-advanced-rabbitmq-data         Bound    <PV>     1Gi        local-path     <AGE>
-    coriolis-appliance-advanced-loki-data             Bound    <PV>     10Gi       local-path     <AGE>
+    NAME                                        STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+    coriolis-appliance-advanced-mariadb-data    Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
+    coriolis-appliance-advanced-rabbitmq-data   Bound    <PV>       1Gi        RWO            local-path     <unset>                 <AGE>
+    coriolis-appliance-advanced-loki-data       Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
     ```
 
-The three data PVCs remain `Bound`: they are retained ownerless claims, exactly like the generated credential Secrets, which also survive. A same-name CR recreation therefore reuses the identical credential identities and the same persistent data; the owner-referenced workloads, configuration, and routes are what the delete removed. Do not delete, force, edit finalizers, or reassign owners on any retained resource to "clean up" further; the retained state is the designed behavior.
+The three data PVCs remain `Bound`: they are retained ownerless claims, exactly like the generated credential Secrets, which also survive. A same-name CR recreation therefore reuses the identical credential identities and the same persistent data; the owner-referenced workloads, configuration, and routes are what the delete removed. **Keep this retained state by default** -- it is the designed behavior, and same-name recreation is meant to reuse it. Never delete, force, edit finalizers, or reassign owners on any retained resource as improvised "cleanup". If and only if you deliberately want the namespace back to its pre-run, operator-only baseline, follow the optional [Full Fresh Reset](#full-fresh-reset) section below, which removes each retained resource by its exact recorded name under explicit safeguards.
+
+## :material-book-open-page-variant-outline: Full Fresh Reset
+
+!!! danger "Irreversible destruction of database, log, and credential state"
+    This reset destroys the appliance databases, queues, logs, and generated credentials. Treat it as irreversible without verified external backups; a later same-name deployment gets fresh identities and empty databases. Complete [Migration Cleanup](#migration-cleanup) first: Kubernetes deletion does not clean resources in external OpenStack clouds, and endpoint/Barbican cleanup must be verified before erasing the backing database. Proceed only after the appliance CR and its owned workloads are gone. Delete only this run's recorded resources; preserve the shared namespace, Argo Application, operator, and both registry pull Secrets.
+
+Retained state is kept by default (see [Optional Runtime Removal](#optional-runtime-removal)); this section is the separate, deliberate, destructive alternative that returns the namespace to the pre-run, operator-only baseline.
+
+<!-- R1: Enumerate the retained Secrets and PVCs by appliance label, metadata only. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get secret,pvc -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o custom-columns=KIND:.kind,NAME:.metadata.name
+```
+
+??? example "Expected result"
+
+    ```text
+    KIND                     NAME
+    Secret                   coriolis-appliance-advanced-barbican-credentials
+    Secret                   coriolis-appliance-advanced-coriolis-credentials
+    Secret                   coriolis-appliance-advanced-infrastructure-credentials
+    Secret                   coriolis-appliance-advanced-keystone-credential-keys
+    Secret                   coriolis-appliance-advanced-keystone-database-credentials
+    Secret                   coriolis-appliance-advanced-keystone-fernet-keys
+    Secret                   coriolis-appliance-advanced-logging-credentials
+    PersistentVolumeClaim    coriolis-appliance-advanced-loki-data
+    PersistentVolumeClaim    coriolis-appliance-advanced-mariadb-data
+    PersistentVolumeClaim    coriolis-appliance-advanced-rabbitmq-data
+    ```
+
+The gate is **exactly seven Secrets and three PVCs** with these names -- ten retained resources in total, and nothing else carrying the appliance label. Never print or decode Secret data here; name and kind only.
+
+Before deleting the claims, note the `VOLUME` (PersistentVolume) name bound to each PVC in the `get pvc` output from the previous section. The `local-path` StorageClass uses `Delete` reclaim, so once a claim is gone its bound PV must be released and deleted automatically; after the next command, confirm each of the three previously recorded PV names returns `NotFound` (a targeted get of each recorded name). Never delete a PV directly.
+
+<!-- R2: Delete the three appliance data PVCs by exact name and wait for completion. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis delete pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data --wait=true --timeout=5m
+```
+
+??? example "Expected result"
+
+    ```text
+    persistentvolumeclaim "coriolis-appliance-advanced-mariadb-data" deleted
+    persistentvolumeclaim "coriolis-appliance-advanced-rabbitmq-data" deleted
+    persistentvolumeclaim "coriolis-appliance-advanced-loki-data" deleted
+    ```
+
+<!-- R3: Delete the seven generated credential Secrets by exact name. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis-appliance-advanced-barbican-credentials coriolis-appliance-advanced-coriolis-credentials coriolis-appliance-advanced-infrastructure-credentials coriolis-appliance-advanced-keystone-credential-keys coriolis-appliance-advanced-keystone-database-credentials coriolis-appliance-advanced-keystone-fernet-keys coriolis-appliance-advanced-logging-credentials
+```
+
+??? example "Expected result"
+
+    ```text
+    secret "coriolis-appliance-advanced-barbican-credentials" deleted
+    secret "coriolis-appliance-advanced-coriolis-credentials" deleted
+    secret "coriolis-appliance-advanced-infrastructure-credentials" deleted
+    secret "coriolis-appliance-advanced-keystone-credential-keys" deleted
+    secret "coriolis-appliance-advanced-keystone-database-credentials" deleted
+    secret "coriolis-appliance-advanced-keystone-fernet-keys" deleted
+    secret "coriolis-appliance-advanced-logging-credentials" deleted
+    ```
+
+<!-- R6: Confirm no Certificate or Ingress remains before deleting the TLS Secret. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o name
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+!!! warning "The TLS Secret is separate: verify before deleting it"
+    The cert-manager TLS Secret `coriolis.app.cloudbase.wiki-tls` is **not** part of the appliance's retained set: the label query above cannot see it because cert-manager's ingress-shim created it ownerless and unlabeled, and it persists after CR deletion. It was created by this run's certificate issuance flow, not by the namespace baseline, and it is not shared with any other workload. Delete it explicitly only after confirming that no `Certificate` or `Ingress` resource referencing it remains (the namespace-wide sweep in R6 proves this) and that the Secret still matches the UID recorded for this run in your pre-removal metadata inventory. Deleting it forces a **fresh ACME issuance** on the next appliance deployment, which consumes Let's Encrypt rate limits; **keeping this one Secret is an accepted shortcut** so a future run reuses the certificate, but a kept TLS Secret means the namespace is not at the exact blank baseline.
+
+<!-- R4: Delete the run-created TLS Secret after the verification above. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis.app.cloudbase.wiki-tls
+```
+
+??? example "Expected result"
+
+    ```text
+    secret "coriolis.app.cloudbase.wiki-tls" deleted
+    ```
+
+The remaining commands are verification gates for the wipe, plus the health proof that nothing shared was harmed.
+
+<!-- R5: Confirm no appliance-labeled workload, config, or storage resources remain. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,cm,secret,pvc,ingress,sa,role,rolebinding -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o name
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- R7: Confirm the operator Deployment is untouched and still ready. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
+```
+
+??? example "Expected result"
+
+    ```text
+    NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+    coriolis-operator   1/1     1            1           <AGE>
+    ```
+
+<!-- R8: Confirm the Argo CD Application is still Synced and Healthy. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    NAME       SYNC STATUS   HEALTH STATUS
+    coriolis   Synced        Healthy
+    ```
+
+With R5 to R8 green (and the three recorded PV names `NotFound`), the `coriolis` namespace is back to the pre-run, operator-only baseline: only the operator Deployment and Pod, the two pull Secrets, and the Argo CD-managed operator chart resources remain, and a fresh appliance apply will generate new credentials, new data volumes, and -- unless you kept it -- a new certificate.
 
 ## :material-book-open-page-variant-outline: Troubleshooting
 
@@ -710,6 +869,8 @@ The three data PVCs remain `Bound`: they are retained ownerless claims, exactly 
 | Logs look stale or a bootstrap Job seems missing | Natural producer activity needs time, and a successful but old bootstrap Job may simply have no log inside the selected observation window. Recreate the CR under the same name only when you intentionally want to refresh startup evidence, since retained state is reused unchanged; it is not routine recovery. |
 | Helper prints `ERROR category=post_ambiguous` | A POST's outcome could not be confirmed and the helper refused to guess. Inspect transfers and deployments for the unique notes in the UI before deciding; never blindly retry a write. |
 | Any other helper `ERROR category=...` | Each category is fixed and terminal (config, preflight, authentication, network, execution/deployment failure or timeout). Stop, match the category to the phase, and diagnose before re-running. |
+| Helper prints `ERROR category=preflight_failed` | No migration write occurred. Check endpoint IDs and the Keystone project scope first, then inspect existing transfers/deployments with the same notes. Resolve or clean the existing run before retrying; choose fresh notes only for a deliberately new migration, not to bypass duplicate protection. |
+| Licence card shows an error on the dashboard | Expected in this development appliance: there is no licensing backend and no licensing Ingress, so `/licensing/appliances` falls through to the Web UI single-page application and returns HTML instead of a licensing API response. It does not affect login, endpoints, or migration work; see the note in [Web Login And Visual Inspection](#web-login-and-visual-inspection). |
 | Someone suggests `coriolisDebug: true` | Decline on the immutable `2603.4` runtime; debug verbosity is unsafe for log hygiene here. |
 | Deleted Pod or drifted resource is not being repaired | Expected: reconciliation is retry- and collision-scoped, not broad periodic drift self-healing. Stop and follow the documented controlled recovery path; CR recreation or operator resume has lifecycle effects and must be a deliberate decision, never hand-edited operator-owned objects and not a re-apply expecting a repair. |
 
@@ -720,7 +881,7 @@ The three data PVCs remain `Bound`: they are retained ownerless claims, exactly 
 
 - Single-replica development appliance only; the `local-path` storage has no HA and no backups.
 - Upgrades, production storage classes, multi-CR routing, and drift self-healing are not production-accepted.
-- The bounded `0.5.54` UI migration evidence and the `0.5.57` logging evidence inform the expected outcomes above, but the current `0.5.59` walkthrough on this page remains **in progress** until someone follows it end to end on that release. No production claim is made.
+- The bounded `0.5.54` UI migration evidence and the `0.5.57` logging evidence informed the expected outcomes above, and the current `0.5.59` walkthrough on this page has been followed end to end on that release, as recorded in the [Coriolis Operator Tutorial Validation Record](operator-tutorial-validation.md). That is bounded development evidence on one disposable fixture; no production claim is made.
 
 Continue with:
 

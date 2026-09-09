@@ -14,7 +14,7 @@ The Kubernetes operator is separate from the migration product. It reconciles a 
 OpenStack is the initial documentation focus. OpenStack provider plugins implement source export and destination import operations.
 
 !!! warning
-    One bounded actual-browser Web UI OpenStack-to-OpenStack migration proof of concept has passed on released operator 0.5.54 in the development environment. The 0.5.59 walkthrough in the [Advanced Operator Tutorial](operator-advanced-tutorial.md) and all production-readiness claims remain unvalidated and in progress.
+    One bounded actual-browser Web UI OpenStack-to-OpenStack migration proof of concept has passed on released operator 0.5.54 in the development environment. The [Advanced Operator Tutorial](operator-advanced-tutorial.md) walkthrough has since been followed end to end on operator 0.5.59 with runtime 2603.4, recorded checkpoint by checkpoint in the [Coriolis Operator Tutorial Validation Record](operator-tutorial-validation.md). This is bounded development evidence only; all production-readiness claims remain unvalidated.
 
 ## :material-book-open-page-variant-outline: Architecture
 
@@ -24,6 +24,6 @@ Follow the [Migration Flow](migration-flow.md) from endpoint definition through 
 
 See the [Coriolis Operator](operator.md) for its Kubernetes lifecycle scope, validated boundaries, and current limitations.
 
-For a hands-on walkthrough from appliance bring-up through a Web UI migration, follow the in-progress [Advanced Operator Tutorial](operator-advanced-tutorial.md).
+For a hands-on walkthrough from appliance bring-up through a Web UI migration, follow the validated-on-0.5.59 [Advanced Operator Tutorial](operator-advanced-tutorial.md), tracked in its [Validation Record](operator-tutorial-validation.md).
 
 Prepare the two-cloud prerequisites described in the [OpenStack Context](openstack-provider.md), and use the focused [Terminology](terminology.md) when terms need clarification.

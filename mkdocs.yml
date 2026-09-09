@@ -13,7 +13,8 @@ nav:
   - 📋 Coriolis Architecture: architecture.md
   - 📋 Migration Flow: migration-flow.md
   - 📋 Coriolis Operator: operator.md
-  - ⏳ Advanced Operator Tutorial: operator-advanced-tutorial.md
+  - 📋 Advanced Operator Tutorial: operator-advanced-tutorial.md
+  - 📄 Operator Tutorial Validation Record: operator-tutorial-validation.md
   - ⏳ OpenStack Context: openstack-provider.md
   - 📄 Terminology: terminology.md
 
