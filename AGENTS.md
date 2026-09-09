@@ -11,16 +11,16 @@ Before the first inspection, debugging, or implementation tool call, classify th
 
 ## Task Routing And Delegation
 
-- The only roles are `main agent` and `subagent`. "Calling agent" means the main agent.
-- Only the main agent may delegate. Each subagent performs only its assigned bounded task and must never delegate or spawn other agents.
-- Only the main agent routes work: for discovery, it may delegate the first pass to `explore`; for analysis, it may gather evidence with `explore` then delegate bounded reasoning to `general`; for active changes, it may delegate implementation to `general` when context is clear and instructions are not risky. Before any non-trivial `general` delegation, the main agent must decompose the work and determine dependencies and execution order. The main agent may edit directly only when work is trivial, urgent, or unsafe to delegate.
-- `explore` subagents perform read-only discovery, including repository inspection, documentation review, pattern analysis, and observational diagnostics of remote environments. `general` subagents perform bounded reasoning and active changes or external operations with side effects assigned by the main agent.
+- The only roles are `main agent` and `subagent`. Only the main agent routes and delegates work; subagents perform only their assigned bounded tasks and must never delegate or spawn other agents.
+- Use `explore` for delegated discovery and evidence gathering: strictly read-only repository inspection, documentation review, pattern analysis, and observational diagnostics of remote environments.
+- Use `general` for delegated bounded reasoning, active changes, and assigned side-effecting external operations. Implementation may be delegated when context is clear and instructions are not risky, subject to the main agent's direct-work limits below.
 - `/home/radu/Dev/cb-coriolis` is the single project root; all repositories live beneath it, nested repositories do not redefine it, and filesystem access outside it is prohibited and unnecessary.
-- The main agent may directly inspect only narrow follow-up paths tied to a known edit, verification step, or scoped task. It must not do broad discovery or active external work when delegation is appropriate.
 - The main agent retains decomposition, integration, ambiguity and risk decisions, user communication, and the final response.
-- Every delegation prompt must identify the recipient as a subagent and state that no further delegation is allowed. It must state the resolved absolute repository root; that the root and all descendants at any depth are allowed; that nested working directories do not redefine the root; that filesystem access outside the root is prohibited; the exact target, objective, prerequisites, in-scope and out-of-scope boundaries, known constraints, relevant commands or files, safety limits, expected result, and one practical verification criterion.
-- Each `general` assignment must be one small, bounded objective or change concern that a limited-capability subagent can independently review. Split it further when it spans unrelated components, has independent deliverables, or cannot be reviewed with one targeted check. Provide only context necessary for the subtask; do not delegate the full user request as a substitute for decomposition. Do not ask subagents to guess targets, credentials, command syntax, deployment details, or environment assumptions. Run independent delegations in parallel and dependent work sequentially.
-- After every `general` subagent result, the main agent must perform a lightweight sanity review before accepting it, choosing follow-ups, or completing the task. Inspect the relevant diff, output, or state and run one targeted practical check without duplicating the full assignment.
+- The main agent may directly inspect only narrow follow-up paths tied to a known edit, verification step, or scoped task, and may edit directly only when work is trivial, urgent, or unsafe to delegate. It must not do broad discovery or active external work when delegation is appropriate.
+- Before non-trivial `general` delegation, the main agent must decompose the work and determine dependencies and execution order. Run independent delegations in parallel and dependent work sequentially.
+- Each `general` assignment must be one small, bounded objective or change concern a limited-capability subagent can independently review. Split work spanning unrelated components, independent deliverables, or more than one targeted check. Provide only necessary context; never substitute full-request delegation for decomposition or make subagents guess targets, credentials, command syntax, deployment details, or environment assumptions.
+- Every delegation prompt must identify the recipient as a subagent, forbid further delegation, and state the filesystem boundaries: the resolved absolute repository root, all descendants at any depth allowed, nested working directories do not redefine the root, and outside-root access prohibited. Include the exact target, objective, prerequisites, in-scope and out-of-scope boundaries, known constraints, relevant commands or files, safety limits, expected result, and one practical verification criterion.
+- After every `general` result, the main agent must perform a lightweight sanity review before acceptance, choosing follow-ups, or completion: inspect the relevant diff, output, or state and run one targeted practical check without duplicating the full assignment.
 - Request concise factual results: inspected or changed files, commands run, important output, errors, and current state.
 
 ## Execution And Safety
@@ -28,32 +28,62 @@ Before the first inspection, debugging, or implementation tool call, classify th
 - Use targeted searches for symbols, filenames, commands, or keywords; avoid loading broad references unless necessary.
 - After a manageable failure caused by syntax, quoting, missing tools, or minor environment mismatch, a subagent may make a small number of clear, low-risk corrective attempts only within its assigned scope.
 - Stop and report exact failures when errors indicate permissions, unexpected state, unclear prompts, target ambiguity, or side-effect risk. Do not make environment assumptions or continue repeated failures without corrected instructions.
-- Protect secrets: never print, log, echo, or expose their values. Prefer non-interactive secret handling and avoid prompts that may reveal them.
 - Failure reports must include the attempted action or command, exact error, corrective attempts, relevant output, and observed state. The main agent reviews failures before proceeding.
 
-## Site Structure
+### Sensitive Information
 
-- `docs/` is the MkDocs documentation source.
-- Keep documentation assets in `docs/assets/`.
+- Development is the default working environment unless a task explicitly targets Production.
+- In Development, agents and subagents may work with plaintext sensitive information without restriction, subject to the Git rule below.
+- When a task explicitly targets Production, never print, log, echo, or otherwise expose sensitive values.
+- In every environment, never commit sensitive information to Git; tracked code, config, docs, and examples must use placeholders instead.
 
-## Confluence Documentation
+## Documentation Sources
 
-- Use the authenticated Atlassian MCP server to query documentation in Confluence.
-- Use the `Coriolis Docs Support` space (key: `CDS`): `https://cloudbasedev.atlassian.net/wiki/spaces/CDS`.
+- `docs/` is the MkDocs documentation source; keep documentation assets in `docs/assets/`.
+- Use the authenticated Atlassian MCP server to query Confluence documentation in the `Coriolis Docs Support` space (key: `CDS`): `https://cloudbasedev.atlassian.net/wiki/spaces/CDS`.
 
-## Student-Facing Documentation
+## Documentation Standards
 
-The rules in this section apply only to student-facing documentation under `docs/`; they do not impose heading or command-presentation requirements on this `AGENTS.md` file or other internal tracking files.
+The rules in this section apply only to MkDocs documentation under `docs/`; they do not impose heading or command-presentation requirements on this `AGENTS.md` file or other internal tracking files.
 
 ### Navigation
 
 - Use `📋` for completed or currently validated pages, `⏳` for unvalidated or in-progress pages, and `📄` for reference pages in `mkdocs.yml` navigation labels.
 
-### Writing And Admonitions
+### Writing Rules
 
-- Keep explanations concise, direct, task-focused, and consistently formatted. Keep commands close to their original intent, rewriting only for clarity.
-- Prefix every second-level heading with `:material-book-open-page-variant-outline:` and every third-level heading with `:material-application-edit-outline:`.
-- Use Material admonitions where helpful: `!!! abstract` for goals or purpose, `!!! note` for context, `!!! tip` for shortcuts or best practices, `!!! warning` for risky actions, and `!!! danger` for destructive actions.
+- Keep explanations concise, direct, and task-focused; do not over-explain unless explicitly requested. Normalize inconsistent source formatting.
+- Preserve commands close to their original intent, rewriting only for clarity.
+- Prefix every second-level docs heading with `:material-book-open-page-variant-outline:` and every third-level docs heading with `:material-application-edit-outline:`.
+
+### Admonitions
+
+- Use Material admonitions where helpful: `!!! abstract` for goals or purpose, `!!! note` for context, `!!! tip` for shortcuts or best practices, `!!! warning` for risky actions, and `!!! danger` for service-disrupting or destructive actions.
+- Use the expandable `??? example "Expected result"` form for bulky expected results.
+
+### Command Formatting
+
+- Use one command per fenced block, with a short explanatory comment immediately above it.
+- Immediately follow each command block with an expandable `??? example "Expected result"` admonition containing an indented fenced block, with no intervening content.
+- Use representative, concrete success output, or exactly `No output.` when the command prints nothing.
+- Default expected-output fences to `text`; use another tag only for output accurately structured in that language. Reserve `shell` for transcripts mixing prompts, commands, and output.
+- Do not repeat the executable command inside its expected result.
+
+Compact template:
+
+````markdown
+<!-- List pods in the selected namespace. -->
+```bash
+kubectl get pods -n <namespace>
+```
+
+??? example "Expected result"
+
+    ```text
+    NAME              READY   STATUS    RESTARTS   AGE
+    example-pod-1     1/1     Running   0          2m
+    ```
+````
 
 ## Editing Rules
 
