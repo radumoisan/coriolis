@@ -3,8 +3,8 @@
 !!! abstract
     This tutorial takes you from an already-installed Coriolis operator in the approved development cluster to a fully Ready, LoggingReady Coriolis appliance you can log into from a browser. The complete tutorial covers appliance bring-up, an optional headless migration, a Web UI migration with observation, and cleanup.
 
-!!! info "Validation record"
-    This walkthrough was followed end to end on operator `0.5.59` with runtime `2603.4` in the approved development cluster on 2026-09-09, covering the headless and Web UI OpenStack-to-OpenStack migrations and full cleanup. Execution is tracked checkpoint by checkpoint in the [Coriolis Operator Tutorial Validation Record](operator-tutorial-validation.md). Follow that page's recording rules when you run the tutorial.
+!!! info "Supported and validated scope"
+    This walkthrough was validated on operator `0.5.59` with runtime `2603.4`, covering headless and Web UI OpenStack-to-OpenStack migrations and cleanup in the development cluster. The checks below show concrete healthy-state output. Generated identifiers and creation dates differ between installations; use the values returned by your own commands, not the example IDs. The Helm installation reference was rendered, not installed over Argo CD.
 
 !!! info "Estimated time"
     Appliance bring-up typically converges in 5 to 15 minutes. A small migration takes 10 to 30+ minutes, depending on the source and destination cloud. The operator install reference adds time only if you choose to read it closely.
@@ -40,25 +40,26 @@ Two ownership classes matter when inspecting state: most generated resources (De
 
 The live pattern is the Argo CD Application that syncs the operator chart from OCI with a wildcard `targetRevision` channel selector, automated sync, and no prune or selfHeal. The example manifest is [coriolis-operator-application.example.yaml](assets/manifests/coriolis-operator-application.example.yaml).
 
-The operator's own runtime knobs (log level, resources, security contexts, probes, and the `regcred` pull secret) are shown in [coriolis-operator-values.example.yaml](assets/manifests/coriolis-operator-values.example.yaml). These values are the chart defaults; passing them is optional. Do not add image repository or tag overrides there: as an ordinary user you do not edit the CI-owned `Chart.yaml` version, `appVersion`, or `values.yaml` image metadata. Selecting a published chart version at install time is different and is allowed, as the command below shows.
+The operator's own runtime knobs (log level, resources, security contexts, probes, and the `regcred` pull secret) are shown in [coriolis-operator-values.example.yaml](assets/manifests/coriolis-operator-values.example.yaml). These values are the chart defaults; passing them is optional. Do not override the CI-owned image repository, image tag, chart version, or `appVersion` in source files. Selecting a published chart version for a render is different: the preview below selects `0.5.59` without modifying release metadata.
 
-A direct Helm install is equivalent to what Argo CD does, using a concrete chart version you obtain from the OCI registry rather than inventing one:
+!!! warning "Do not install over the Argo CD-managed operator"
+    Argo CD owns the development operator. Do not run a separate `helm install` or `helm upgrade --install` against it. The command below only renders the chart and lists its resource kinds; it creates no Kubernetes resources and does not prove a live installation succeeded. Access to the private OCI registry is required to download the chart.
 
-<!-- Install or update the operator chart from the OCI registry with the example values (reference only; the dev cluster uses Argo CD). -->
+<!-- Preview the published operator chart without installing it. -->
 ```bash
-helm upgrade --install coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator --version <OPERATOR_CHART_VERSION> --namespace coriolis --create-namespace --values docs/assets/manifests/coriolis-operator-values.example.yaml
+(set -o pipefail; helm template coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator --version 0.5.59 --namespace coriolis --values docs/assets/manifests/coriolis-operator-values.example.yaml | grep '^kind:')
 ```
 
 ??? example "Expected result"
 
     ```text
-    Release "coriolis-operator" does not exist. Installing it now.
-    NAME: coriolis-operator
-    LAST DEPLOYED: <TIMESTAMP>
-    NAMESPACE: coriolis
-    STATUS: deployed
-    REVISION: 1
+    kind: ServiceAccount
+    kind: Role
+    kind: RoleBinding
+    kind: Deployment
     ```
+
+These four resources are the operator, not an appliance. OCI download messages may also appear on stderr. `pipefail` preserves a Helm failure instead of treating partial filtered output as success.
 
 ## :material-book-open-page-variant-outline: CRD First Install And Upgrade Caveat
 
@@ -69,6 +70,8 @@ The consequence for you: before any operator chart upgrade, the new `coriolisapp
 ## :material-book-open-page-variant-outline: Hands-On Prerequisites
 
 Run each check and compare with the expected result before continuing. Any mismatch means stop and fix the prerequisite, not the tutorial.
+
+Use Bash for the workstation commands; later cleanup steps use shell variables and an array. Have `kubectl`, Helm, `jq`, `curl`, Python 3, and standard shell utilities available. Keep command tracing disabled when handling credentials.
 
 ### :material-application-edit-outline: Repository Location
 
@@ -101,19 +104,31 @@ kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
 
 ### :material-application-edit-outline: Operator Deployment And CRD
 
-<!-- Verify the operator Deployment is running in the coriolis namespace. -->
+<!-- Verify the operator Deployment is running in the coriolis namespace; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
+kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator -o jsonpath='{.metadata.name}{" ready="}{.status.readyReplicas}{"/"}{.spec.replicas}{" available="}{.status.availableReplicas}{"\n"}'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                READY   UP-TO-DATE   AVAILABLE   AGE
-    coriolis-operator   1/1     1            1           <AGE>
+    coriolis-operator ready=1/1 available=1
     ```
 
 The operator Pod should show zero restarts in the cluster baseline; sustained restarts mean stop and investigate before deploying an appliance.
+
+<!-- Inspect the operator container's readiness and restart count without changing it. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l app.kubernetes.io/name=coriolis-operator -o jsonpath='{range .items[*]}ready={.status.containerStatuses[?(@.name=="operator")].ready} restarts={.status.containerStatuses[?(@.name=="operator")].restartCount}{"\n"}{end}'
+```
+
+??? example "Expected result"
+
+    ```text
+    ready=true restarts=0
+    ```
+
+Expect exactly one line. An empty result, an unready container, or a nonzero restart count needs investigation. Two Pods can appear during a rollout; wait for it to settle. The selector deliberately omits the release-instance label, which differs between Helm and Argo CD installations.
 
 <!-- Verify the CoriolisAppliance CRD is registered. -->
 ```bash
@@ -123,8 +138,8 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get crd coriolisappliances.c
 ??? example "Expected result"
 
     ```text
-    NAME                                      CREATED AT
-    coriolisappliances.coriolis.cloudbase.it   <CREATED_AT>
+    NAME                                       CREATED AT
+    coriolisappliances.coriolis.cloudbase.it   2026-08-20T13:37:25Z
     ```
 
 ### :material-application-edit-outline: Namespace Pull Secrets
@@ -139,8 +154,8 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get secret regcred coriolis-
 ??? example "Expected result"
 
     ```text
-    NAME                         TYPE
-    regcred                      kubernetes.io/dockerconfigjson
+    NAME                          TYPE
+    regcred                       kubernetes.io/dockerconfigjson
     coriolis-appliance-registry   kubernetes.io/dockerconfigjson
     ```
 
@@ -150,28 +165,28 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get secret regcred coriolis-
 
 The operator does not install storage, ingress, or certificate infrastructure. Confirm the three cluster services the appliance values will reference. These resources are cluster-scoped; the `-n coriolis` flag is ignored by kubectl there and is included only to keep the project convention of an explicit namespace on every dev kubectl command.
 
-<!-- Verify the dev local-path StorageClass exists. -->
+<!-- Verify the dev local-path StorageClass exists; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get storageclass local-path
+kubectl --context virt-infra-dev-buc-hq -n coriolis get storageclass local-path -o custom-columns='NAME:.metadata.name,PROVISIONER:.provisioner,RECLAIM:.reclaimPolicy,BINDING:.volumeBindingMode'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                   PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
-    local-path (default)   rancher.io/local-path   Delete          WaitForFirstConsumer   false                  <AGE>
+    NAME         PROVISIONER             RECLAIM   BINDING
+    local-path   rancher.io/local-path   Delete    WaitForFirstConsumer
     ```
 
-<!-- Verify the nginx IngressClass exists. -->
+<!-- Verify the nginx IngressClass exists; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get ingressclass nginx
+kubectl --context virt-infra-dev-buc-hq -n coriolis get ingressclass nginx -o custom-columns='NAME:.metadata.name,CONTROLLER:.spec.controller'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME    CONTROLLER             PARAMETERS   AGE
-    nginx   k8s.io/ingress-nginx    <none>      <AGE>
+    NAME    CONTROLLER
+    nginx   k8s.io/ingress-nginx
     ```
 
 <!-- Verify the letsencrypt ClusterIssuer is Ready. -->
@@ -201,6 +216,19 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get coriolisappliance coriol
     ```
 
 A `NotFound` here is the success condition. If the CR already exists, stop and reconcile with its owner instead of double-applying.
+
+<!-- Check whether the TLS Secret already exists before this run. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis.app.cloudbase.wiki-tls --ignore-not-found -o name
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+No output with exit status zero means the Secret is absent. If its name is printed, it predates this run: record that fact and preserve it during cleanup. A permission or connection error is not evidence of absence.
 
 ## :material-book-open-page-variant-outline: Chosen Appliance Values
 
@@ -292,101 +320,113 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get coriolisappliance coriol
 ??? example "Expected result"
 
     ```text
-    Accepted=True reason=<REASON>
-    Progressing=False reason=<REASON>
-    Reconciled=True reason=<REASON>
-    Ready=True reason=<REASON>
-    Degraded=False reason=<REASON>
+    Accepted=True reason=Accepted
+    Progressing=False reason=RuntimeReady
+    Reconciled=True reason=Reconciled
+    Ready=True reason=RuntimeReady
+    Degraded=False reason=NotDegraded
     Upgradeable=False reason=UpgradeNotSupported
-    LoggingReady=True reason=<REASON>
+    LoggingReady=True reason=LoggingReady
     ```
 
-The gate is the status combination, not the reason text: `Accepted`, `Reconciled`, `Ready`, and `LoggingReady` must be `True`, `Progressing` and `Degraded` must be `False`, and `Upgradeable` is expected `False` for this release. Reasons are the operator's internal detail; `UpgradeNotSupported` is shown as the expected example.
+The gate is the status combination, not the reason text: `Accepted`, `Reconciled`, `Ready`, and `LoggingReady` must be `True`, `Progressing` and `Degraded` must be `False`, and `Upgradeable` is expected `False` for this release. The reasons above are the fixed converged-state values emitted by the `0.5.59` operator; while the appliance is still converging you may instead see `RuntimeStarting` or `LoggingStarting`, and a blocked reconcile carries the failure category in place of the ready reasons.
 
 ### :material-application-edit-outline: Pods
 
 Every resource owned by the appliance carries the label `coriolis.cloudbase.it/appliance=coriolis-appliance-advanced`.
 
-<!-- List the appliance Pods by label. -->
+<!-- Show each component's ready/total containers, Pod phase, and restart count. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced
+kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.metadata.labels["coriolis.cloudbase.it/component"]) | .[] | [.metadata.labels["coriolis.cloudbase.it/component"], "\(((.status.containerStatuses // []) | map(select(.ready)) | length))/\(.spec.containers | length)", .status.phase, (((.status.containerStatuses // []) | map(.restartCount) | add) // 0)] | map(tostring) | join(" ")'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                                                        READY   STATUS      RESTARTS   AGE
-    coriolis-appliance-advanced-adaptor-...                     1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-alloy-...                       1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-barbican-api-...                1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-barbican-worker-...             1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-common-bootstrap-v3-...         0/1     Completed   0          <AGE>
-    coriolis-appliance-advanced-coriolis-api-...                1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-conductor-...          1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-deployer-manager-...   1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-minion-manager-...     1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-scheduler-...          1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-transfer-cron-...      1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-web-...                1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-coriolis-worker-...             1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-keystone-...                    1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-loki-0                          2/2     Running     0          <AGE>
-    coriolis-appliance-advanced-mariadb-0                       1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-memcached-...                   1/1     Running     0          <AGE>
-    coriolis-appliance-advanced-rabbitmq-0                      1/1     Running     0          <AGE>
+    adaptor 1/1 Running 0
+    alloy 1/1 Running 0
+    barbican-api 1/1 Running 0
+    barbican-worker 1/1 Running 0
+    common-bootstrap-v3 0/1 Succeeded 0
+    coriolis-api 1/1 Running 0
+    coriolis-conductor 1/1 Running 0
+    coriolis-deployer-manager 1/1 Running 0
+    coriolis-minion-manager 1/1 Running 0
+    coriolis-scheduler 1/1 Running 0
+    coriolis-transfer-cron 1/1 Running 0
+    coriolis-web 1/1 Running 0
+    coriolis-worker 1/1 Running 0
+    keystone 1/1 Running 0
+    loki 2/2 Running 0
+    mariadb 1/1 Running 0
+    memcached 1/1 Running 0
+    rabbitmq 1/1 Running 0
     ```
 
-The label filter must return **18 appliance Pods: 17 `Running` plus exactly one `Completed` (phase `Succeeded`) bootstrap Job Pod, with zero restarts**. The namespace-wide total is 19 Pods because the already-running operator Pod joins it but carries operator labels, not the appliance label. Any `CrashLoopBackOff`, restart, or missing appliance Pod blocks the tutorial; read the relevant condition and Pod logs before acting.
+Component labels come from the operator source (the logging gateway runs as a sidecar container inside the `loki` Pod, which is why that row shows `2/2`). The gate is **18 appliance rows: 17 `Running` with all containers ready plus exactly one `Succeeded` bootstrap Job row, with zero restarts everywhere**. The namespace-wide Pod total is 19 because the already-running operator Pod joins it but carries operator labels, not the appliance label. Any nonzero restart count, a phase other than `Running`/`Succeeded`, or a missing component row blocks the tutorial; read the relevant condition and Pod logs before acting.
 
 ### :material-application-edit-outline: PVCs, Ingresses, And Certificate
 
-<!-- List the appliance PersistentVolumeClaims. -->
+<!-- List the appliance PersistentVolumeClaims; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc
+kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                                        STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-    coriolis-appliance-advanced-loki-data       Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
-    coriolis-appliance-advanced-mariadb-data    Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
-    coriolis-appliance-advanced-rabbitmq-data   Bound    <PV>       1Gi        RWO            local-path     <unset>                 <AGE>
+    NAME                                        STATUS   VOLUME                                     CAPACITY   STORAGECLASS
+    coriolis-appliance-advanced-loki-data       Bound    pvc-6359c0f0-08c5-440a-9055-d2126e340196   10Gi       local-path
+    coriolis-appliance-advanced-mariadb-data    Bound    pvc-032c16e5-a89e-40e7-892b-2a7c18523880   10Gi       local-path
+    coriolis-appliance-advanced-rabbitmq-data   Bound    pvc-e35e92fd-d0b3-438b-ad43-16f76b86fd70   1Gi        local-path
     ```
 
-Exactly **three Bound PVCs**, created as direct resources with the names above (MariaDB, RabbitMQ, and Loki data), each `RWO` on `local-path` with `VOLUMEATTRIBUTESCLASS` `<unset>`. They are retained ownerless claims, so same-name recreation reuses them instead of reprovisioning.
+Exactly **three Bound PVCs**, created as direct resources with the names above (MariaDB, RabbitMQ, and Loki data), each `RWO` on `local-path`. The `VOLUME` names are cluster-generated, so the three values shown are representative, not literal; record your actual bound PV names from this output now, because the [Full Fresh Reset](#full-fresh-reset) section verifies their automatic reclaim after claim deletion. These are retained ownerless claims, so same-name recreation reuses them instead of reprovisioning.
 
-<!-- List the appliance Ingress resources. -->
+<!-- List the appliance Ingress resources; stable fields only, no volatile address or age (the HTTPS check below proves routing). -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get ingress
+kubectl --context virt-infra-dev-buc-hq -n coriolis get ingress -o custom-columns='NAME:.metadata.name,CLASS:.spec.ingressClassName,HOST:.spec.rules[0].host'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                                          CLASS   HOSTS                          ADDRESS        PORTS     AGE
-    coriolis-appliance-advanced-adaptor           nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
-    coriolis-appliance-advanced-barbican-api      nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
-    coriolis-appliance-advanced-coriolis-api      nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
-    coriolis-appliance-advanced-coriolis-web      nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
-    coriolis-appliance-advanced-keystone          nginx   coriolis.app.cloudbase.wiki   <INGRESS_IP>   80, 443   <AGE>
+    NAME                                       CLASS   HOST
+    coriolis-appliance-advanced-adaptor        nginx   coriolis.app.cloudbase.wiki
+    coriolis-appliance-advanced-barbican-api   nginx   coriolis.app.cloudbase.wiki
+    coriolis-appliance-advanced-coriolis-api   nginx   coriolis.app.cloudbase.wiki
+    coriolis-appliance-advanced-coriolis-web   nginx   coriolis.app.cloudbase.wiki
+    coriolis-appliance-advanced-keystone       nginx   coriolis.app.cloudbase.wiki
     ```
 
-Five Ingress resources, all on the same host, one per routed service. Only the `coriolis-appliance-advanced-coriolis-web` Ingress carries the cert-manager ClusterIssuer annotation, so it is the resource that drives certificate issuance; the `coriolis-appliance-advanced-adaptor` Ingress serves the `/logs` and `/log-stream` routes.
+Five Ingress resources, all on the same class and host, one per routed service. Only the `coriolis-appliance-advanced-coriolis-web` Ingress carries the cert-manager ClusterIssuer annotation, so it is the resource that drives certificate issuance; the `coriolis-appliance-advanced-adaptor` Ingress serves the `/logs` and `/log-stream` routes.
 
-<!-- Check the cert-manager Certificate readiness. -->
+<!-- Check the cert-manager Certificate readiness; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate
+kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate -o custom-columns='NAME:.metadata.name,READY:.status.conditions[?(@.type=="Ready")].status,SECRET:.spec.secretName'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                              READY   SECRET                            AGE
-    coriolis.app.cloudbase.wiki-tls   True    coriolis.app.cloudbase.wiki-tls   <AGE>
+    NAME                              READY   SECRET
+    coriolis.app.cloudbase.wiki-tls   True    coriolis.app.cloudbase.wiki-tls
     ```
 
 The gate is one `Ready=True` Certificate whose `SECRET` is the TLS Secret for the configured host; the ingressed Secret name follows the ingress-shim `<host>-tls` convention. The issuer behind it is the `letsencrypt` ClusterIssuer annotated on the web Ingress (see above); the `get certificate` table itself does not show an `ISSUER` column.
+
+<!-- Verify the Certificate's requested issuer and DNS names without reading private keys. -->
+```bash
+kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate coriolis.app.cloudbase.wiki-tls -o jsonpath='{.spec.secretName}{" issuer="}{.spec.issuerRef.kind}{"/"}{.spec.issuerRef.name}{" dnsNames="}{.spec.dnsNames[*]}{"\n"}'
+```
+
+??? example "Expected result"
+
+    ```text
+    coriolis.app.cloudbase.wiki-tls issuer=ClusterIssuer/letsencrypt dnsNames=coriolis.app.cloudbase.wiki
+    ```
+
+These are the requested issuer and DNS subject alternative names (SANs), not proof of what the server presents. The next check verifies HTTPS with certificate and hostname validation enabled; do not add `--insecure` to make a TLS error disappear.
 
 ### :material-application-edit-outline: HTTPS And Routes
 
@@ -412,20 +452,20 @@ A `200` with a hostname-valid certificate proves the Ingress, the TLS Certificat
 | `/logs`, `/log-stream` | Authenticated log list, download, and streaming APIs served by the logging adaptor |
 
 !!! warning
-    The next command prints a real credential to your terminal. That is acceptable only because this is the approved development environment; never run it while screen-sharing, in CI output, or against Production, and never paste the value anywhere.
+    The appliance's Keystone admin password is a real credential. The command below captures it into a shell variable without printing it. Use Bash with tracing (`set -x`) disabled, or the assignment will leak the value. Reveal it only in a private terminal, never while screen-sharing, in CI output, or against Production, and never store it in tracked files or notes.
 
-<!-- Read the generated Keystone admin password from the appliance credentials Secret (dev only). -->
+<!-- Capture the admin password privately and fail if it cannot be read or is empty. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d
+KEYSTONE_ADMIN_PASSWORD="$(set -o pipefail; kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d)" && test -n "$KEYSTONE_ADMIN_PASSWORD"
 ```
 
 ??? example "Expected result"
 
     ```text
-    <GENERATED_ADMIN_PASSWORD>
+    No output.
     ```
 
-The operator generates this credential once and retains it across same-name appliance recreations; the value is random per appliance. Use it directly for this development session only, and never store it in tracked files, notes, or command output.
+Success is exit status zero with no output; stop on any error or nonzero status. In that same private terminal, `printf '%s\n' "$KEYSTONE_ADMIN_PASSWORD"` reveals the value for browser login. Its output is deliberately not reproduced here. After logging in, use `unset KEYSTONE_ADMIN_PASSWORD` and clear the terminal scrollback. The operator generates the credential once and retains it across same-name appliance recreation.
 
 ## :material-book-open-page-variant-outline: Web Login And Visual Inspection
 
@@ -433,7 +473,7 @@ The operator generates this credential once and retains it across same-name appl
    **Expected outcome:** the Coriolis web UI loads over HTTPS with a valid TLS certificate (no browser warning) and presents a Welcome screen with privacy and end-user license agreement (EULA) checkboxes and a **Submit** button.
 2. Select both the privacy and EULA checkboxes, then click **Submit**.
    **Expected outcome:** the UI proceeds to `/login`, which offers only `Username` and `Password` fields and a **Login** button (there is no domain field on this form).
-3. Log in with username `admin` and the `keystone_admin_password` you just displayed.
+3. Log in with username `admin` and the password you captured into `KEYSTONE_ADMIN_PASSWORD` (reveal it in a private terminal as described above).
    **Expected outcome:** authentication succeeds and the Dashboard loads with a Signed in indicator, in an empty or near-empty state, because this fresh appliance has no endpoints or transfers yet.
 4. Use the sidebar navigation labels **Transfers**, **Deployments**, and **Cloud Endpoints** to open each area without creating anything.
    **Expected outcome:** pages render without error banners; the transfer, deployment, and endpoint lists are empty. This confirms the UI can talk to the Coriolis API and Keystone through the ingress.
@@ -444,7 +484,7 @@ The operator generates this credential once and retains it across same-name appl
     The Dashboard's **Current Licence** card reports an error in this deployment: `/licensing/appliances` falls through to the Web UI and returns HTML, not a licensing API response. The core operator profile does not deploy a licensing backend or configure `LICENSING_SERVER_BASE_URL` for the conductor. Do not treat HTTP 200 on `/licensing` as a healthy licensing service or generalize this development configuration to a licensed production deployment.
 
 !!! tip "Checkpoint"
-    At this point you have a Ready and LoggingReady appliance with zero-restart Pods, three Bound PVCs, a trusted HTTPS endpoint, and a working browser login to the Dashboard with empty Transfers, Deployments, and Cloud Endpoints lists and a reachable Logs page. Stop here for now; endpoint registration and the first migration continue in the next section.
+    At this point you have a Ready and LoggingReady appliance with zero-restart Pods, three Bound PVCs, a trusted HTTPS endpoint, and a working browser login to the Dashboard with empty Transfers, Deployments, and Cloud Endpoints lists and a reachable Logs page. Endpoint registration and the first migration continue in the next section.
 
 ## :material-book-open-page-variant-outline: OpenStack Migration Prerequisites
 
@@ -565,11 +605,13 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-applianc
 
     ```text
     PASS preflight
-    PASS transfer id=<TRANSFER_ID>
-    PASS execution id=<EXECUTION_ID> status=COMPLETED
-    PASS deployment id=<DEPLOYMENT_ID> status=COMPLETED
+    PASS transfer id=3f205a3f-581a-48c4-8357-774525052e73
+    PASS execution id=bfcd1c48-d37c-4549-b880-cbbdd473c7f6 status=COMPLETED
+    PASS deployment id=cc2c27cb-877e-456f-a9ab-04828669458d status=COMPLETED
     SUMMARY headless-migration passed
     ```
+
+The three ids are the actual objects created by the validated run. Your ids will differ: they are outputs to record for the observation and cleanup steps, never inputs you configure or reuse.
 
 The helper's output contract is fixed and safe to keep on screen:
 
@@ -600,6 +642,21 @@ Verify the same facts a UI-driven run would show, through the Web UI and the clo
 7. Open the Logs navigation and browse the appliance components around the migration window.
    **Expected outcome:** conductor, scheduler, worker, and deployer activity is visible for the run; you never search logs for secret values to confirm any of this.
 
+Inside the migrated guest, reached over SSH using its floating IP and keypair, also check cloud-init. Run this in the guest, not on the Kubernetes workstation:
+
+<!-- Inside the migrated guest, confirm cloud-init completed. -->
+```bash
+cloud-init status
+```
+
+??? example "Expected result"
+
+    ```text
+    status: done
+    ```
+
+If it is still running, wait and check again. Investigate errors inside the guest before declaring it usable. Even `done` does not replace reading your marker file and checking the disks and network: a cloned disk can preserve cloud-init state from the source.
+
 !!! warning "Completion is not usability"
     `COMPLETED` statuses prove the Coriolis workflow finished. Guest usability is a separate conclusion you only reach from step 6: boot state, disks, networking, and your marker.
 
@@ -611,10 +668,11 @@ If you ran the headless migration, do not start the walkthrough below on top of 
    **Expected outcome:** no headless transfer, deployment, or migration artifacts remain. Keep the fixture infrastructure and both endpoints; an empty run-created Swift export container may also be kept for the repeat, then removed during final cleanup.
 2. Intentionally restore the fixture: restart, recreate, or rebuild the disposable source VM so it is `ACTIVE` with the marker again, on the same source network.
    **Expected outcome:** the source VM matches the prerequisites table again.
-3. Remove or keep the destination VM according to who owns the test result; it is a real VM, not an automatic leftover.
-   **Expected outcome:** the destination project state is a deliberate choice, not an accident.
-4. Keep both endpoints.
+3. Keep both endpoints.
    **Expected outcome:** the UI walkthrough below can reuse the validated endpoints without re-entering credentials.
+
+!!! note "Cloud-init markers run once per instance"
+    A normal restart does not rerun cloud-init `runcmd` or produce a new first-boot serial marker. After restoring the source, check the persisted marker inside the guest; if you recreated or rebuilt it, verify that initialization wrote the marker again. Do not mistake an old console message or `cloud-init status: done` for proof of a new initialization run.
 
 ## :material-book-open-page-variant-outline: Full Web UI Migration Walkthrough
 
@@ -662,8 +720,8 @@ Then, once your execution actually completes, repeat the observation checks from
 
 The Logs navigation queries the appliance's own Loki-backed logging through the authenticated UI session.
 
-- Natural producer activity appears over time: as components emit logs they show up in the viewer. An initially quiet component is not a failure; the run you just did should have produced volume across conductor, scheduler, worker, deployer, API, and web.
-- The audited expectations from the logging qualification are that producers are non-empty over a window, with Memcached as the explicit non-empty-log exception. The logging infrastructure (Loki, gateway, Alloy, adaptor) is handled separately: it is self-excluded from natural correlation so the stack never queries itself, while its own health is audited for readiness and readability.
+- Look around the migration window for `coriolis-conductor`, `coriolis-scheduler`, `coriolis-worker`, `coriolis-deployer-manager`, `coriolis-api`, and `coriolis-web`. Quiet components need not emit continuously, and retention removes older entries.
+- A successful log request can return empty content for Memcached; that alone is not a logging failure. An adaptor error or missing logs across active producers needs investigation. Loki, gateway, Alloy, and adaptor are excluded from the application's producer listing to avoid self-collection; use their Kubernetes readiness and container logs when diagnosing the logging stack itself.
 - Never search, filter, or display log output for secret values, tokens, or endpoint credentials; confirm facts from status and cloud state instead.
 
 !!! warning "Debug mode is unsafe on this runtime"
@@ -693,6 +751,21 @@ An empty Swift export container can remain after disk cleanup. In this run the s
 !!! warning "The namespace is shared"
     The `coriolis` namespace also hosts the Argo CD-managed operator. Deleting an appliance never justifies deleting the namespace, the operator, or the Argo CD Application.
 
+If you intend to perform the full fresh reset, capture the TLS Secret's UID before removal. Keep this Bash session open through cleanup; the variable is a metadata reference, not the certificate's private key.
+
+<!-- Remember the TLS Secret identity for the optional destructive reset. -->
+```bash
+TUTORIAL_TLS_UID="$(kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis.app.cloudbase.wiki-tls -o jsonpath='{.metadata.uid}')" && test -n "$TUTORIAL_TLS_UID"
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+Proceed only on exit status zero. Recording the UID does not establish ownership: the pre-run check must also have shown this Secret absent before you can delete it during reset.
+
 <!-- Delete the appliance CR through the operator's supported path and wait for finalization. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis delete coriolisappliance coriolis-appliance-advanced --wait=true --timeout=10m
@@ -715,21 +788,21 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudba
     No resources found in coriolis namespace.
     ```
 
-<!-- List the three retained data PVCs explicitly. -->
+<!-- List the three retained data PVCs explicitly; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data
+kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                                        STATUS   VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-    coriolis-appliance-advanced-mariadb-data    Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
-    coriolis-appliance-advanced-rabbitmq-data   Bound    <PV>       1Gi        RWO            local-path     <unset>                 <AGE>
-    coriolis-appliance-advanced-loki-data       Bound    <PV>       10Gi       RWO            local-path     <unset>                 <AGE>
+    NAME                                        STATUS   VOLUME                                     CAPACITY   STORAGECLASS
+    coriolis-appliance-advanced-mariadb-data    Bound    pvc-032c16e5-a89e-40e7-892b-2a7c18523880   10Gi       local-path
+    coriolis-appliance-advanced-rabbitmq-data   Bound    pvc-e35e92fd-d0b3-438b-ad43-16f76b86fd70   1Gi        local-path
+    coriolis-appliance-advanced-loki-data       Bound    pvc-6359c0f0-08c5-440a-9055-d2126e340196   10Gi       local-path
     ```
 
-The three data PVCs remain `Bound`: they are retained ownerless claims, exactly like the generated credential Secrets, which also survive. A same-name CR recreation therefore reuses the identical credential identities and the same persistent data; the owner-referenced workloads, configuration, and routes are what the delete removed. **Keep this retained state by default** -- it is the designed behavior, and same-name recreation is meant to reuse it. Never delete, force, edit finalizers, or reassign owners on any retained resource as improvised "cleanup". If and only if you deliberately want the namespace back to its pre-run, operator-only baseline, follow the optional [Full Fresh Reset](#full-fresh-reset) section below, which removes each retained resource by its exact recorded name under explicit safeguards.
+The three data PVCs remain `Bound` with the same `VOLUME` bindings recorded earlier: they are retained ownerless claims, exactly like the generated credential Secrets, which also survive. A same-name CR recreation therefore reuses the identical credential identities and the same persistent data; the owner-referenced workloads, configuration, and routes are what the delete removed. **Keep this retained state by default** -- it is the designed behavior, and same-name recreation is meant to reuse it. Never delete, force, edit finalizers, or reassign owners on any retained resource as improvised "cleanup". If and only if you deliberately want the namespace back to its pre-run, operator-only baseline, follow the optional [Full Fresh Reset](#full-fresh-reset) section below, which removes each retained resource by its exact recorded name under explicit safeguards.
 
 ## :material-book-open-page-variant-outline: Full Fresh Reset
 
@@ -740,28 +813,40 @@ Retained state is kept by default (see [Optional Runtime Removal](#optional-runt
 
 <!-- R1: Enumerate the retained Secrets and PVCs by appliance label, metadata only. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret,pvc -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o custom-columns=KIND:.kind,NAME:.metadata.name
+kubectl --context virt-infra-dev-buc-hq -n coriolis get secret,pvc -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.kind, .metadata.name) | .[] | "\(.kind) \(.metadata.name)"'
 ```
 
 ??? example "Expected result"
 
     ```text
-    KIND                     NAME
-    Secret                   coriolis-appliance-advanced-barbican-credentials
-    Secret                   coriolis-appliance-advanced-coriolis-credentials
-    Secret                   coriolis-appliance-advanced-infrastructure-credentials
-    Secret                   coriolis-appliance-advanced-keystone-credential-keys
-    Secret                   coriolis-appliance-advanced-keystone-database-credentials
-    Secret                   coriolis-appliance-advanced-keystone-fernet-keys
-    Secret                   coriolis-appliance-advanced-logging-credentials
-    PersistentVolumeClaim    coriolis-appliance-advanced-loki-data
-    PersistentVolumeClaim    coriolis-appliance-advanced-mariadb-data
-    PersistentVolumeClaim    coriolis-appliance-advanced-rabbitmq-data
+    PersistentVolumeClaim coriolis-appliance-advanced-loki-data
+    PersistentVolumeClaim coriolis-appliance-advanced-mariadb-data
+    PersistentVolumeClaim coriolis-appliance-advanced-rabbitmq-data
+    Secret coriolis-appliance-advanced-barbican-credentials
+    Secret coriolis-appliance-advanced-coriolis-credentials
+    Secret coriolis-appliance-advanced-infrastructure-credentials
+    Secret coriolis-appliance-advanced-keystone-credential-keys
+    Secret coriolis-appliance-advanced-keystone-database-credentials
+    Secret coriolis-appliance-advanced-keystone-fernet-keys
+    Secret coriolis-appliance-advanced-logging-credentials
     ```
 
 The gate is **exactly seven Secrets and three PVCs** with these names -- ten retained resources in total, and nothing else carrying the appliance label. Never print or decode Secret data here; name and kind only.
 
-Before deleting the claims, note the `VOLUME` (PersistentVolume) name bound to each PVC in the `get pvc` output from the previous section. The `local-path` StorageClass uses `Delete` reclaim, so once a claim is gone its bound PV must be released and deleted automatically; after the next command, confirm each of the three previously recorded PV names returns `NotFound` (a targeted get of each recorded name). Never delete a PV directly.
+The `local-path` StorageClass uses `Delete` reclaim: after claim deletion, each bound PV must be deleted automatically. Capture the three actual bindings in a Bash array before deleting the claims; do not reuse the example UUIDs. Keep this session open until the PV check below. Never delete a PV directly.
+
+<!-- Capture exactly three bound PV names from the tutorial claims. -->
+```bash
+TUTORIAL_PVS=($(kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data -o jsonpath='{.items[*].spec.volumeName}')) && test "${#TUTORIAL_PVS[@]}" -eq 3
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+Exit status zero confirms three names were captured. Stop if the read fails or a claim is unbound; do not continue with an empty or incomplete array.
 
 <!-- R2: Delete the three appliance data PVCs by exact name and wait for completion. -->
 ```bash
@@ -775,6 +860,19 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete pvc coriolis-applianc
     persistentvolumeclaim "coriolis-appliance-advanced-rabbitmq-data" deleted
     persistentvolumeclaim "coriolis-appliance-advanced-loki-data" deleted
     ```
+
+<!-- Check only the captured PVs; ignore NotFound responses, not other errors. -->
+```bash
+test "${#TUTORIAL_PVS[@]}" -eq 3 && kubectl --context virt-infra-dev-buc-hq -n coriolis get pv "${TUTORIAL_PVS[@]}" --ignore-not-found -o name
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+Exit status zero with no names means all three PVs are absent. If a name remains, wait for automatic reclaim and repeat this check. Investigate a persistent resource or API error; do not force deletion to obtain an empty result.
 
 <!-- R3: Delete the seven generated credential Secrets by exact name. -->
 ```bash
@@ -793,7 +891,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis-appli
     secret "coriolis-appliance-advanced-logging-credentials" deleted
     ```
 
-<!-- R6: Confirm no Certificate or Ingress remains before deleting the TLS Secret. -->
+<!-- R4: Confirm no Certificate or Ingress remains before deleting the TLS Secret. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o name
 ```
@@ -805,9 +903,22 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o n
     ```
 
 !!! warning "The TLS Secret is separate: verify before deleting it"
-    The cert-manager TLS Secret `coriolis.app.cloudbase.wiki-tls` is **not** part of the appliance's retained set: the label query above cannot see it because cert-manager's ingress-shim created it ownerless and unlabeled, and it persists after CR deletion. It was created by this run's certificate issuance flow, not by the namespace baseline, and it is not shared with any other workload. Delete it explicitly only after confirming that no `Certificate` or `Ingress` resource referencing it remains (the namespace-wide sweep in R6 proves this) and that the Secret still matches the UID recorded for this run in your pre-removal metadata inventory. Deleting it forces a **fresh ACME issuance** on the next appliance deployment, which consumes Let's Encrypt rate limits; **keeping this one Secret is an accepted shortcut** so a future run reuses the certificate, but a kept TLS Secret means the namespace is not at the exact blank baseline.
+    The cert-manager TLS Secret `coriolis.app.cloudbase.wiki-tls` is ownerless and unlabeled in this deployment, so the appliance-label query cannot find it and CR deletion leaves it behind. Delete it only if your baseline proves this run created it, no other workload uses it, no referencing Certificate or Ingress remains (R4), and its UID matches your pre-removal inventory. Do not assume ownership from the name alone. Deleting it forces fresh ACME issuance on the next deployment and consumes Let's Encrypt rate limits. Keeping this Secret lets a later run reuse the certificate, but is not an exact return to the blank baseline.
 
-<!-- R4: Delete the run-created TLS Secret after the verification above. -->
+<!-- Verify that the TLS Secret still has the UID captured before runtime removal. -->
+```bash
+test -n "${TUTORIAL_TLS_UID:-}" && test "$TUTORIAL_TLS_UID" = "$(kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis.app.cloudbase.wiki-tls -o jsonpath='{.metadata.uid}')"
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+Only exit status zero is success. A lost variable, changed UID, missing Secret, or API error blocks the next command. If you kept the pre-existing TLS Secret, skip both this comparison and its deletion.
+
+<!-- R5: Delete the run-created TLS Secret after the verification above. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis.app.cloudbase.wiki-tls
 ```
@@ -820,7 +931,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis.app.c
 
 The remaining commands are verification gates for the wipe, plus the health proof that nothing shared was harmed.
 
-<!-- R5: Confirm no appliance-labeled workload, config, or storage resources remain. -->
+<!-- R6: Confirm no appliance-labeled workload, config, or storage resources remain. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,cm,secret,pvc,ingress,sa,role,rolebinding -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o name
 ```
@@ -831,16 +942,15 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,c
     No output.
     ```
 
-<!-- R7: Confirm the operator Deployment is untouched and still ready. -->
+<!-- R7: Confirm the operator Deployment is untouched and still ready; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
+kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator -o jsonpath='{.metadata.name}{" ready="}{.status.readyReplicas}{"/"}{.spec.replicas}{" available="}{.status.availableReplicas}{"\n"}'
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                READY   UP-TO-DATE   AVAILABLE   AGE
-    coriolis-operator   1/1     1            1           <AGE>
+    coriolis-operator ready=1/1 available=1
     ```
 
 <!-- R8: Confirm the Argo CD Application is still Synced and Healthy. -->
@@ -855,7 +965,7 @@ kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
     coriolis   Synced        Healthy
     ```
 
-With R5 to R8 green (and the three recorded PV names `NotFound`), the `coriolis` namespace is back to the pre-run, operator-only baseline: only the operator Deployment and Pod, the two pull Secrets, and the Argo CD-managed operator chart resources remain, and a fresh appliance apply will generate new credentials, new data volumes, and -- unless you kept it -- a new certificate.
+With R6 to R8 green and the captured-PV check returning no names, the `coriolis` namespace is back to the pre-run, operator-only baseline: only the operator Deployment and Pod, the two pull Secrets, and the Argo CD-managed operator chart resources remain, and a fresh appliance apply will generate new credentials, new data volumes, and -- unless you kept it -- a new certificate.
 
 ## :material-book-open-page-variant-outline: Troubleshooting
 
@@ -881,7 +991,7 @@ With R5 to R8 green (and the three recorded PV names `NotFound`), the `coriolis`
 
 - Single-replica development appliance only; the `local-path` storage has no HA and no backups.
 - Upgrades, production storage classes, multi-CR routing, and drift self-healing are not production-accepted.
-- The bounded `0.5.54` UI migration evidence and the `0.5.57` logging evidence informed the expected outcomes above, and the current `0.5.59` walkthrough on this page has been followed end to end on that release, as recorded in the [Coriolis Operator Tutorial Validation Record](operator-tutorial-validation.md). That is bounded development evidence on one disposable fixture; no production claim is made.
+- The bounded `0.5.54` UI migration evidence and the `0.5.57` logging evidence informed the expected outcomes above, and the current `0.5.59` walkthrough with runtime `2603.4` on this page was followed end to end in the approved development cluster on 2026-09-09. That is bounded development evidence on one disposable fixture; no production claim is made.
 
 Continue with:
 
