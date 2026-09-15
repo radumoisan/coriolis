@@ -2,28 +2,29 @@
   "$schema": "https://opencode.ai/config.json",
   "agent": {
     "explore": {
-      "model": "opencode-go/deepseek-v4-flash",
+      "model": "openai/gpt-5.6-luna",
       "reasoningEffort": "low"
     },
     "general": {
-      "model": "opencode-go/qwen3.8-flash",
-      "variant": "medium"
+      "model": "openai/gpt-5.6-terra",
+      "variant": "high"
     },
     "plan": {
       "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "xhigh"
+    },
+    "build": {
+      "model": "openai/gpt-5.6-sol",
+      "reasoningEffort": "high"
     }
   },
   "mcp": {
     "playwright": {
       "type": "local",
       "command": [
-        "docker",
-        "run",
-        "-i",
-        "--rm",
-        "--init",
-        "mcr.microsoft.com/playwright/mcp@sha256:18c0a9c934004fe9580cc79f1e8e6e6cde7c667348b215335e8a23fd3e509804",
+        "npx",
+        "-y",
+        "@playwright/mcp",
         "--headless",
         "--browser",
         "chromium",

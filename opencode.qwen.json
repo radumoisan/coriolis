@@ -18,12 +18,9 @@
     "playwright": {
       "type": "local",
       "command": [
-        "docker",
-        "run",
-        "-i",
-        "--rm",
-        "--init",
-        "mcr.microsoft.com/playwright/mcp@sha256:18c0a9c934004fe9580cc79f1e8e6e6cde7c667348b215335e8a23fd3e509804",
+        "npx",
+        "-y",
+        "@playwright/mcp",
         "--headless",
         "--browser",
         "chromium",

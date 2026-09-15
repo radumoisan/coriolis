@@ -27,20 +27,11 @@ Four layers cooperate, each owned by a different actor:
    &emsp;⟡ Memcached,<br>
    &emsp;⟡ Keystone,<br>
    &emsp;⟡ Barbican,<br>
-   &emsp;⟡ the Coriolis services:<br>
-   &emsp;&emsp;⤷ API,<br>
-   &emsp;&emsp;⤷ Web,<br>
-   &emsp;&emsp;⤷ Conductor,<br>
-   &emsp;&emsp;⤷ Scheduler,<br>
-   &emsp;&emsp;⤷ Transfer Cron,<br>
-   &emsp;&emsp;⤷ Minion Manager,<br>
-   &emsp;&emsp;⤷ Deployer Manager,<br>
+   &emsp;⟡ the Coriolis services<br>
+   &emsp;&emsp;⤷ `API` | `Web` | `Conductor` | `Scheduler` | `Transfer Cron` | `Minion Mgr` | `Deployer Mgr`<br>
    &emsp;&emsp;⤷ Worker,<br>
-   &emsp;⟡ the logging stack:<br>
-   &emsp;&emsp;⤷ Loki,<br>
-   &emsp;&emsp;⤷ gateway,<br>
-   &emsp;&emsp;⤷ Alloy,<br>
-   &emsp;&emsp;⤷ adaptor,<br>
+   &emsp;⟡ the Logging stack<br>
+   &emsp;&emsp;⤷ `Loki` | `gateway` | `Alloy` | `adaptor`<br>
    &emsp;⟡ the web UI.
 
 For normal appliance work, change the custom resource and use the runtime. Check Argo CD and the operator when you need to diagnose or confirm their health.
