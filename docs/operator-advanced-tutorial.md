@@ -20,13 +20,8 @@ Four layers cooperate, each owned by a different actor:
    &emsp;⟡ resource bounds,<br>
    &emsp;⟡ ingress host and TLS,<br>
    &emsp;⟡ logging retention.<br>
-   Its `.status.conditions` are the authoritative progress report.
-4. **The runtime** is the set of appliance Pods:<br>
-   &emsp;⟡ MariaDB,<br>
-   &emsp;⟡ RabbitMQ,<br>
-   &emsp;⟡ Memcached,<br>
-   &emsp;⟡ Keystone,<br>
-   &emsp;⟡ Barbican,<br>
+4. **The runtime** is the set of appliance Pods<br>
+   &emsp;⟡ MariaDB | RabbitMQ | Memcached | Keystone | Barbican<br>
    &emsp;⟡ the Coriolis services<br>
    &emsp;&emsp;⤷ `API` | `Web` | `Conductor` | `Scheduler` | ...<br>
    &emsp;⟡ the Logging stack<br>
