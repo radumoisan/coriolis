@@ -8,9 +8,40 @@
 Four layers cooperate, each owned by a different actor:
 
 1. **Argo CD** (`argocd/coriolis` Application) continuously deploys the operator Helm chart from the OCI registry and keeps the operator Deployment in sync. CIXpress CI publishes chart and image versions, and the live Application selects them through a wildcard chart channel rather than a user-edited pin.
-2. **The operator** (a single reconciler Pod in the `coriolis` namespace) watches `CoriolisAppliance` custom resources. It validates the request, then creates dependencies, runs bootstrap, applies workloads, and exposes the runtime through Ingress.
-3. **The custom resource** (`CoriolisAppliance`) is your only declaration of intent: runtime version, storage classes and sizes, resource bounds, ingress host and TLS, and logging retention. Its `.status.conditions` are the authoritative progress report.
-4. **The runtime** is the set of appliance Pods: MariaDB, RabbitMQ, Memcached, Keystone, Barbican, the Coriolis services (API, Web, Conductor, Scheduler, Transfer Cron, Minion Manager, Deployer Manager, Worker), the logging stack (Loki, gateway, Alloy, adaptor), and the web UI you reach over HTTPS.
+2. **The operator** (a single reconciler Pod in the `coriolis` namespace) watches `CoriolisAppliance` custom resources.<br>
+   &emsp;⤷ It validates the request,<br>
+   &emsp;&emsp;⤷ creates dependencies,<br>
+   &emsp;&emsp;&emsp;⤷ runs bootstrap,<br>
+   &emsp;&emsp;&emsp;&emsp;⤷ applies workloads,<br>
+   &emsp;&emsp;&emsp;&emsp;&emsp;⤷ exposes the runtime through Ingress.
+3. **The custom resource** (`CoriolisAppliance`) is your only declaration of intent:<br>
+   &emsp;⟡ runtime version,<br>
+   &emsp;⟡ storage classes and sizes,<br>
+   &emsp;⟡ resource bounds,<br>
+   &emsp;⟡ ingress host and TLS,<br>
+   &emsp;⟡ logging retention.<br>
+   Its `.status.conditions` are the authoritative progress report.
+4. **The runtime** is the set of appliance Pods:<br>
+   &emsp;⟡ MariaDB,<br>
+   &emsp;⟡ RabbitMQ,<br>
+   &emsp;⟡ Memcached,<br>
+   &emsp;⟡ Keystone,<br>
+   &emsp;⟡ Barbican,<br>
+   &emsp;⟡ the Coriolis services:<br>
+   &emsp;&emsp;⤷ API,<br>
+   &emsp;&emsp;⤷ Web,<br>
+   &emsp;&emsp;⤷ Conductor,<br>
+   &emsp;&emsp;⤷ Scheduler,<br>
+   &emsp;&emsp;⤷ Transfer Cron,<br>
+   &emsp;&emsp;⤷ Minion Manager,<br>
+   &emsp;&emsp;⤷ Deployer Manager,<br>
+   &emsp;&emsp;⤷ Worker,<br>
+   &emsp;⟡ the logging stack:<br>
+   &emsp;&emsp;⤷ Loki,<br>
+   &emsp;&emsp;⤷ gateway,<br>
+   &emsp;&emsp;⤷ Alloy,<br>
+   &emsp;&emsp;⤷ adaptor,<br>
+   &emsp;⟡ the web UI.
 
 For normal appliance work, change the custom resource and use the runtime. Check Argo CD and the operator when you need to diagnose or confirm their health.
 
