@@ -12,8 +12,12 @@ nav:
   - 📋 Overview: index.md
   - 📋 Coriolis Architecture: architecture.md
   - 📋 Migration Flow: migration-flow.md
-  - 📋 Coriolis Operator: operator.md
-  - 📋 Advanced Operator Tutorial: operator-advanced-tutorial.md
+  - 📋 Quick Start:
+      - 📋 Coriolis Operator: operator.md
+      - 📄 Lab Environment: operator-lab-environment.md
+      - 📋 Deploy an Appliance: deploy-appliance.md
+      - "📋 Phase 1: Headless Migration": headless-migration.md
+      - "📋 Phase 2: Web UI Migration": web-ui-migration.md
   - ⏳ Technical Debt And Limitations: technical-debt.md
   - ⏳ OpenStack Context: openstack-provider.md
   - 📄 Terminology: terminology.md
