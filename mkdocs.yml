@@ -14,6 +14,7 @@ nav:
   - 📋 Migration Flow: migration-flow.md
   - 📋 Coriolis Operator: operator.md
   - 📋 Advanced Operator Tutorial: operator-advanced-tutorial.md
+  - ⏳ Technical Debt And Limitations: technical-debt.md
   - ⏳ OpenStack Context: openstack-provider.md
   - 📄 Terminology: terminology.md
 

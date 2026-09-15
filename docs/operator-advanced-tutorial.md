@@ -3,12 +3,6 @@
 !!! abstract
     This tutorial takes you from an already-installed Coriolis operator in the approved development cluster to a fully Ready, LoggingReady Coriolis appliance you can log into from a browser. The complete tutorial covers appliance bring-up, an optional headless migration, a Web UI migration with observation, and cleanup.
 
-!!! info "Supported and validated scope"
-    This walkthrough was validated on operator `0.5.59` with runtime `2603.4`, covering headless and Web UI OpenStack-to-OpenStack migrations and cleanup in the development cluster. The checks below show concrete healthy-state output. Generated identifiers and creation dates differ between installations; use the values returned by your own commands, not the example IDs. The Helm installation reference was rendered, not installed over Argo CD.
-
-!!! info "Estimated time"
-    Appliance bring-up typically converges in 5 to 15 minutes. A small migration takes 10 to 30+ minutes, depending on the source and destination cloud. The operator install reference adds time only if you choose to read it closely.
-
 ## :material-book-open-page-variant-outline: Mental Model
 
 Four layers cooperate, each owned by a different actor:
@@ -18,48 +12,39 @@ Four layers cooperate, each owned by a different actor:
 3. **The custom resource** (`CoriolisAppliance`) is your only declaration of intent: runtime version, storage classes and sizes, resource bounds, ingress host and TLS, and logging retention. Its `.status.conditions` are the authoritative progress report.
 4. **The runtime** is the set of appliance Pods: MariaDB, RabbitMQ, Memcached, Keystone, Barbican, the Coriolis services (API, Web, Conductor, Scheduler, Transfer Cron, Minion Manager, Deployer Manager, Worker), the logging stack (Loki, gateway, Alloy, adaptor), and the web UI you reach over HTTPS.
 
-You interact with layers 3 and 4 directly, and with layer 1 and 2 only to verify they are healthy.
+For normal appliance work, change the custom resource and use the runtime. Check Argo CD and the operator when you need to diagnose or confirm their health.
 
-Two ownership classes matter when inspecting state: most generated resources (Deployments, Services, ConfigMaps, the rebuildable configuration Secret, and Ingresses) are owner-referenced and are recreated with or garbage collected alongside the CR, while the generated credential Secrets and the stateful MariaDB, RabbitMQ, and Loki data PVCs are retained ownerless resources that survive same-name appliance recreation unchanged.
+Most generated runtime resources are recreated when you recreate the CR and removed with it.
+Generated credential Secrets and the MariaDB, RabbitMQ, and Loki data PVCs are retained, so same-name recreation reuses them.
 
-## :material-book-open-page-variant-outline: Safety And Scope
+## :material-book-open-page-variant-outline: Optional Standalone Helm Installation
 
-!!! danger "Development environment only"
-    Every command in this tutorial targets the explicit context `virt-infra-dev-buc-hq`. Do not run them against any other cluster without a separate, deliberate plan.
+Helm values configure the operator Deployment, not the `CoriolisAppliance` runtime. See [CR Versus Helm Values, And The Two Retention Profiles](#cr-versus-helm-values-and-the-two-retention-profiles) for the distinction.
 
-- **local-path storage is dev-only.** Data is bound to a single node with no backup, no failover, and no redundancy. Other environments need a production storage class.
-- **The operator-deployed Worker runs privileged and as root**, with host mounts for `/dev` and `/lib/modules`. This is a known operational constraint of the migration engine, not a security endorsement. Do not treat the appliance as production-hardened.
-- **Migrations write to destinations and can shut down sources.** A running migration mutates real workloads; the source instance may be powered off as part of the flow. This tutorial does not start a migration until its migration sections.
-- **Keep `coriolisDebug: false`.** Enabling debug raises verbosity across all appliance components and has historically exposed sensitive request detail in logs.
-- **Never force-delete, never edit finalizers or owner references, and never scale operator-owned resources by hand.** The operator is fail-closed on collisions; fighting it only creates more collisions. Normal `kubectl delete` of the appliance CR is the supported cleanup.
+This development environment already uses Argo CD. Choose one owner for the operator; its [Argo CD Application example](assets/manifests/coriolis-operator-application.example.yaml) shows the existing Argo-managed pattern.
 
-## :material-book-open-page-variant-outline: Operator Install Reference (Skippable)
+!!! warning "Choose one owner"
+    Do not run Helm against an operator release managed by Argo CD.
 
-!!! tip "Skip ahead if the operator is already deployed"
-    If the next section's checks pass, the operator is already installed and managed by Argo CD. This section exists only so you understand what is installed and how you *could* install it yourself.
+Helm must be able to access the private `cr.virtomat.io` registry. The `coriolis` namespace and an image pull Secret named `regcred` must already exist; do not expose registry credentials.
 
-The live pattern is the Argo CD Application that syncs the operator chart from OCI with a wildcard `targetRevision` channel selector, automated sync, and no prune or selfHeal. The example manifest is [coriolis-operator-application.example.yaml](assets/manifests/coriolis-operator-application.example.yaml).
+The [operator values example](assets/manifests/coriolis-operator-values.example.yaml) configures `imagePullSecrets`, `logLevel`, resources, pod and container security contexts, and the liveness probe.
 
-The operator's own runtime knobs (log level, resources, security contexts, probes, and the `regcred` pull secret) are shown in [coriolis-operator-values.example.yaml](assets/manifests/coriolis-operator-values.example.yaml). These values are the chart defaults; passing them is optional. Do not override the CI-owned image repository, image tag, chart version, or `appVersion` in source files. Selecting a published chart version for a render is different: the preview below selects `0.5.59` without modifying release metadata.
-
-!!! warning "Do not install over the Argo CD-managed operator"
-    Argo CD owns the development operator. Do not run a separate `helm install` or `helm upgrade --install` against it. The command below only renders the chart and lists its resource kinds; it creates no Kubernetes resources and does not prove a live installation succeeded. Access to the private OCI registry is required to download the chart.
-
-<!-- Preview the published operator chart without installing it. -->
+<!-- Install or upgrade the standalone operator release with the documented values. -->
 ```bash
-(set -o pipefail; helm template coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator --version 0.5.59 --namespace coriolis --values docs/assets/manifests/coriolis-operator-values.example.yaml | grep '^kind:')
+helm upgrade --install coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator --namespace coriolis --values docs/assets/manifests/coriolis-operator-values.example.yaml
 ```
 
 ??? example "Expected result"
 
     ```text
-    kind: ServiceAccount
-    kind: Role
-    kind: RoleBinding
-    kind: Deployment
+    Release "coriolis-operator" does not exist. Installing it now.
+    NAME: coriolis-operator
+    NAMESPACE: coriolis
+    STATUS: deployed
     ```
 
-These four resources are the operator, not an appliance. OCI download messages may also appear on stderr. `pipefail` preserves a Helm failure instead of treating partial filtered output as success.
+This command intentionally omits `--version`, so Helm resolves the latest published chart. The later Deployment and CRD checks verify the installation.
 
 ## :material-book-open-page-variant-outline: CRD First Install And Upgrade Caveat
 
@@ -68,6 +53,9 @@ Helm installs CRDs from the chart's `crds/` directory on first install only. Hel
 The consequence for you: before any operator chart upgrade, the new `coriolisappliances.coriolis.cloudbase.it` CRD must be applied separately from the chart sources (for example `kubectl apply -f` of the CRD file in the chart you are upgrading to). In this tutorial you only verify the CRD exists; you never upgrade the operator.
 
 ## :material-book-open-page-variant-outline: Hands-On Prerequisites
+
+!!! danger "Development cluster only"
+    The hands-on `kubectl` commands target context `virt-infra-dev-buc-hq`. Do not run them against another cluster accidentally.
 
 Run each check and compare with the expected result before continuing. Any mismatch means stop and fix the prerequisite, not the tutorial.
 
@@ -141,6 +129,8 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get crd coriolisappliances.c
     NAME                                       CREATED AT
     coriolisappliances.coriolis.cloudbase.it   2026-08-20T13:37:25Z
     ```
+
+The creation timestamp is installation-specific.
 
 ### :material-application-edit-outline: Namespace Pull Secrets
 
@@ -280,7 +270,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis apply -f docs/assets/manifes
 
 ## :material-book-open-page-variant-outline: Wait For Ready, Then LoggingReady
 
-Reconciliation stages the core runtime first and the logging stack alongside it, but the conditions flip independently. Wait for each with its own bounded timeout rather than polling by eye. The whole converge typically takes around five minutes; `15m` is generous slack.
+Reconciliation stages the core runtime first and the logging stack alongside it, but the conditions flip independently. Wait for each with its own bounded timeout rather than polling by eye. Convergence usually takes 5 to 15 minutes; each `15m` timeout gives the operator enough time to finish.
 
 <!-- Wait for the core runtime Ready condition. -->
 ```bash
@@ -514,7 +504,7 @@ The migration path here is a single OpenStack-to-OpenStack live migration of one
 
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
-Create both endpoints through the Web UI before any headless test: the headless helper only works against existing, validated endpoints.
+Create and save both endpoints through the Web UI before any headless test: the headless helper only works against saved endpoints that have passed validation.
 
 1. In the web UI, open **Cloud Endpoints**, choose **Add Endpoint** on an empty list or **New > Endpoint**, then select the **OpenStack** logo.
    **Expected outcome:** the endpoint creation form appears with OpenStack connection fields.
@@ -535,7 +525,7 @@ Create both endpoints through the Web UI before any headless test: the headless 
 !!! danger "This is a real migration"
     Running the helper creates a Transfer, executes it against both live clouds, deploys the destination VM, and can shut down the source. Use it only with the disposable fixture from the prerequisites section. The helper performs one migration, never any cleanup, and leaves the transfer, execution, deployment, and all cloud objects visible in the Web UI for observation.
 
-The helper `deploy/coriolis-headless-migration.py` works only against the two existing validated endpoints from the previous section. Its configuration contract is [headless-migration.example.json](assets/manifests/headless-migration.example.json).
+The helper `deploy/coriolis-headless-migration.py` works only against the two saved endpoints from the previous section. Its configuration contract is [headless-migration.example.json](assets/manifests/headless-migration.example.json).
 
 ### :material-application-edit-outline: Prepare The Config File
 
@@ -594,7 +584,9 @@ python3 -m json.tool .openstack/tutorial-validation/headless-migration.json > /d
 
 Use the same Keystone project as the Web UI: this walkthrough logs in as `admin` in project `admin`. The helper defaults to `coriolis` in project `service`, which cannot see these UI-created endpoints; the explicit `--username admin --project-name admin` options below are required. The pipeline reads the corresponding admin password from the retained infrastructure Secret directly into stdin without printing it. The public `/identity` and `/coriolis` bases already include the Ingress version rewrites, so the helper appends only `/auth/tokens` and `/<project_id>` itself.
 
-The helper currently authenticates both the user and project in Keystone's `Default` domain; other domains are outside this example's supported scope.
+The helper currently requires both the user and project to be in Keystone's `Default` domain.
+
+A small migration often takes 10 to 30+ minutes. `--timeout 1800` gives each polling phase up to 30 minutes; it is not a total run limit.
 
 <!-- Feed the Keystone admin password into the helper in the same project as the Web UI. -->
 ```bash
@@ -611,7 +603,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-applianc
     SUMMARY headless-migration passed
     ```
 
-The three ids are the actual objects created by the validated run. Your ids will differ: they are outputs to record for the observation and cleanup steps, never inputs you configure or reuse.
+The three IDs are the objects created by the current run. Your IDs will differ: record them for the observation and cleanup steps, never configure or reuse them as inputs.
 
 The helper's output contract is fixed and safe to keep on screen:
 
@@ -669,7 +661,7 @@ If you ran the headless migration, do not start the walkthrough below on top of 
 2. Intentionally restore the fixture: restart, recreate, or rebuild the disposable source VM so it is `ACTIVE` with the marker again, on the same source network.
    **Expected outcome:** the source VM matches the prerequisites table again.
 3. Keep both endpoints.
-   **Expected outcome:** the UI walkthrough below can reuse the validated endpoints without re-entering credentials.
+   **Expected outcome:** the UI walkthrough below can reuse the saved endpoints without re-entering credentials.
 
 !!! note "Cloud-init markers run once per instance"
     A normal restart does not rerun cloud-init `runcmd` or produce a new first-boot serial marker. After restoring the source, check the persisted marker inside the guest; if you recreated or rebuilt it, verify that initialization wrote the marker again. Do not mistake an old console message or `cloud-init status: done` for proof of a new initialization run.
@@ -691,7 +683,7 @@ If you ran the headless migration, do not start the walkthrough below on top of 
    **Expected outcome:** the destination cloud step appears with the instance inventory (disks and NICs) loaded.
 6. On the destination cloud step, pick the existing destination endpoint from its **Select** dropdown and click **Next**.
    **Expected outcome:** the target options step appears.
-7. In the simple target options set: a unique **Title** (this run's notes), the worker **Migration Flavor** name `c1.small` (a searchable field), the Linux entry of the **Migration Image Map** (in this validated run the `ubuntu-24.04` image, matching the source and destination guest OS), and the dedicated **Migration Network**.
+7. In the simple target options set: a unique **Title** (this run's notes), the worker **Migration Flavor** name `c1.small` (a searchable field), the Linux entry of the **Migration Image Map** (in this example, the `ubuntu-24.04` image, matching the source and destination guest OS), and the dedicated **Migration Network**.
    **Expected outcome:** the form accepts every worker field.
 8. Expand the target options **Advanced** section to reach the remaining fields: **Keypair Name**, **Security Groups**, **Floating IP Pool**, **Use Floating IP**, **Migration Floating IP Pool Name**, **Migration Worker Use FIP**, **Migration Worker Volume Type** (set `__DEFAULT__`), and **Preserve Fixed IPs**. Wherever a pool dropdown lists candidates, its labels are network/subnet pairs (for example `ext_net_gts/ext_subnet_gts`); choose the IPv4 entry, not the IPv6 one.
    **Expected outcome:** every advanced field is accepted and each pool selection resolves to an IPv4 network/subnet label.
@@ -707,9 +699,9 @@ If you ran the headless migration, do not start the walkthrough below on top of 
     **Expected outcome:** the summary review step appears with those options.
 14. On the summary, verify exactly one instance is listed, then click the **Finish** button (it is Finish, not Confirm).
     **Expected outcome:** the wizard submits the transfer.
-15. Verify the new transfer has the correct endpoints and one instance, and its **Execution #1** starts. Browser network inspection can additionally confirm the successful creation request; a transient toast is not required evidence.
+15. Verify the new transfer has the correct endpoints and one instance, and its **Execution #1** starts. Confirm creation from the Executions tab; browser network inspection can provide an additional check.
     **Expected outcome:** the UI opens the transfer's Executions tab and shows the running execution, not merely a saved transfer record.
-16. Watch **Executions** until the transfer reaches `COMPLETED`, then open the correlated entry in **Deployments** and inspect its **Tasks** tab.
+16. Watch **Executions** until the transfer reaches `COMPLETED`, then open the correlated entry in **Deployments** and inspect its **Tasks** tab. A small migration often takes 10 to 30+ minutes, depending on the source and destination cloud.
     **Expected outcome:** both execution and deployment reach `COMPLETED`, with no failed tasks. Completion alone does not prove guest usability; perform the observation checks below.
 17. If any task or execution shows an `ERROR` status, stop.
     **Expected outcome:** you diagnose through the task details and the Logs navigation before touching anything; a failed execution is not blindly re-run.
@@ -811,7 +803,7 @@ The three data PVCs remain `Bound` with the same `VOLUME` bindings recorded earl
 
 Retained state is kept by default (see [Optional Runtime Removal](#optional-runtime-removal)); this section is the separate, deliberate, destructive alternative that returns the namespace to the pre-run, operator-only baseline.
 
-<!-- R1: Enumerate the retained Secrets and PVCs by appliance label, metadata only. -->
+<!-- Enumerate the retained Secrets and PVCs by appliance label, metadata only. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis get secret,pvc -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.kind, .metadata.name) | .[] | "\(.kind) \(.metadata.name)"'
 ```
@@ -848,7 +840,7 @@ TUTORIAL_PVS=($(kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc cori
 
 Exit status zero confirms three names were captured. Stop if the read fails or a claim is unbound; do not continue with an empty or incomplete array.
 
-<!-- R2: Delete the three appliance data PVCs by exact name and wait for completion. -->
+<!-- Delete the three appliance data PVCs by exact name and wait for completion. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis delete pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data --wait=true --timeout=5m
 ```
@@ -874,7 +866,7 @@ test "${#TUTORIAL_PVS[@]}" -eq 3 && kubectl --context virt-infra-dev-buc-hq -n c
 
 Exit status zero with no names means all three PVs are absent. If a name remains, wait for automatic reclaim and repeat this check. Investigate a persistent resource or API error; do not force deletion to obtain an empty result.
 
-<!-- R3: Delete the seven generated credential Secrets by exact name. -->
+<!-- Delete the seven generated credential Secrets by exact name. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis-appliance-advanced-barbican-credentials coriolis-appliance-advanced-coriolis-credentials coriolis-appliance-advanced-infrastructure-credentials coriolis-appliance-advanced-keystone-credential-keys coriolis-appliance-advanced-keystone-database-credentials coriolis-appliance-advanced-keystone-fernet-keys coriolis-appliance-advanced-logging-credentials
 ```
@@ -891,7 +883,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis-appli
     secret "coriolis-appliance-advanced-logging-credentials" deleted
     ```
 
-<!-- R4: Confirm no Certificate or Ingress remains before deleting the TLS Secret. -->
+<!-- Confirm no Certificate or Ingress remains before deleting the TLS Secret. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o name
 ```
@@ -903,7 +895,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o n
     ```
 
 !!! warning "The TLS Secret is separate: verify before deleting it"
-    The cert-manager TLS Secret `coriolis.app.cloudbase.wiki-tls` is ownerless and unlabeled in this deployment, so the appliance-label query cannot find it and CR deletion leaves it behind. Delete it only if your baseline proves this run created it, no other workload uses it, no referencing Certificate or Ingress remains (R4), and its UID matches your pre-removal inventory. Do not assume ownership from the name alone. Deleting it forces fresh ACME issuance on the next deployment and consumes Let's Encrypt rate limits. Keeping this Secret lets a later run reuse the certificate, but is not an exact return to the blank baseline.
+    The cert-manager TLS Secret `coriolis.app.cloudbase.wiki-tls` is ownerless and unlabeled in this deployment, so the appliance-label query cannot find it and CR deletion leaves it behind. Delete it only if your baseline proves this run created it, no other workload uses it, no referencing Certificate or Ingress remains, and its UID matches your pre-removal inventory. Do not assume ownership from the name alone. Deleting it forces fresh ACME issuance on the next deployment and consumes Let's Encrypt rate limits. Keeping this Secret lets a later run reuse the certificate, but is not an exact return to the blank baseline.
 
 <!-- Verify that the TLS Secret still has the UID captured before runtime removal. -->
 ```bash
@@ -918,7 +910,7 @@ test -n "${TUTORIAL_TLS_UID:-}" && test "$TUTORIAL_TLS_UID" = "$(kubectl --conte
 
 Only exit status zero is success. A lost variable, changed UID, missing Secret, or API error blocks the next command. If you kept the pre-existing TLS Secret, skip both this comparison and its deletion.
 
-<!-- R5: Delete the run-created TLS Secret after the verification above. -->
+<!-- Delete the run-created TLS Secret after the verification above. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis.app.cloudbase.wiki-tls
 ```
@@ -931,7 +923,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis.app.c
 
 The remaining commands are verification gates for the wipe, plus the health proof that nothing shared was harmed.
 
-<!-- R6: Confirm no appliance-labeled workload, config, or storage resources remain. -->
+<!-- Confirm no appliance-labeled workload, config, or storage resources remain. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,cm,secret,pvc,ingress,sa,role,rolebinding -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o name
 ```
@@ -942,7 +934,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,c
     No output.
     ```
 
-<!-- R7: Confirm the operator Deployment is untouched and still ready; stable fields only, no volatile age. -->
+<!-- Confirm the operator Deployment is untouched and still ready; stable fields only, no volatile age. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator -o jsonpath='{.metadata.name}{" ready="}{.status.readyReplicas}{"/"}{.spec.replicas}{" available="}{.status.availableReplicas}{"\n"}'
 ```
@@ -953,7 +945,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-oper
     coriolis-operator ready=1/1 available=1
     ```
 
-<!-- R8: Confirm the Argo CD Application is still Synced and Healthy. -->
+<!-- Confirm the Argo CD Application is still Synced and Healthy. -->
 ```bash
 kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
 ```
@@ -965,7 +957,7 @@ kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
     coriolis   Synced        Healthy
     ```
 
-With R6 to R8 green and the captured-PV check returning no names, the `coriolis` namespace is back to the pre-run, operator-only baseline: only the operator Deployment and Pod, the two pull Secrets, and the Argo CD-managed operator chart resources remain, and a fresh appliance apply will generate new credentials, new data volumes, and -- unless you kept it -- a new certificate.
+With the final resource, operator Deployment, and Argo CD Application checks green and the captured-PV check returning no names, the `coriolis` namespace is back to the pre-run, operator-only baseline: only the operator Deployment and Pod, the two pull Secrets, and the Argo CD-managed operator chart resources remain, and a fresh appliance apply will generate new credentials, new data volumes, and -- unless you kept it -- a new certificate.
 
 ## :material-book-open-page-variant-outline: Troubleshooting
 
@@ -976,7 +968,7 @@ With R6 to R8 green and the captured-PV check returning no names, the `coriolis`
 | No TLS / browser warning on the host | DNS for `coriolis.app.cloudbase.wiki`, the `letsencrypt` ClusterIssuer, or the Certificate is at fault; check the Certificate and its events before touching the Ingress. |
 | Reconcile reports a collision and stays fail-closed | A foreign resource already owns the expected name. The operator will not adopt it; resolve the conflict with the other owner. Never edit owners or finalizers yourself. |
 | `Ready=True` but `LoggingReady=False` | The logging stack converges independently and later; wait with the LoggingReady condition, then inspect its reason if it times out. |
-| Logs look stale or a bootstrap Job seems missing | Natural producer activity needs time, and a successful but old bootstrap Job may simply have no log inside the selected observation window. Recreate the CR under the same name only when you intentionally want to refresh startup evidence, since retained state is reused unchanged; it is not routine recovery. |
+| Logs look stale or a bootstrap Job seems missing | Natural producer activity needs time, and a successful but old bootstrap Job may simply have no log inside the selected observation window. Recreate the CR under the same name only when you intentionally want fresh startup logs, since retained state is reused unchanged; it is not routine recovery. |
 | Helper prints `ERROR category=post_ambiguous` | A POST's outcome could not be confirmed and the helper refused to guess. Inspect transfers and deployments for the unique notes in the UI before deciding; never blindly retry a write. |
 | Any other helper `ERROR category=...` | Each category is fixed and terminal (config, preflight, authentication, network, execution/deployment failure or timeout). Stop, match the category to the phase, and diagnose before re-running. |
 | Helper prints `ERROR category=preflight_failed` | No migration write occurred. Check endpoint IDs and the Keystone project scope first, then inspect existing transfers/deployments with the same notes. Resolve or clean the existing run before retrying; choose fresh notes only for a deliberately new migration, not to bypass duplicate protection. |
@@ -984,18 +976,12 @@ With R6 to R8 green and the captured-PV check returning no names, the `coriolis`
 | Someone suggests `coriolisDebug: true` | Decline on the immutable `2603.4` runtime; debug verbosity is unsafe for log hygiene here. |
 | Deleted Pod or drifted resource is not being repaired | Expected: reconciliation is retry- and collision-scoped, not broad periodic drift self-healing. Stop and follow the documented controlled recovery path; CR recreation or operator resume has lifecycle effects and must be a deliberate decision, never hand-edited operator-owned objects and not a re-apply expecting a repair. |
 
-## :material-book-open-page-variant-outline: Limits And Next Steps
-
-!!! info "Scope of what you just did"
-    This tutorial demonstrates a bounded development-capability path, not a production endorsement.
-
-- Single-replica development appliance only; the `local-path` storage has no HA and no backups.
-- Upgrades, production storage classes, multi-CR routing, and drift self-healing are not production-accepted.
-- The bounded `0.5.54` UI migration evidence and the `0.5.57` logging evidence informed the expected outcomes above, and the current `0.5.59` walkthrough with runtime `2603.4` on this page was followed end to end in the approved development cluster on 2026-09-09. That is bounded development evidence on one disposable fixture; no production claim is made.
+## :material-book-open-page-variant-outline: Next Steps
 
 Continue with:
 
-- [Coriolis Operator](operator.md) for the operator's own validated scope.
+- [Coriolis Operator](operator.md) for operator behavior and configuration.
 - [Architecture](architecture.md) for component roles.
 - [Migration Flow](migration-flow.md) and [OpenStack Context](openstack-provider.md) for the migration contract.
 - [Terminology](terminology.md) for the vocabulary used throughout.
+- [Technical Debt](technical-debt.md) for current limitations and deferred work.

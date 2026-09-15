@@ -12,7 +12,7 @@ Accepted evidence covers operator 0.5.40 managing runtime 2603.4 through a bound
 | Implemented | Present in the operator. | Core profile reconciliation and its resource definitions, including the managed logging stack. |
 | Validated | Tested with accepted evidence. | Managed resource reconciliation and lifecycle behavior for dependencies, Coriolis services, and Ingress, including collision safety and normal cleanup. |
 | Validated, bounded | Tested only within a stated limit. | Single-node `Ready=True` and retained-state recreation on 0.5.40; a development Web UI OpenStack-to-OpenStack migration proof of concept on 0.5.54; logging hardening on 0.5.57; the [Advanced Operator Tutorial](operator-advanced-tutorial.md) end-to-end walkthrough on 0.5.59 with runtime 2603.4. |
-| In progress | Work with partial evidence not yet accepted end to end on the current release. | Direct Helm operator installation is not separately validated: the tutorial previews the chart without installing it, while Argo CD owns the live development operator. |
+| In progress | Work with partial evidence not yet accepted end to end on the current release. | Direct Helm operator installation is not separately validated: the tutorial documents an optional standalone install that resolves the latest published chart, while only the Argo CD-managed live development path is validated. |
 | Pending | Planned work without acceptance evidence. | Broader provider qualification and browser-flow validation beyond the bounded 0.5.54 development proof of concept and the bounded 0.5.59 tutorial walkthrough. |
 | Unsupported/unvalidated | Not supported as a public readiness claim. | Production HA, storage, backup, upgrades, drift self-healing, and multi-CR routing. |
 
