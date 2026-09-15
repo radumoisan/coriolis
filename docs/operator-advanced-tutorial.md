@@ -28,8 +28,7 @@ Four layers cooperate, each owned by a different actor:
    &emsp;⟡ Keystone,<br>
    &emsp;⟡ Barbican,<br>
    &emsp;⟡ the Coriolis services<br>
-   &emsp;&emsp;⤷ `API` | `Web` | `Conductor` | `Scheduler` | `Transfer Cron` | `Minion Mgr` | `Deployer Mgr`<br>
-   &emsp;&emsp;⤷ Worker,<br>
+   &emsp;&emsp;⤷ `API` | `Web` | `Conductor` | `Scheduler` | ...<br>
    &emsp;⟡ the Logging stack<br>
    &emsp;&emsp;⤷ `Loki` | `gateway` | `Alloy` | `adaptor`<br>
    &emsp;⟡ the web UI.
