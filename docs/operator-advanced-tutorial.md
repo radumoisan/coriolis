@@ -41,11 +41,9 @@ For normal appliance work, change the custom resource and use the runtime. Check
 
 ## :material-book-open-page-variant-outline: Optional Standalone Helm Installation
 
-Helm values configure the operator Deployment, not the `CoriolisAppliance` runtime. See [CR Versus Helm Values, And The Two Retention Profiles](#cr-versus-helm-values-and-the-two-retention-profiles) for the distinction.
-
-This development environment already uses Argo CD; its [Argo CD Application example](assets/manifests/coriolis-operator-application.example.yaml) shows the existing Argo-managed pattern.
-
-Helm must be able to access the private `cr.virtomat.io` registry. The `coriolis` namespace and an image pull Secret named `regcred` must already exist.
+!!! info
+    Helm values configure the operator Deployment, not the `CoriolisAppliance` runtime.<br>
+    See [CR Versus Helm Values, And The Two Retention Profiles](#cr-versus-helm-values-and-the-two-retention-profiles) for the distinction.
 
 These are the chart defaults used by the standalone installation:
 
@@ -115,8 +113,8 @@ These are the chart defaults used by the standalone installation:
 
 <!-- Install or upgrade the standalone operator release with chart defaults. -->
 ```bash
-helm upgrade --install coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator \
-        --namespace coriolis
+# use '--namespace coriolis' to deploy in namespace coriolis
+helm upgrade --install coriolis-operator oci://<registry>/coriolis/helm/coriolis-operator
 ```
 
 ??? example "Expected result"
