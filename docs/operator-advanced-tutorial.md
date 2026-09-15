@@ -124,9 +124,34 @@ This command intentionally omits `--version`, so Helm resolves the latest publis
 
 ## :material-book-open-page-variant-outline: CRD First Install And Upgrade Caveat
 
-Helm installs CRDs from the chart's `crds/` directory on first install only. Helm never upgrades or removes CRDs, so an operator chart upgrade that changes the `CoriolisAppliance` schema does not update the schema by itself. The CRD carries an explicit upgrade note to this effect.
+A **CRD** defines a new Kubernetes resource type. Here, it teaches Kubernetes what a `CoriolisAppliance` is, including its accepted fields and validation rules.
 
-The consequence for you: before any operator chart upgrade, the new `coriolisappliances.coriolis.cloudbase.it` CRD must be applied separately from the chart sources (for example `kubectl apply -f` of the CRD file in the chart you are upgrading to). In this tutorial you only verify the CRD exists; you never upgrade the operator.
+Helm treats files under `crds/` differently from normal chart templates:
+
+- On the first installation, Helm creates the CRD before deploying the operator.
+- During `helm upgrade`, Helm updates the operator Deployment and related resources, but skips the CRD.
+- During uninstall, Helm also leaves the CRD in place to avoid accidentally deleting custom resources and their data.
+
+This can create a mismatch:
+
+```text
+New operator version
+        |
+        | expects new CoriolisAppliance fields
+        v
+Old CRD still registered in Kubernetes
+```
+
+The Kubernetes API server may then reject, ignore, or remove fields supported by the new operator because the old CRD schema does not know about them.
+
+Therefore, an upgrade has two separate steps:
+
+1. Apply the `coriolisappliances.coriolis.cloudbase.it` CRD supplied with the target chart version.
+2. Upgrade the operator with Helm.
+
+The order matters because Kubernetes should understand the new schema before the new operator starts using it.
+
+This tutorial does not upgrade the operator, so it only checks that the CRD was installed successfully. The caveat is there to prevent someone from assuming that a future `helm upgrade` will update everything automatically.
 
 ## :material-book-open-page-variant-outline: Hands-On Prerequisites
 
