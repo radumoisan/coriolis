@@ -55,6 +55,16 @@
 
 **Resolution or validation criterion:** A standalone Helm operator installation, including latest-chart resolution behavior, is validated independently of the Argo CD-managed path.
 
+### :material-application-edit-outline: Tutorial Helm Defaults Can Drift
+
+**Current state:** The [advanced tutorial](operator-advanced-tutorial.md#optional-standalone-helm-installation) embeds a commented copy of `coriolis-operator/helm/values.yaml`; the current MkDocs configuration does not include that source file automatically.
+
+**Impact:** The tutorial can show stale defaults after the operator chart changes, especially because its standalone installation command resolves the latest published chart.
+
+**Workaround:** Compare the displayed defaults with the selected chart before customizing an installation.
+
+**Resolution or validation criterion:** Render the tutorial values from the canonical chart source or enforce an automated equality check.
+
 ### :material-application-edit-outline: Licensing Backend Is Not Deployed
 
 **Current state:** The core profile does not deploy a licensing backend or configure `LICENSING_SERVER_BASE_URL`; the Dashboard licence card receives HTML instead of a licensing API response.

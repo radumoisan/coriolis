@@ -45,25 +45,87 @@ Four layers cooperate, each owned by a different actor:
 
 For normal appliance work, change the custom resource and use the runtime. Check Argo CD and the operator when you need to diagnose or confirm their health.
 
-Most generated runtime resources are recreated when you recreate the CR and removed with it.
-Generated credential Secrets and the MariaDB, RabbitMQ, and Loki data PVCs are retained, so same-name recreation reuses them.
+!!! note ""
+    Most generated runtime resources are recreated when you recreate the CR and removed with it. Generated credential Secrets and data PVCs (MariaDB, RabbitMQ, Loki) are retained, so same-name recreation reuses them.
 
 ## :material-book-open-page-variant-outline: Optional Standalone Helm Installation
 
 Helm values configure the operator Deployment, not the `CoriolisAppliance` runtime. See [CR Versus Helm Values, And The Two Retention Profiles](#cr-versus-helm-values-and-the-two-retention-profiles) for the distinction.
 
-This development environment already uses Argo CD. Choose one owner for the operator; its [Argo CD Application example](assets/manifests/coriolis-operator-application.example.yaml) shows the existing Argo-managed pattern.
+This development environment already uses Argo CD; its [Argo CD Application example](assets/manifests/coriolis-operator-application.example.yaml) shows the existing Argo-managed pattern.
 
-!!! warning "Choose one owner"
-    Do not run Helm against an operator release managed by Argo CD.
+Helm must be able to access the private `cr.virtomat.io` registry. The `coriolis` namespace and an image pull Secret named `regcred` must already exist.
 
-Helm must be able to access the private `cr.virtomat.io` registry. The `coriolis` namespace and an image pull Secret named `regcred` must already exist; do not expose registry credentials.
+These are the chart defaults used by the standalone installation:
 
-The [operator values example](assets/manifests/coriolis-operator-values.example.yaml) configures `imagePullSecrets`, `logLevel`, resources, pod and container security contexts, and the liveness probe.
+??? quote "`coriolis-operator-values.yaml`"
 
-<!-- Install or upgrade the standalone operator release with the documented values. -->
+    ```yaml
+    # Container image used for the operator.
+    image:
+      # Registry path containing the operator image.
+      repository: cr.virtomat.io/virtomat/coriolis/operator
+      # Image version paired with this chart release.
+      tag: "0.5.59"
+      # Pull the image only when it is not already present on the node.
+      pullPolicy: IfNotPresent
+    # Secrets Kubernetes uses to pull the private operator image.
+    imagePullSecrets:
+      - name: regcred
+    # Optional short name override for chart resources.
+    nameOverride: ""
+    # Full generated name for the operator resources.
+    fullnameOverride: "coriolis-operator"
+    # Service account created for the operator; an empty name uses the chart-generated name.
+    serviceAccount:
+      create: true
+      name: ""
+    # Operator log verbosity.
+    logLevel: INFO
+    # CPU and memory reserved for, and capped for, the operator container.
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    # Optional node labels that constrain where the operator runs.
+    nodeSelector: {}
+    # Optional scheduling tolerations for the operator Pod.
+    tolerations: []
+    # Optional advanced Pod scheduling rules.
+    affinity: {}
+    # Pod-wide security settings; run the Pod as a non-root user.
+    podSecurityContext:
+      runAsNonRoot: true
+    # Container security restrictions for the operator.
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        # Drop every Linux capability from the container.
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+    # HTTP health check served by the operator.
+    liveness:
+      # Endpoint queried by the kubelet.
+      port: 8080
+      path: /healthz
+      # Wait before starting health checks.
+      initialDelaySeconds: 10
+      # Check every ten seconds and allow one second for each response.
+      periodSeconds: 10
+      timeoutSeconds: 1
+      # Restart the container after three consecutive failures.
+      failureThreshold: 3
+    ```
+
+<!-- Install or upgrade the standalone operator release with chart defaults. -->
 ```bash
-helm upgrade --install coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator --namespace coriolis --values docs/assets/manifests/coriolis-operator-values.example.yaml
+helm upgrade --install coriolis-operator oci://cr.virtomat.io/virtomat/coriolis/helm/coriolis-operator \
+        --namespace coriolis
 ```
 
 ??? example "Expected result"
