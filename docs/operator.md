@@ -141,7 +141,12 @@ This command intentionally omits `--version`, so Helm resolves the latest publis
 
 A **CRD** defines a new Kubernetes resource type. Here, it teaches Kubernetes what a `CoriolisAppliance` is, including its accepted fields and validation rules.
 
-Helm treats files under `crds/` differently from normal chart templates:
+The operator chart stores this definition at `coriolis-operator/helm/crds/coriolisappliances.yaml`. This is separate from the repository's top-level `helm/` directory, which packages the documentation site.
+
+!!! warning ""
+    `coriolisappliances.yaml` is not an appliance configuration file. It defines the cluster-wide schema for every `CoriolisAppliance` CR: permitted fields, types, required values, defaults, and validation rules. Configure an individual appliance through a namespaced `CoriolisAppliance` CR, such as [coriolis-appliance-advanced.yaml](assets/manifests/coriolis-appliance-advanced.yaml). Adding a field to the CRD only makes it acceptable to Kubernetes; the operator reconciliation code must also implement its behavior.
+
+Helm treats files under a chart's `crds/` directory differently from normal chart templates:
 
 - On the first installation, Helm creates the CRD before deploying the operator.
 - During `helm upgrade`, Helm updates the operator Deployment and related resources, but skips the CRD.
@@ -166,20 +171,41 @@ Therefore, an upgrade has two separate steps:
 
 The order matters because Kubernetes should understand the new schema before the new operator starts using it.
 
-This article does not upgrade the operator. See [Operator Deployment And CRD](deploy-appliance.md#operator-deployment-and-crd) for installation checks. The caveat is here to prevent assuming that a future `helm upgrade` will update everything automatically.
+!!! note ""
+    This article does not upgrade the operator. See [Operator Deployment And CRD](deploy-appliance.md#operator-deployment-and-crd) for installation checks. The caveat is here to prevent assuming that a future `helm upgrade` will update everything automatically.
 
 ## :material-book-open-page-variant-outline: CR Versus Helm Values, And The Two Retention Profiles
 
-!!! note "Two different configuration channels"
-    The operator chart's Helm values configure the **operator process itself**: its log level, resources, probes, and security contexts. The `CoriolisAppliance` custom resource is a complete, self-contained declaration of the **appliance runtime**: version, storage, ingress, logging, and per-component resources. The CR references pull Secrets by name but does not restate them; they must already exist. See the [lab manifest and environment values](operator-lab-environment.md) for the development configuration.
+Helm values, the CRD, and a CR have three different roles:
+
+- **Helm values** in `coriolis-operator/helm/values.yaml` configure the operator Deployment itself: its image, log level, resources, probes, and security contexts.
+- **The CRD** in `coriolis-operator/helm/crds/coriolisappliances.yaml` defines the fields a `CoriolisAppliance` CR may contain, along with their types, required values, defaults, and validation rules.
+- **A `CoriolisAppliance` CR** supplies the values for one namespaced appliance runtime: version, storage, ingress, logging, and per-component resources. See the [lab manifest and environment values](operator-lab-environment.md) for a concrete configuration.
+
+The operator translates the CR into the runtime resources:
+
+```text
+coriolisappliances.yaml (allowed structure)
+        |
+        v
+CoriolisAppliance CR (one appliance's values)
+        |
+        v
+operator reconciliation
+        |
+        v
+Deployments, StatefulSets, Services, Ingresses, Secrets, and PVCs
+```
+
+To change an existing appliance setting, edit its CR. To introduce a new configurable field, update both the CRD schema and the operator reconciliation code; editing only the CRD does not implement runtime behavior.
+
+The CR references pull Secrets by name but does not restate them. Those Secrets must already exist before the appliance is deployed.
 
 The CR's three logging knobs answer different questions:
 
-| Key | Meaning |
-| --- | --- |
-| `retentionHours` | Logs older than this are marked for deletion by the compactor. |
-| `retentionDeleteDelayMinutes` | Extra grace period before marked data is physically removed, so a mistaken retention change can be reverted. |
-| `compactionIntervalMinutes` | How often stored log chunks are compacted. |
+- `retentionHours`: logs older than this are marked for deletion by the compactor.
+- `retentionDeleteDelayMinutes`: extra grace period before marked data is physically removed, so a mistaken retention change can be reverted.
+- `compactionIntervalMinutes`: how often stored log chunks are compacted.
 
 The lab asset ships the **practical profile** `24` h / `15` m / `120` m: a day of queryable history, frequent compaction, and a two-hour undo window. Prior qualification runs instead used a deliberately compressed **test profile** of `1` h / `1` m / `5` m so that retention expiry and physical deletion could be observed within a single session. Both are valid inputs; the test profile exists to make retention provable, not to be left in place. The lab environment uses the practical values because it is standing up something to live in, not benchmarking deletion.
 
