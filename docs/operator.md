@@ -21,12 +21,11 @@ Four layers cooperate, each owned by a different actor:
    &emsp;⟡ ingress host and TLS,<br>
    &emsp;⟡ logging retention.<br>
 4. **The runtime** is the set of appliance Pods<br>
-   &emsp;⟡ MariaDB | RabbitMQ | Memcached | Keystone | Barbican<br>
+   &emsp;⟡ `mariadb` | `rabbitmq` | `memcached` | `keystone` | `barbican-api` | `barbican-worker`<br>
    &emsp;⟡ the Coriolis services<br>
-   &emsp;&emsp;⤷ `API` | `Web` | `Conductor` | `Scheduler` | ...<br>
+   &emsp;&emsp;⤷ `coriolis-api` | `coriolis-web` | `coriolis-conductor` | `coriolis-scheduler` | ...<br>
    &emsp;⟡ the Logging stack<br>
-   &emsp;&emsp;⤷ `Loki` | `gateway` | `Alloy` | `adaptor`<br>
-   &emsp;⟡ the web UI.
+   &emsp;&emsp;⤷ `loki` | `gateway` | `alloy` | `adaptor`
 
 For normal appliance work, change the custom resource and use the runtime. Check the installer and the operator when you need to diagnose or confirm their health.
 
