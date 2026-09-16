@@ -38,18 +38,17 @@ The namespaced `CoriolisAppliance` custom resource selects the current `core` pr
 
 The core profile manages these runtime categories:
 
-| Category | Managed runtime |
-| --- | --- |
-| Dependencies | MariaDB, RabbitMQ, Memcached, Keystone, and Barbican |
-| Bootstrap | Common initialization before application workloads |
-| Coriolis services | API, Web UI, Conductor, Scheduler, Transfer Cron, Minion Manager, Deployer Manager, and Worker services |
-| Logging | Loki, the logging gateway, Alloy, and the logging adaptor |
-| Access | Services and Ingress resources |
-| State | Operator state, generated retained state, and persistent claims where configured |
+- **Dependencies:** `mariadb`, `rabbitmq`, `memcached`, `keystone`, and the Barbican components `barbican-api` and `barbican-worker`.
+- **Bootstrap:** the common initialization component `common-bootstrap-v3`, which runs before application workloads.
+- **Coriolis services:** `coriolis-api`, `coriolis-web`, `coriolis-conductor`, `coriolis-scheduler`, `coriolis-transfer-cron`, `coriolis-minion-manager`, `coriolis-deployer-manager`, and `coriolis-worker` services.
+- **Logging:** `loki`, `gateway`, `alloy`, and `adaptor`.
+- **Access:** Services and Ingress resources.
+- **State:** Operator state, generated retained state, and persistent claims where configured.
 
-The operator does not install an Ingress controller, cert-manager, or storage infrastructure. Those are cluster responsibilities.
+!!! warning ""
+    The operator does not install an Ingress controller, cert-manager, or storage infrastructure. Those are cluster responsibilities.
 
-## :material-book-open-page-variant-outline: Optional Standalone Helm Installation
+## :material-book-open-page-variant-outline: Helm Installation
 
 !!! info
     Helm values configure the operator Deployment, not the `CoriolisAppliance` runtime.<br>
@@ -57,7 +56,7 @@ The operator does not install an Ingress controller, cert-manager, or storage in
 
 These are the chart defaults used by the standalone installation:
 
-??? quote "`coriolis-operator-values.yaml`"
+??? quote "coriolis-operator-values.yaml"
 
     ```yaml
     # Container image used for the operator.

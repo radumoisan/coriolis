@@ -47,7 +47,7 @@
 
 ### :material-application-edit-outline: Standalone Helm Installation Is Unvalidated
 
-**Current state:** The [operator guide](operator.md#optional-standalone-helm-installation) documents an optional standalone Helm command, but it has no separate acceptance evidence. The command intentionally omits `--version`, so it resolves the latest published chart and can change as releases are published.
+**Current state:** The [operator guide](operator.md#helm-installation) documents an optional standalone Helm command, but it has no separate acceptance evidence. The command intentionally omits `--version`, so it resolves the latest published chart and can change as releases are published.
 
 **Impact:** Standalone Helm installation is unvalidated and can deploy a different chart over time.
 
@@ -57,7 +57,7 @@
 
 ### :material-application-edit-outline: Operator Guide Helm Defaults Can Drift
 
-**Current state:** The [operator guide](operator.md#optional-standalone-helm-installation) embeds a commented copy of `coriolis-operator/helm/values.yaml`; the current MkDocs configuration does not include that source file automatically.
+**Current state:** The [operator guide](operator.md#helm-installation) embeds a commented copy of `coriolis-operator/helm/values.yaml`; the current MkDocs configuration does not include that source file automatically.
 
 **Impact:** The operator guide can show stale defaults after the operator chart changes, especially because its standalone installation command resolves the latest published chart.
 
@@ -94,7 +94,7 @@ Accepted evidence covers operator 0.5.40 managing runtime 2603.4 through a bound
 | Implemented | Present in the operator. | Core profile reconciliation and its resource definitions, including the managed logging stack. |
 | Validated | Tested with accepted evidence. | Managed resource reconciliation and lifecycle behavior for dependencies, Coriolis services, and Ingress, including collision safety and normal cleanup. |
 | Validated, bounded | Tested only within a stated limit. | Single-node `Ready=True` and retained-state recreation on 0.5.40; a development Web UI OpenStack-to-OpenStack migration proof of concept on 0.5.54; logging hardening on 0.5.57; the prior walkthrough now split across the [deployment](deploy-appliance.md), [headless migration](headless-migration.md), and [Web UI migration](web-ui-migration.md) pages, followed end to end on 0.5.59 with runtime 2603.4. |
-| In progress | Work with partial evidence not yet accepted end to end on the current release. | Direct Helm operator installation is not separately validated: the [operator guide](operator.md#optional-standalone-helm-installation) documents an optional standalone install that resolves the latest published chart, while only the Argo CD-managed live development path in the [operator lab environment](operator-lab-environment.md#operator-installation) is validated. |
+| In progress | Work with partial evidence not yet accepted end to end on the current release. | Direct Helm operator installation is not separately validated: the [operator guide](operator.md#helm-installation) documents an optional standalone install that resolves the latest published chart, while only the Argo CD-managed live development path in the [operator lab environment](operator-lab-environment.md#operator-installation) is validated. |
 | Pending | Planned work without acceptance evidence. | Broader, repeatable, production-oriented browser-flow, OpenStack provider, and API migration qualification beyond the bounded 0.5.54 development proof of concept and the bounded 0.5.59 prior walkthrough. |
 | Unsupported/unvalidated | Not supported as a public readiness claim. | Production HA, storage, backup, upgrades, drift self-healing, and multi-CR routing. |
 
