@@ -26,9 +26,9 @@ The lab uses these concrete values:
 
 The operator is a single reconciler Pod in the `coriolis` namespace and watches `CoriolisAppliance` custom resources. The custom resource is the declaration of intent for the appliance runtime: version, storage, resources, ingress, logging, and retention. The operator does not install storage, ingress, or certificate infrastructure; those are cluster responsibilities.
 
-`regcred` is what the operator chart references via `imagePullSecrets`; `coriolis-appliance-registry` is the prerequisite the appliance itself expects to already exist for its runtime images. The `local-path` storage is dev-only: data is bound to a single node and has no backup or failover. Use a production storage class elsewhere.
-
-Complete the operational prerequisites and checks in [Deploy an Appliance](deploy-appliance.md#hands-on-prerequisites).
+:material-lightbulb-on-outline: `regcred` is what the operator chart references via `imagePullSecrets`
+:material-lightbulb-on-outline: `coriolis-appliance-registry` is the prerequisite the appliance itself expects to already exist for its runtime images
+:material-lightbulb-on-outline: The `local-path` storage is dev-only: data is bound to a single node and has no backup or failover.
 
 ## :material-book-open-page-variant-outline: Chosen Appliance Values
 
