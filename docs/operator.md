@@ -141,10 +141,12 @@ This command intentionally omits `--version`, so Helm resolves the latest publis
 
 A **CRD** defines a new Kubernetes resource type. Here, it teaches Kubernetes what a `CoriolisAppliance` is, including its accepted fields and validation rules.
 
-The operator chart stores this definition at `coriolis-operator/helm/crds/coriolisappliances.yaml`. This is separate from the repository's top-level `helm/` directory, which packages the documentation site.
+The operator chart stores this definition at `coriolis-operator/helm/crds/coriolisappliances.yaml`.
 
 !!! warning ""
-    `coriolisappliances.yaml` is not an appliance configuration file. It defines the cluster-wide schema for every `CoriolisAppliance` CR: permitted fields, types, required values, defaults, and validation rules. Configure an individual appliance through a namespaced `CoriolisAppliance` CR, such as [coriolis-appliance-advanced.yaml](assets/manifests/coriolis-appliance-advanced.yaml). Adding a field to the CRD only makes it acceptable to Kubernetes; the operator reconciliation code must also implement its behavior.
+    :material-lightbulb-on-outline: `coriolisappliances.yaml` is not an appliance configuration file. It defines the cluster-wide schema for every `CoriolisAppliance` CR: permitted fields, types, required values, defaults, and validation rules.<br>
+    :material-lightbulb-on-outline: Configure an individual appliance through a namespaced `CoriolisAppliance` CR, such as [coriolis-appliance-advanced.yaml](assets/manifests/coriolis-appliance-advanced.yaml)<br>
+    :material-lightbulb-on-outline: Adding a field to the CRD only makes it acceptable to Kubernetes; the operator reconciliation code must also implement its behavior.
 
 Helm treats files under a chart's `crds/` directory differently from normal chart templates:
 
