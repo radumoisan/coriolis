@@ -179,7 +179,7 @@ The [chosen appliance values](operator-lab-environment.md#chosen-appliance-value
 
 <!-- Create the CoriolisAppliance from the tutorial asset. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis apply -f docs/assets/manifests/coriolis-appliance-advanced.yaml
+kubectl --context virt-infra-dev-buc-hq -n coriolis apply -f docs/assets/manifests/coriolis-appliance.yaml
 ```
 
 ??? example "Expected result"

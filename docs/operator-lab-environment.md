@@ -32,7 +32,7 @@ Complete the operational prerequisites and checks in [Deploy an Appliance](deplo
 
 ## :material-book-open-page-variant-outline: Chosen Appliance Values
 
-The tutorial uses [coriolis-appliance-advanced.yaml](assets/manifests/coriolis-appliance-advanced.yaml) unchanged. It is written directly against this dev namespace.
+The tutorial uses [coriolis-appliance.yaml](assets/manifests/coriolis-appliance.yaml) unchanged. It is written directly against this dev namespace.
 
 | Setting | Value | Why chosen |
 | --- | --- | --- |

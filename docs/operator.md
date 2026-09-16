@@ -145,8 +145,394 @@ The operator chart stores this definition at `coriolis-operator/helm/crds/coriol
 
 !!! warning ""
     :material-lightbulb-on-outline: `coriolisappliances.yaml` is not an appliance configuration file. It defines the cluster-wide schema for every `CoriolisAppliance` CR: permitted fields, types, required values, defaults, and validation rules.<br>
-    :material-lightbulb-on-outline: Configure an individual appliance through a namespaced `CoriolisAppliance` CR, such as [coriolis-appliance-advanced.yaml](assets/manifests/coriolis-appliance-advanced.yaml)<br>
+    :material-lightbulb-on-outline: Configure an individual appliance through a namespaced `CoriolisAppliance` CR, such as [coriolis-appliance.yaml](assets/manifests/coriolis-appliance.yaml)<br>
     :material-lightbulb-on-outline: Adding a field to the CRD only makes it acceptable to Kubernetes; the operator reconciliation code must also implement its behavior.
+
+The operator chart installs this CRD:
+
+??? quote "coriolisappliances.yaml"
+
+    ```yaml
+    # Helm installs CRDs from this directory only on initial install. Apply this CRD
+    # separately before upgrading the chart whenever its schema changes.
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: coriolisappliances.coriolis.cloudbase.it
+      annotations:
+        coriolis.cloudbase.it/upgrade-note: "Apply this CRD separately before chart upgrades; Helm does not upgrade CRDs in crds/."
+    spec:
+      group: coriolis.cloudbase.it
+      scope: Namespaced
+      names:
+        plural: coriolisappliances
+        singular: coriolisappliance
+        kind: CoriolisAppliance
+        shortNames:
+          - ca
+      versions:
+        - name: v1alpha1
+          served: true
+          storage: true
+          schema:
+            openAPIV3Schema:
+              type: object
+              properties:
+                apiVersion:
+                  type: string
+                kind:
+                  type: string
+                metadata:
+                  type: object
+                spec:
+                  type: object
+                  required:
+                    - version
+                    - logging
+                  properties:
+                    profile:
+                      type: string
+                      enum:
+                        - core
+                      default: core
+                    version:
+                      type: string
+                      minLength: 1
+                    storage:
+                      type: object
+                      properties:
+                        mariadb:
+                          type: object
+                          required:
+                            - storageClassName
+                            - size
+                          properties:
+                            storageClassName:
+                              type: string
+                              minLength: 1
+                            size:
+                              type: string
+                              minLength: 1
+                        rabbitmq:
+                          type: object
+                          required:
+                            - storageClassName
+                            - size
+                          properties:
+                            storageClassName:
+                              type: string
+                              minLength: 1
+                            size:
+                              type: string
+                              minLength: 1
+                    resources:
+                      type: object
+                      properties:
+                        mariadb:
+                          type: object
+                          required:
+                            - requests
+                            - limits
+                          properties:
+                            requests:
+                              type: object
+                              required:
+                                - cpu
+                                - memory
+                              properties:
+                                cpu:
+                                  type: string
+                                  minLength: 1
+                                memory:
+                                  type: string
+                                  minLength: 1
+                            limits:
+                              type: object
+                              required:
+                                - cpu
+                                - memory
+                              properties:
+                                cpu:
+                                  type: string
+                                  minLength: 1
+                                memory:
+                                  type: string
+                                  minLength: 1
+                        rabbitmq:
+                          type: object
+                          required:
+                            - requests
+                            - limits
+                          properties:
+                            requests:
+                              type: object
+                              required:
+                                - cpu
+                                - memory
+                              properties:
+                                cpu:
+                                  type: string
+                                  minLength: 1
+                                memory:
+                                  type: string
+                                  minLength: 1
+                            limits:
+                              type: object
+                              required:
+                                - cpu
+                                - memory
+                              properties:
+                                cpu:
+                                  type: string
+                                  minLength: 1
+                                memory:
+                                  type: string
+                                  minLength: 1
+                    ingress:
+                      type: object
+                      default:
+                        host: coriolis.app.cloudbase.wiki
+                        ingressClassName: nginx
+                        tls:
+                          mode: certManager
+                      properties:
+                        host:
+                          type: string
+                          default: coriolis.app.cloudbase.wiki
+                        ingressClassName:
+                          type: string
+                          default: nginx
+                        tls:
+                          type: object
+                          default:
+                            mode: certManager
+                          properties:
+                            mode:
+                              type: string
+                              enum:
+                                - certManager
+                                - existingSecret
+                              default: certManager
+                            clusterIssuer:
+                              type: string
+                            tlsSecretName:
+                              type: string
+                    logging:
+                      type: object
+                      required:
+                        - retentionHours
+                        - storage
+                        - resources
+                      properties:
+                        retentionHours:
+                          type: integer
+                          minimum: 1
+                        compactionIntervalMinutes:
+                          type: integer
+                          minimum: 1
+                          default: 15
+                        retentionDeleteDelayMinutes:
+                          type: integer
+                          minimum: 1
+                          default: 120
+                        coriolisDebug:
+                          type: boolean
+                          default: false
+                        storage:
+                          type: object
+                          required:
+                            - loki
+                          properties:
+                            loki:
+                              type: object
+                              required:
+                                - storageClassName
+                                - size
+                              properties:
+                                storageClassName:
+                                  type: string
+                                  minLength: 1
+                                size:
+                                  type: string
+                                  minLength: 1
+                        resources:
+                          type: object
+                          required:
+                            - loki
+                            - gateway
+                            - alloy
+                            - adaptor
+                          properties:
+                            loki:
+                              type: object
+                              required:
+                                - requests
+                                - limits
+                              properties:
+                                requests:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                                limits:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                            gateway:
+                              type: object
+                              required:
+                                - requests
+                                - limits
+                              properties:
+                                requests:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                                limits:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                            alloy:
+                              type: object
+                              required:
+                                - requests
+                                - limits
+                              properties:
+                                requests:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                                limits:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                            adaptor:
+                              type: object
+                              required:
+                                - requests
+                                - limits
+                              properties:
+                                requests:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                                limits:
+                                  type: object
+                                  required:
+                                    - cpu
+                                    - memory
+                                  properties:
+                                    cpu:
+                                      type: string
+                                      minLength: 1
+                                    memory:
+                                      type: string
+                                      minLength: 1
+                status:
+                  type: object
+                  properties:
+                    acceptedVersion:
+                      type: string
+                      minLength: 1
+                    observedGeneration:
+                      type: integer
+                      format: int64
+                      minimum: 0
+                    conditions:
+                      type: array
+                      x-kubernetes-list-type: map
+                      x-kubernetes-list-map-keys:
+                        - type
+                      items:
+                        type: object
+                        required:
+                          - type
+                          - status
+                          - observedGeneration
+                          - lastTransitionTime
+                          - reason
+                          - message
+                        properties:
+                          type:
+                            type: string
+                            minLength: 1
+                          status:
+                            type: string
+                            enum:
+                              - "True"
+                              - "False"
+                              - "Unknown"
+                          observedGeneration:
+                            type: integer
+                            format: int64
+                            minimum: 0
+                          lastTransitionTime:
+                            type: string
+                            format: date-time
+                          reason:
+                            type: string
+                            minLength: 1
+                          message:
+                            type: string
+                            minLength: 1
+          subresources:
+            status: {}
+    ```
 
 Helm treats files under a chart's `crds/` directory differently from normal chart templates:
 
@@ -183,6 +569,105 @@ Helm values, the CRD, and a CR have three different roles:
 - **Helm values** in `coriolis-operator/helm/values.yaml` configure the operator Deployment itself: its image, log level, resources, probes, and security contexts.
 - **The CRD** in `coriolis-operator/helm/crds/coriolisappliances.yaml` defines the fields a `CoriolisAppliance` CR may contain, along with their types, required values, defaults, and validation rules.
 - **A `CoriolisAppliance` CR** supplies the values for one namespaced appliance runtime: version, storage, ingress, logging, and per-component resources. See the [lab manifest and environment values](operator-lab-environment.md) for a concrete configuration.
+
+The lab uses this appliance CR:
+
+??? quote "coriolis-appliance.yaml"
+
+    ```yaml
+    # CoriolisAppliance example, directly applicable to the current
+    # approved dev namespace.
+    #
+    # Prerequisite (not part of this resource): the `coriolis-appliance-registry`
+    # secret must already exist in the `coriolis` namespace before applying.
+    #
+    # Apply with an explicit context and namespace, for example:
+    #   kubectl --context virt-infra-dev-buc-hq -n coriolis apply -f coriolis-appliance.yaml
+    apiVersion: coriolis.cloudbase.it/v1alpha1
+    kind: CoriolisAppliance
+    metadata:
+      name: coriolis-appliance-advanced
+      namespace: coriolis
+    spec:
+      profile: core
+      # Supported immutable Coriolis runtime version deployed by the operator.
+      version: "2603.4"
+      storage:
+        # local-path storage is dev-only: data is bound to a single node and has
+        # no backup or failover. Use a production storage class elsewhere.
+        mariadb:
+          storageClassName: local-path
+          size: 10Gi
+        rabbitmq:
+          storageClassName: local-path
+          size: 1Gi
+      resources:
+        mariadb:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        rabbitmq:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+      ingress:
+        host: coriolis.app.cloudbase.wiki
+        ingressClassName: nginx
+        tls:
+          mode: certManager
+          clusterIssuer: letsencrypt
+      logging:
+        # retentionHours: logs older than this are marked for deletion.
+        # retentionDeleteDelayMinutes: extra grace period before marked data is physically removed,
+        #                              so retention changes can be reverted safely.
+        # compactionIntervalMinutes: how often stored log chunks are compacted.
+        retentionHours: 24
+        compactionIntervalMinutes: 15
+        retentionDeleteDelayMinutes: 120
+        # coriolisDebug stays false: enabling it raises verbosity of all appliance components and can
+        #                            expose sensitive request detail in logs.
+        coriolisDebug: false
+        storage:
+          # local-path Loki volume is dev-only (single node, no redundancy).
+          loki:
+            storageClassName: local-path
+            size: 10Gi
+        resources:
+          loki:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          gateway:
+            requests:
+              cpu: 100m
+              memory: 32Mi
+            limits:
+              cpu: "1"
+              memory: 64Mi
+          alloy:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          adaptor:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+    ```
 
 The operator translates the CR into the runtime resources:
 

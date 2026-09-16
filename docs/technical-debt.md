@@ -55,15 +55,15 @@
 
 **Resolution or validation criterion:** A standalone Helm operator installation, including latest-chart resolution behavior, is validated independently of the Argo CD-managed path.
 
-### :material-application-edit-outline: Operator Guide Helm Defaults Can Drift
+### :material-application-edit-outline: Operator Guide Embedded YAML Can Drift
 
-**Current state:** The [operator guide](operator.md#helm-installation) embeds a commented copy of `coriolis-operator/helm/values.yaml`; the current MkDocs configuration does not include that source file automatically.
+**Current state:** The [operator guide](operator.md#helm-installation) embeds copies of `coriolis-operator/helm/values.yaml`, `coriolis-operator/helm/crds/coriolisappliances.yaml`, and `docs/assets/manifests/coriolis-appliance.yaml`; the current MkDocs configuration has no automatic source inclusion.
 
-**Impact:** The operator guide can show stale defaults after the operator chart changes, especially because its standalone installation command resolves the latest published chart.
+**Impact:** Chart defaults, CRD schema, or appliance example can become stale after canonical source changes, especially because the standalone Helm command resolves the latest published chart.
 
-**Workaround:** Compare the displayed defaults with the selected chart before customizing an installation.
+**Workaround:** Compare displayed examples with the canonical source and selected chart before use or customization.
 
-**Resolution or validation criterion:** Render the operator guide values from the canonical chart source or enforce an automated equality check.
+**Resolution or validation criterion:** Render examples from canonical sources or enforce automated synchronization or equality checks appropriate to all three embedded copies.
 
 ### :material-application-edit-outline: Licensing Backend Is Not Deployed
 
