@@ -47,14 +47,14 @@ spec:
       clusterIssuer: letsencrypt
   logging:
     # retentionHours: logs older than this are marked for deletion.
-    # retentionDeleteDelayMinutes: extra grace period before marked data is physically removed,
-    #                              so retention changes can be reverted safely.
-    # compactionIntervalMinutes: how often stored log chunks are compacted.
     retentionHours: 24
+    # compactionIntervalMinutes: how often stored log chunks are compacted.
     compactionIntervalMinutes: 15
+    # retentionDeleteDelayMinutes: extra grace period before marked data is physically removed,
+    # so retention changes can be reverted safely.
     retentionDeleteDelayMinutes: 120
     # coriolisDebug stays false: enabling it raises verbosity of all appliance components and can
-    #                            expose sensitive request detail in logs.
+    # expose sensitive request detail in logs.
     coriolisDebug: false
     storage:
       # local-path Loki volume is dev-only (single node, no redundancy).

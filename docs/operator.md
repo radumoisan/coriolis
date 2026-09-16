@@ -560,7 +560,7 @@ Therefore, an upgrade has two separate steps:
 The order matters because Kubernetes should understand the new schema before the new operator starts using it.
 
 !!! note ""
-    This article does not upgrade the operator. See [Operator Deployment And CRD](deploy-appliance.md#operator-deployment-and-crd) for installation checks. The caveat is here to prevent assuming that a future `helm upgrade` will update everything automatically.
+    This article does not upgrade the operator. The caveat is here to prevent assuming that a future `helm upgrade` will update everything automatically.
 
 ## :material-book-open-page-variant-outline: CR Versus Helm Values, And The Two Retention Profiles
 
@@ -568,7 +568,7 @@ Helm values, the CRD, and a CR have three different roles:
 
 - **Helm values** in `coriolis-operator/helm/values.yaml` configure the operator Deployment itself: its image, log level, resources, probes, and security contexts.
 - **The CRD** in `coriolis-operator/helm/crds/coriolisappliances.yaml` defines the fields a `CoriolisAppliance` CR may contain, along with their types, required values, defaults, and validation rules.
-- **A `CoriolisAppliance` CR** supplies the values for one namespaced appliance runtime: version, storage, ingress, logging, and per-component resources. See the [lab manifest and environment values](operator-lab-environment.md) for a concrete configuration.
+- **A `CoriolisAppliance` CR** supplies the values for one namespaced appliance runtime: version, storage, ingress, logging, and per-component resources.
 
 The lab uses this appliance CR:
 
@@ -624,14 +624,14 @@ The lab uses this appliance CR:
           clusterIssuer: letsencrypt
       logging:
         # retentionHours: logs older than this are marked for deletion.
-        # retentionDeleteDelayMinutes: extra grace period before marked data is physically removed,
-        #                              so retention changes can be reverted safely.
-        # compactionIntervalMinutes: how often stored log chunks are compacted.
         retentionHours: 24
+        # compactionIntervalMinutes: how often stored log chunks are compacted.
         compactionIntervalMinutes: 15
+        # retentionDeleteDelayMinutes: extra grace period before marked data is physically removed,
+        # so retention changes can be reverted safely.
         retentionDeleteDelayMinutes: 120
         # coriolisDebug stays false: enabling it raises verbosity of all appliance components and can
-        #                            expose sensitive request detail in logs.
+        # expose sensitive request detail in logs.
         coriolisDebug: false
         storage:
           # local-path Loki volume is dev-only (single node, no redundancy).
@@ -694,7 +694,10 @@ The CR's three logging knobs answer different questions:
 - `retentionDeleteDelayMinutes`: extra grace period before marked data is physically removed, so a mistaken retention change can be reverted.
 - `compactionIntervalMinutes`: how often stored log chunks are compacted.
 
-The lab asset ships the **practical profile** `24` h / `15` m / `120` m: a day of queryable history, frequent compaction, and a two-hour undo window. Prior qualification runs instead used a deliberately compressed **test profile** of `1` h / `1` m / `5` m so that retention expiry and physical deletion could be observed within a single session. Both are valid inputs; the test profile exists to make retention provable, not to be left in place. The lab environment uses the practical values because it is standing up something to live in, not benchmarking deletion.
+!!! info ""
+    Compaction is Loki's periodic maintenance process: it combines smaller index files into optimized files and marks expired log data for retention cleanup. `compactionIntervalMinutes` controls how often this process runs; physical deletion still waits for `retentionDeleteDelayMinutes`.
+
+The lab asset ships the **practical profile** `24` h / `15` m / `120` m: a day of queryable history, frequent compaction, and a two-hour undo window.
 
 ## :material-book-open-page-variant-outline: Reconciliation
 
@@ -723,21 +726,21 @@ The lab asset ships the **practical profile** `24` h / `15` m / `120` m: a day o
                   [Ready=True or Ready=False]      [LoggingReady=True or LoggingReady=False]
 ```
 
-The operator reads and classifies expected resources before mutation. A conflicting object is not adopted or overwritten; reconciliation reports a collision instead. After dependencies and successful bootstrap, it applies the workload and access resources, then records operator state last. Core readiness and logging readiness are separate, bounded observations after reconciliation; the logging stack converges independently and later. Neither is a general health or repair loop.
+The operator turns a `CoriolisAppliance` CR into the resources needed to run the appliance. It creates the dependencies first, runs the bootstrap process, and then deploys the Coriolis services and access resources. If an existing resource with the same name belongs to something else, the operator stops instead of replacing it.
 
-Owned resources use owner references and are garbage collected with the custom resource. Retained state is ownerless and reused only when its identity and expected metadata match exactly. Same-name recreation is accepted only for this bounded lifecycle case: retained state is reused without mutation, while newly created owned resources belong only to the new custom-resource instance. The retry behavior covers absent or empty status, stable collisions, and in-flight reconciliation retry; it is not broad periodic drift self-healing.
+Most resources belong to the CR and are removed with it. Data PVCs and generated credentials are retained so that an appliance recreated with the same name can reuse them.
+
+The operator reports core readiness and logging readiness separately because the logging stack can take longer to become ready.
 
 ## :material-book-open-page-variant-outline: Conditions
 
-| Condition | Meaning |
-| --- | --- |
-| `Accepted` | The requested profile and version are supported. |
-| `Progressing` | Reconciliation or bounded readiness is still in progress. |
-| `Reconciled` | The desired managed resource set was applied; a collision keeps it false. |
-| `Ready` | The bounded internal-core readiness observation passed. |
-| `LoggingReady` | The bounded logging-stack readiness observation passed; it converges independently from `Ready`. |
-| `Degraded` | A collision, invalid configuration, or failed readiness observation blocks healthy status. |
-| `Upgradeable` | Whether version changes are supported; it is currently false. |
+- `Accepted` - The requested profile and version are supported.
+- `Progressing` - Reconciliation or bounded readiness is still in progress.
+- `Reconciled` - The desired managed resource set was applied; a collision keeps it false.
+- `Ready` - The bounded internal-core readiness observation passed.
+- `LoggingReady` - The bounded logging-stack readiness observation passed; it converges independently from `Ready`.
+- `Degraded` - A collision, invalid configuration, or failed readiness observation blocks healthy status.
+- `Upgradeable` - Whether version changes are supported; it is currently false.
 
 !!! warning
     `Ready=True` alone means only that selected single-replica internal-core checks passed, and even `Ready=True` with `LoggingReady=True` is not migration or production evidence. Neither condition establishes provider connectivity, browser login, migration success, HA, production storage, backup, or production readiness.
