@@ -554,7 +554,8 @@ The Kubernetes API server may then reject, ignore, or remove fields supported by
 
 Therefore, an upgrade has two separate steps:
 
-1. Apply the `coriolisappliances.coriolis.cloudbase.it` CRD supplied with the target chart version.
+1. Apply the `coriolisappliances.coriolis.cloudbase.it` 
+&emsp;&emsp;⤷ CRD supplied with the target chart version.
 2. Upgrade the operator with Helm.
 
 The order matters because Kubernetes should understand the new schema before the new operator starts using it.
