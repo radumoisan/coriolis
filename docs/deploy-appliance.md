@@ -54,7 +54,7 @@ kubectl -n coriolis get pods -l app.kubernetes.io/name=coriolis-operator
     coriolis-operator-749677f8f5-44ghm   1/1     Running   1 (23h ago)   14d
     ```
 
-The operator Pod should show `1/1` ready and `Running`. A single old restart, as shown here, does not by itself block the lab; recent, repeated, or increasing restarts need investigation. Two Pods can appear during a rollout; wait for it to settle. The selector deliberately omits the release-instance label, which differs between Helm and Argo CD installations.
+The operator Pod should show `1/1` ready and `Running`.
 
 <!-- Verify the CoriolisAppliance CRD is registered. -->
 ```bash
@@ -89,41 +89,42 @@ kubectl -n coriolis get secret regcred coriolis-appliance-registry
 
 ### :material-application-edit-outline: Cluster Services
 
-The operator does not install storage, ingress, or certificate infrastructure. Confirm the three cluster services the appliance values will reference. These resources are cluster-scoped; the `-n coriolis` flag is ignored by kubectl there and is included only to keep the project convention of an explicit namespace on every dev kubectl command.
+The operator does not install storage, ingress, or certificate infrastructure. Confirm the three cluster-scoped services the appliance values will reference.
 
-<!-- Verify the dev local-path StorageClass exists; stable fields only, no volatile age. -->
+<!-- Verify the dev local-path StorageClass exists. -->
 ```bash
-kubectl -n coriolis get storageclass local-path -o custom-columns='NAME:.metadata.name,PROVISIONER:.provisioner,RECLAIM:.reclaimPolicy,BINDING:.volumeBindingMode'
+kubectl -n coriolis get storageclass local-path
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME         PROVISIONER             RECLAIM   BINDING
-    local-path   rancher.io/local-path   Delete    WaitForFirstConsumer
+    NAME                   PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+    local-path (default)   rancher.io/local-path   Delete          WaitForFirstConsumer   false                  121d
     ```
 
-<!-- Verify the nginx IngressClass exists; stable fields only, no volatile age. -->
+<!-- Verify the nginx IngressClass exists. -->
 ```bash
-kubectl -n coriolis get ingressclass nginx -o custom-columns='NAME:.metadata.name,CONTROLLER:.spec.controller'
+kubectl -n coriolis get ingressclass nginx
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME    CONTROLLER
-    nginx   k8s.io/ingress-nginx
+    NAME    CONTROLLER             PARAMETERS   AGE
+    nginx   k8s.io/ingress-nginx   <none>       121d
     ```
 
 <!-- Verify the letsencrypt ClusterIssuer is Ready. -->
 ```bash
-kubectl -n coriolis get clusterissuer letsencrypt -o jsonpath='{.metadata.name}{" ready="}{.status.conditions[?(@.type=="Ready")].status}{"\n"}'
+kubectl -n coriolis get clusterissuer letsencrypt
 ```
 
 ??? example "Expected result"
 
     ```text
-    letsencrypt ready=True
+    NAME          READY   AGE
+    letsencrypt   True    121d
     ```
 
 ### :material-application-edit-outline: No Existing Appliance CR
