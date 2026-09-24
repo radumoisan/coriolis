@@ -146,16 +146,16 @@ A `NotFound` here is the success condition. If the CR already exists, stop and r
 
 <!-- Check whether the TLS Secret already exists before this run. -->
 ```bash
-kubectl -n coriolis get secret coriolis.app.cloudbase.wiki-tls --ignore-not-found -o name
+kubectl -n coriolis get secret coriolis.app.cloudbase.wiki-tls
 ```
 
 ??? example "Expected result"
 
     ```text
-    No output.
+    Error from server (NotFound): secrets "coriolis.app.cloudbase.wiki-tls" not found
     ```
 
-No output with exit status zero means the Secret is absent. If its name is printed, it predates this run: record that fact and preserve it during cleanup. A permission or connection error is not evidence of absence.
+A `NotFound` for this Secret means it is absent. If the Secret exists, it predates this run: record that fact and preserve it during cleanup.
 
 ## :material-book-open-page-variant-outline: Apply The Appliance
 
