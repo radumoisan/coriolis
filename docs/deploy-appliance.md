@@ -85,7 +85,7 @@ kubectl -n coriolis get secret regcred coriolis-appliance-registry
     coriolis-appliance-registry   kubernetes.io/dockerconfigjson   1      34d
     ```
 
-`regcred` is what the operator chart references via `imagePullSecrets`; `coriolis-appliance-registry` is the prerequisite the appliance itself expects to already exist for its runtime images.
+`regcred` is what the operator chart references via `imagePullSecrets`;<br>`coriolis-appliance-registry` is the prerequisite the appliance itself expects to already exist for its runtime images.
 
 ### :material-application-edit-outline: Cluster Services
 
