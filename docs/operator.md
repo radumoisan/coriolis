@@ -145,7 +145,9 @@ The operator chart stores this definition at `coriolis-operator/helm/crds/coriol
 
 !!! warning ""
     :material-lightbulb-on-outline: `coriolisappliances.yaml` is not an appliance configuration file. It defines the cluster-wide schema for every `CoriolisAppliance` CR: permitted fields, types, required values, defaults, and validation rules.<br>
+    ---
     :material-lightbulb-on-outline: Configure an individual appliance through a namespaced `CoriolisAppliance` CR, such as [coriolis-appliance.yaml](assets/manifests/coriolis-appliance.yaml)<br>
+    ---
     :material-lightbulb-on-outline: Adding a field to the CRD only makes it acceptable to Kubernetes; the operator reconciliation code must also implement its behavior.
 
 The operator chart installs this CRD:
