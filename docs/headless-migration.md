@@ -39,13 +39,6 @@ The helper requires two saved, validated endpoints. Create the source endpoint f
 !!! danger "This is a real migration"
     The run creates cloud resources, can shut down the source instance, and can deploy a destination instance. Use a disposable fixture only.
 
-### :material-application-edit-outline: Prerequisites
-
-- A disposable, volume-backed source instance with one bootable volume. See [OpenStack Migration Prerequisites](openstack-provider.md#openstack-migration-prerequisites).
-- Saved and validated source and destination endpoints, plus their IDs, the source instance ID, and the destination resource names and IDs required by the configuration.
-- Python 3 and `kubectl` access to the appliance namespace and the Secret that contains the Keystone password. See [Web Login And Visual Inspection](deploy-appliance.md#web-login-and-visual-inspection) for appliance access.
-- Sufficient source and destination quota, capacity, network reachability, images, flavors, networks, security groups, keypairs, and floating-IP pools. The [Lab Environment](operator-lab-environment.md) describes a suitable test environment.
-
 ### :material-application-edit-outline: Download And Configure
 
 In a local working directory, download these two files:
