@@ -68,23 +68,21 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get crd coriolisappliances.c
     coriolisappliances.coriolis.cloudbase.it   2026-08-20T13:37:25Z
     ```
 
-The creation timestamp is installation-specific.
-
 ### :material-application-edit-outline: Namespace Pull Secrets
 
 Both registry pull Secrets must exist in the `coriolis` namespace. Query name and type only; never decode or print Secret data.
 
-<!-- List only the names and types of the two required pull Secrets. -->
+<!-- Verify the two required pull Secrets exist. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret regcred coriolis-appliance-registry -o custom-columns=NAME:.metadata.name,TYPE:.type
+kubectl --context virt-infra-dev-buc-hq -n coriolis get secret regcred coriolis-appliance-registry
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                          TYPE
-    regcred                       kubernetes.io/dockerconfigjson
-    coriolis-appliance-registry   kubernetes.io/dockerconfigjson
+    NAME                          TYPE                             DATA   AGE
+    regcred                       kubernetes.io/dockerconfigjson   1      34d
+    coriolis-appliance-registry   kubernetes.io/dockerconfigjson   1      34d
     ```
 
 `regcred` is what the operator chart references via `imagePullSecrets`; `coriolis-appliance-registry` is the prerequisite the appliance itself expects to already exist for its runtime images.
