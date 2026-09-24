@@ -320,7 +320,13 @@ kubectl -n coriolis get coriolisappliance coriolis-appliance-advanced -o json | 
     LoggingReady=True reason=LoggingReady
     ```
 
-The gate is the status combination, not the reason text: `Accepted`, `Reconciled`, `Ready`, and `LoggingReady` must be `True`, `Progressing` and `Degraded` must be `False`, and `Upgradeable` is expected `False` for this release. The reasons above are the fixed converged-state values emitted by the `0.5.59` operator; while the appliance is still converging you may instead see `RuntimeStarting` or `LoggingStarting`, and a blocked reconcile carries the failure category in place of the ready reasons.
+Use the `STATUS` values to decide whether the appliance is ready:
+
+- `Accepted`, `Reconciled`, `Ready`, and `LoggingReady` should be `True`.
+- `Progressing` and `Degraded` should be `False`.
+- `Upgradeable` is expected to be `False` because upgrades are not supported yet.
+
+The `REASON` values provide additional context and may change while the appliance starts. For example, `RuntimeStarting` and `LoggingStarting` mean that the corresponding services are still becoming ready. If reconciliation fails, the reason identifies the type of failure.
 
 ### :material-application-edit-outline: Pods
 
