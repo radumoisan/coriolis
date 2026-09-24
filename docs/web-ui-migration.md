@@ -74,4 +74,4 @@ Delete through the Web UI in this order; each step gates the next.
 
 An empty Swift export container can remain after disk cleanup. In this run the source container `coriolis` was absent before validation and empty afterward; final reset removed it. Delete an empty container only when the baseline and migration evidence establish that this run created it. Never remove a pre-existing/shared container or delete unknown objects to make it empty. Also remove any disposable fixture infrastructure you created, restoring only your recorded router interfaces and leaving pre-existing networks, keys, security groups, and floating IP bindings untouched.
 
-After completing migration cleanup for both phases in the same environment, you can optionally [remove the runtime](deploy-appliance.md#optional-runtime-removal) or perform a [full fresh reset](deploy-appliance.md#full-fresh-reset).
+After completing migration cleanup for both phases in the same environment, you can optionally [remove the runtime](remove-appliance.md#optional-runtime-removal) or perform a [full fresh reset](remove-appliance.md#full-fresh-reset).
