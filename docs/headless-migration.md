@@ -4,18 +4,27 @@ This first phase uses the concrete setup described in [Lab Environment](operator
 
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
-Create and save both endpoints through the Web UI before any headless test: the headless helper only works against saved endpoints that have passed validation.
+The helper requires two saved, validated endpoints. Create the source endpoint first, then repeat these same three steps for the destination using that cloud's values.
 
-1. In the web UI, open **Cloud Endpoints**, choose **Add Endpoint** on an empty list or **New > Endpoint**, then select the **OpenStack** logo.
-   **Expected outcome:** the endpoint creation form appears with OpenStack connection fields.
-2. Give the endpoint a distinct name. Change **Identity API Version** from its default `2` to `3`, then provide the source username, password, project name, auth URL (normally ending `/v3`), user domain, and project domain. Domain fields appear after selecting version `3`; use domain names when the selector says **Name**. Supply region and interface in **Advanced** only when required.
-   **Expected outcome:** all required fields are accepted and the **Validate and save** button becomes enabled.
-3. Click **Validate and save**, open the saved endpoint's details, and click **Validate Endpoint**.
-   **Expected outcome:** the creation form closes and the endpoint appears in the list. The explicit validation dialog then shows `Endpoint is Valid` and `All tests passed succesfully.` Click **Dismiss** and use the details back arrow to return to the list.
-4. Repeat steps 1 to 3 for the destination cloud with its own credentials.
-   **Expected outcome:** a second endpoint listed with `Endpoint is Valid`.
-5. Open each endpoint's details page and record the non-secret endpoint ID shown in the page URL or details for the headless config file.
-   **Expected outcome:** you hold two endpoint ID strings; no credential value is recorded anywhere.
+1. Open **Cloud Endpoints**.<br>
+   &emsp;⤷ Choose **Add Endpoint** (or **New > Endpoint** for a non-empty list).<br>
+   &emsp;&emsp;⤷ Select **OpenStack**.
+2. Fill in the required parameters:
+
+   | Parameter | Value |
+   | --- | --- |
+   | Name | `source-openstack` for the source; `destination-openstack` for the destination |
+   | Description | `Source OpenStack cloud` for the source; `Destination OpenStack cloud` for the destination |
+   | Username | `<OPENSTACK_USERNAME>` |
+   | Password | `<OPENSTACK_PASSWORD>` |
+   | Authentication URL | `<KEYSTONE_URL>/v3` |
+   | Project Name | `<PROJECT_NAME>` |
+   | Glance API Version | `2` |
+   | Identity API Version | `3` |
+
+   Selecting **Identity API Version** `3` reveals the domain fields; fill the **User Domain** and **Project Domain** names, and use **Advanced** region/interface only if required.
+3. **Validate and save:** Click **Validate and save**, open the saved endpoint details, click **Validate Endpoint**, and record the non-secret endpoint ID from the page URL or details.
+   **Expected outcome:** the form closes, the endpoint is listed, explicit validation reports `Endpoint is Valid` and `All tests passed succesfully.`, and the endpoint ID is recorded without recording credentials.
 
 !!! tip "Where the credentials actually live"
     The operator-managed Barbican on this appliance stores the encrypted connection payload as a Barbican secret; the Coriolis endpoint object itself contains only the returned `secret_ref`. That is why the UI reports the endpoint valid only after both the secret is `ACTIVE` and the provider connection test succeeds, and why deleting the endpoint is expected to remove its Barbican-backed credential as part of cleanup.
