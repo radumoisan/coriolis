@@ -7,23 +7,14 @@ This first phase uses the concrete setup described in [Lab Environment](operator
 !!! danger "Migrations write real state and can shut down the source"
     Every action in the remaining sections operates on real OpenStack clouds. A transfer execution copies disk data, creates destination resources, and the selected execution options power the source VM off. Prepare only a small, disposable, volume-backed fixture you own and can destroy.
 
-The migration path here is a single OpenStack-to-OpenStack live migration of one disposable VM. The provider contract and stage boundaries live in [OpenStack Context](openstack-provider.md) and [Migration Flow](migration-flow.md); this table is the concrete preflight for this tutorial.
+The migration path here is a single OpenStack-to-OpenStack live migration of one disposable VM. The provider contract and stage boundaries live in [OpenStack Context](openstack-provider.md) and [Migration Flow](migration-flow.md); use this preflight checklist for the tutorial.
 
-| Input | Why it is needed | Expected preflight result |
-| --- | --- | --- |
-| One small disposable volume-backed source VM with a known marker (a unique file on its boot volume) | Proves the disk actually moved and the destination boots your state | VM is `ACTIVE`, exactly one attached volume is marked bootable and `in-use`, and the marker is verified -- either read inside the guest (for example over SSH) or proven hypervisor-side from the server's serial console output (for example a cloud-init `runcmd` line plus a `final_message` completion line fetched through the Compute API). |
-| Source project permission for Cinder backups plus Swift object storage | The selected export mechanism (`swift_backups`) stages disk data through Cinder backups read from Swift | Both APIs are available to the endpoint project. The controlled fixture migration must then demonstrate successful Cinder-backup/Swift replication in its task progress; API discovery alone is not data-path proof. |
-| Destination project quota for volumes, snapshots, ports, floating IPs, and temporary worker VMs | Transfer and deployment create real destination and temporary resources | Quota headroom covers the fixture disks plus one temporary worker VM and its port. |
-| Visible destination Linux image for temporary workers | Worker VMs boot from it and must initialize on first boot (cloud-init or config drive) | Image is shared to or present in the endpoint project and boots. |
-| Visible destination worker network, flavor, and security group | The temporary worker VM needs a management path back to the OpenStack APIs | Each resource exists in the endpoint project; the security group permits the required API and data paths. |
-| Destination keypair | The worker VM and the migrated VM are launched with it | Keypair exists in the endpoint project. |
-| Destination floating-IP pool(s) | Worker reachability and the migrated VM's own floating IP | Pool has free addresses visible to the project. |
-| Destination volume type for worker boot volumes, if workers boot from volume | Placement of temporary worker storage | Type is visible; `__DEFAULT__` placement is otherwise acceptable. |
-| A destination network mapped for every source NIC | A missing per-interface mapping blocks deployment | Each source network name is matched to a destination network ID up front. |
-| API connectivity from the appliance to both clouds' identity and service endpoints | Conductor and Worker call both APIs | `Validate and save` in the next section reports the endpoint valid. |
-
-!!! note
-    Confirm source and destination resource visibility with project-scoped credentials before creating endpoints. The endpoint project, not an administrator account, must see every image, network, flavor, security group, keypair, pool, and volume type listed above.
+- **Source fixture:** Use one small, disposable, volume-backed source VM with a known marker on its boot volume. It must be `ACTIVE`, have exactly one attached bootable `in-use` volume, and have its marker verified in the guest or through serial-console/cloud-init evidence.
+- **Source data path:** The source endpoint project needs Cinder backups and Swift APIs for `swift_backups`; API discovery alone is not proof. Fixture task progress must demonstrate successful Cinder-backup/Swift replication.
+- **Destination capacity:** Ensure quota headroom for volumes, snapshots, ports, floating IPs, fixture disks, and one temporary worker VM plus its port.
+- **Worker resources:** The endpoint project needs a visible Linux image that boots and initializes, worker network, flavor, security group permitting required API and data paths, keypair, free floating IPs, and a worker volume type when applicable; otherwise `__DEFAULT__` is acceptable.
+- **Network mappings:** Map every source NIC/network to a destination network ID before deployment.
+- **Endpoint access:** The appliance must reach both clouds' identity and service endpoints, and `Validate and save` must succeed. Project-scoped endpoint credentials, not an administrator account, must see every listed image, network, flavor, security group, keypair, floating-IP pool, and volume type.
 
 !!! note "Source Floating IPs Are Not Required By `swift_backups`"
     Coriolis requests source Cinder backups and reads the staged data through Swift APIs; this path does not require SSH into the source VM. Verify the source marker through a guest read or a serial-console check without borrowing an unrelated floating IP. The destination pool still needs free addresses for temporary workers and the migrated guest. Quota headroom alone does not prove that its external subnet allocation pool has free addresses.
