@@ -1,23 +1,6 @@
 # Phase 1: Headless Migration
 
-This first phase uses the concrete setup described in [Lab Environment](operator-lab-environment.md). It assumes the successful deployment and login described in [Web Login And Visual Inspection](deploy-appliance.md#web-login-and-visual-inspection). Prepare the endpoints through the Web UI, then perform the headless migration before continuing to Phase 2.
-
-## :material-book-open-page-variant-outline: OpenStack Migration Prerequisites
-
-!!! danger "Migrations write real state and can shut down the source"
-    Every action in the remaining sections operates on real OpenStack clouds. A transfer execution copies disk data, creates destination resources, and the selected execution options power the source VM off. Prepare only a small, disposable, volume-backed fixture you own and can destroy.
-
-The migration path here is a single OpenStack-to-OpenStack live migration of one disposable VM. The provider contract and stage boundaries live in [OpenStack Context](openstack-provider.md) and [Migration Flow](migration-flow.md); use this preflight checklist for the tutorial.
-
-- **Source fixture:** Use one small, disposable, volume-backed source VM with a known marker on its boot volume. It must be `ACTIVE`, have exactly one attached bootable `in-use` volume, and have its marker verified in the guest or through serial-console/cloud-init evidence.
-- **Source data path:** The source endpoint project needs Cinder backups and Swift APIs for `swift_backups`; API discovery alone is not proof. Fixture task progress must demonstrate successful Cinder-backup/Swift replication.
-- **Destination capacity:** Ensure quota headroom for volumes, snapshots, ports, floating IPs, fixture disks, and one temporary worker VM plus its port.
-- **Worker resources:** The endpoint project needs a visible Linux image that boots and initializes, worker network, flavor, security group permitting required API and data paths, keypair, free floating IPs, and a worker volume type when applicable; otherwise `__DEFAULT__` is acceptable.
-- **Network mappings:** Map every source NIC/network to a destination network ID before deployment.
-- **Endpoint access:** The appliance must reach both clouds' identity and service endpoints, and `Validate and save` must succeed. Project-scoped endpoint credentials, not an administrator account, must see every listed image, network, flavor, security group, keypair, floating-IP pool, and volume type.
-
-!!! note "Source Floating IPs Are Not Required By `swift_backups`"
-    Coriolis requests source Cinder backups and reads the staged data through Swift APIs; this path does not require SSH into the source VM. Verify the source marker through a guest read or a serial-console check without borrowing an unrelated floating IP. The destination pool still needs free addresses for temporary workers and the migrated guest. Quota headroom alone does not prove that its external subnet allocation pool has free addresses.
+This first phase uses the concrete setup described in [Lab Environment](operator-lab-environment.md). It assumes the successful deployment and login described in [Web Login And Visual Inspection](deploy-appliance.md#web-login-and-visual-inspection) and completion of [OpenStack Migration Prerequisites](openstack-provider.md#openstack-migration-prerequisites). Prepare the endpoints through the Web UI, then perform the headless migration before continuing to Phase 2.
 
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
@@ -40,7 +23,7 @@ Create and save both endpoints through the Web UI before any headless test: the 
 ## :material-book-open-page-variant-outline: Headless Real Migration
 
 !!! danger "This is a real migration"
-    Running the helper creates a Transfer, executes it against both live clouds, deploys the destination VM, and can shut down the source. Use it only with the disposable fixture from the prerequisites section. The helper performs one migration, never any cleanup, and leaves the transfer, execution, deployment, and all cloud objects visible in the Web UI for observation.
+    Running the helper creates a Transfer, executes it against both live clouds, deploys the destination VM, and can shut down the source. Use it only with the disposable fixture from [OpenStack Migration Prerequisites](openstack-provider.md#openstack-migration-prerequisites). The helper performs one migration, never any cleanup, and leaves the transfer, execution, deployment, and all cloud objects visible in the Web UI for observation.
 
 The helper `deploy/coriolis-headless-migration.py` works only against the two saved endpoints from the previous section. Its configuration contract is [headless-migration.example.json](assets/manifests/headless-migration.example.json).
 

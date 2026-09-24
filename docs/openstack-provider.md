@@ -51,6 +51,23 @@ The selected path can create temporary export, disk-copy, or operating-system-mo
 
 Temporary worker VM images must initialize on first boot. Use an image with the appropriate initialization support, and use a configuration drive where cloud metadata is unavailable. Ensure security controls permit the Coriolis runtime to reach OpenStack APIs and each temporary worker VM over the required management and data paths. For Ceph-based source access, the Coriolis Worker service also needs a route to the source Ceph cluster.
 
+## :material-book-open-page-variant-outline: OpenStack Migration Prerequisites
+
+!!! danger "Migrations write real state and can shut down the source"
+    The Quick Start migration operates on real OpenStack clouds. A transfer execution copies disk data, creates destination resources, and the selected execution options power the source VM off. Prepare only a small, disposable, volume-backed fixture you own and can destroy.
+
+This checklist is the concrete preflight for the Quick Start's single OpenStack-to-OpenStack live migration of one disposable VM. The provider contract and stage boundaries live in [Migration Flow](migration-flow.md).
+
+- **Source fixture:** Use one small, disposable, volume-backed source VM with a known marker on its boot volume. It must be `ACTIVE`, have exactly one attached bootable `in-use` volume, and have its marker verified in the guest or through serial-console/cloud-init evidence.
+- **Source data path:** The source endpoint project needs Cinder backups and Swift APIs for `swift_backups`; API discovery alone is not proof. Fixture task progress must demonstrate successful Cinder-backup/Swift replication.
+- **Destination capacity:** Ensure quota headroom for volumes, snapshots, ports, floating IPs, fixture disks, and one temporary worker VM plus its port.
+- **Worker resources:** The endpoint project needs a visible Linux image that boots and initializes, worker network, flavor, security group permitting required API and data paths, keypair, free floating IPs, and a worker volume type when applicable; otherwise `__DEFAULT__` is acceptable.
+- **Network mappings:** Map every source NIC/network to a destination network ID before deployment.
+- **Endpoint access:** The appliance must reach both clouds' identity and service endpoints, and `Validate and save` must succeed. Project-scoped endpoint credentials, not an administrator account, must see every listed image, network, flavor, security group, keypair, floating-IP pool, and volume type.
+
+!!! note "Source Floating IPs Are Not Required By `swift_backups`"
+    Coriolis requests source Cinder backups and reads the staged data through Swift APIs; this path does not require SSH into the source VM. Verify the source marker through a guest read or a serial-console check without borrowing an unrelated floating IP. The destination pool still needs free addresses for temporary workers and the migrated guest. Quota headroom alone does not prove that its external subnet allocation pool has free addresses.
+
 ## :material-book-open-page-variant-outline: Cleanup And Validation
 
 1. Validate endpoint API access, source disk access, resource visibility, per-network mappings, and temporary worker VM initialization before a workload transfer.
