@@ -33,6 +33,7 @@ The ignored `.openstack/coriolis-passwords.env` file contains `SOURCE_CORIOLIS_P
 
 <!-- Load the local Coriolis project passwords. -->
 ```bash
+# Load the local Coriolis project passwords.
 source .openstack/coriolis-passwords.env
 ```
 
@@ -46,6 +47,7 @@ source .openstack/coriolis-passwords.env
 
 <!-- Load source-cloud administrator credentials. -->
 ```bash
+# Load source-cloud administrator credentials.
 source .openstack/admin-openrc-source.sh
 ```
 
@@ -57,6 +59,7 @@ source .openstack/admin-openrc-source.sh
 
 <!-- Create the source Coriolis project and print its ID. -->
 ```bash
+# Create the source Coriolis project and print its ID.
 openstack project create --domain Default --description "Coriolis migration demo source project" -f value -c id coriolis
 ```
 
@@ -68,6 +71,7 @@ openstack project create --domain Default --description "Coriolis migration demo
 
 <!-- Create the source Coriolis user and print its ID. -->
 ```bash
+# Create the source Coriolis user and print its ID.
 openstack user create --domain Default --project coriolis --project-domain Default --password "$SOURCE_CORIOLIS_PASSWORD" -f value -c id coriolis
 ```
 
@@ -79,6 +83,7 @@ openstack user create --domain Default --project coriolis --project-domain Defau
 
 <!-- Grant the source Coriolis user the member role in its project. -->
 ```bash
+# Grant the source Coriolis user the member role in its project.
 openstack role add --project coriolis --project-domain Default --user coriolis --user-domain Default member
 ```
 
@@ -90,6 +95,7 @@ openstack role add --project coriolis --project-domain Default --user coriolis -
 
 <!-- Allow the source administrator to select the Coriolis project in Horizon. -->
 ```bash
+# Allow the source administrator to select the Coriolis project in Horizon.
 openstack role add --project coriolis --project-domain Default --user admin --user-domain Default member
 ```
 
@@ -101,6 +107,7 @@ openstack role add --project coriolis --project-domain Default --user admin --us
 
 <!-- Set the source Coriolis project quota. -->
 ```bash
+# Set the source Coriolis project quota.
 openstack quota set \
   --instances 1 --cores 2 --ram 4096 --key-pairs 1 \
   --server-groups 0 --server-group-members 0 \
@@ -120,6 +127,7 @@ openstack quota set \
 
 <!-- Load destination-cloud administrator credentials. -->
 ```bash
+# Load destination-cloud administrator credentials.
 source .openstack/admin-openrc-dest.sh
 ```
 
@@ -131,6 +139,7 @@ source .openstack/admin-openrc-dest.sh
 
 <!-- Create the destination Coriolis project and print its ID. -->
 ```bash
+# Create the destination Coriolis project and print its ID.
 openstack project create --domain Default --description "Coriolis migration demo destination project" -f value -c id coriolis
 ```
 
@@ -142,6 +151,7 @@ openstack project create --domain Default --description "Coriolis migration demo
 
 <!-- Create the destination Coriolis user and print its ID. -->
 ```bash
+# Create the destination Coriolis user and print its ID.
 openstack user create --domain Default --project coriolis --project-domain Default --password "$DESTINATION_CORIOLIS_PASSWORD" -f value -c id coriolis
 ```
 
@@ -153,6 +163,7 @@ openstack user create --domain Default --project coriolis --project-domain Defau
 
 <!-- Grant the destination Coriolis user the member role in its project. -->
 ```bash
+# Grant the destination Coriolis user the member role in its project.
 openstack role add --project coriolis --project-domain Default --user coriolis --user-domain Default member
 ```
 
@@ -164,6 +175,7 @@ openstack role add --project coriolis --project-domain Default --user coriolis -
 
 <!-- Allow the destination administrator to select the Coriolis project in Horizon. -->
 ```bash
+# Allow the destination administrator to select the Coriolis project in Horizon.
 openstack role add --project coriolis --project-domain Default --user admin --user-domain Default member
 ```
 
@@ -175,6 +187,7 @@ openstack role add --project coriolis --project-domain Default --user admin --us
 
 <!-- Set the destination Coriolis project quota. -->
 ```bash
+# Set the destination Coriolis project quota.
 openstack quota set \
   --instances 2 --cores 4 --ram 8192 --key-pairs 2 \
   --server-groups 0 --server-group-members 0 \
