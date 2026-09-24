@@ -28,31 +28,33 @@ kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
 
 ### :material-application-edit-outline: Operator Deployment And CRD
 
-<!-- Verify the operator Deployment is running in the coriolis namespace; stable fields only, no volatile age. -->
+<!-- Verify the operator Deployment is running in the coriolis namespace. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator -o jsonpath='{.metadata.name}{" ready="}{.status.readyReplicas}{"/"}{.spec.replicas}{" available="}{.status.availableReplicas}{"\n"}'
+kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
 ```
 
 ??? example "Expected result"
 
     ```text
-    coriolis-operator ready=1/1 available=1
+    NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+    coriolis-operator   1/1     1            1           32d
     ```
 
-The operator Pod should show zero restarts in the cluster baseline; sustained restarts mean stop and investigate before deploying an appliance.
+The operator Deployment should show `1/1` ready, `1` up to date, and `1` available.
 
-<!-- Inspect the operator container's readiness and restart count without changing it. -->
+<!-- Inspect the operator Pod's readiness, status, and restart count. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l app.kubernetes.io/name=coriolis-operator -o jsonpath='{range .items[*]}ready={.status.containerStatuses[?(@.name=="operator")].ready} restarts={.status.containerStatuses[?(@.name=="operator")].restartCount}{"\n"}{end}'
+kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l app.kubernetes.io/name=coriolis-operator
 ```
 
 ??? example "Expected result"
 
     ```text
-    ready=true restarts=0
+    NAME                                 READY   STATUS    RESTARTS      AGE
+    coriolis-operator-749677f8f5-44ghm   1/1     Running   1 (23h ago)   14d
     ```
 
-Expect exactly one line. An empty result, an unready container, or a nonzero restart count needs investigation. Two Pods can appear during a rollout; wait for it to settle. The selector deliberately omits the release-instance label, which differs between Helm and Argo CD installations.
+The operator Pod should show `1/1` ready and `Running`. A single old restart, as shown here, does not by itself block the lab; recent, repeated, or increasing restarts need investigation. Two Pods can appear during a rollout; wait for it to settle. The selector deliberately omits the release-instance label, which differs between Helm and Argo CD installations.
 
 <!-- Verify the CoriolisAppliance CRD is registered. -->
 ```bash
@@ -606,15 +608,16 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,c
     No output.
     ```
 
-<!-- Confirm the operator Deployment is untouched and still ready; stable fields only, no volatile age. -->
+<!-- Confirm the operator Deployment is untouched and still ready. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator -o jsonpath='{.metadata.name}{" ready="}{.status.readyReplicas}{"/"}{.spec.replicas}{" available="}{.status.availableReplicas}{"\n"}'
+kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
 ```
 
 ??? example "Expected result"
 
     ```text
-    coriolis-operator ready=1/1 available=1
+    NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+    coriolis-operator   1/1     1            1           32d
     ```
 
 <!-- Confirm the Argo CD Application is still Synced and Healthy. -->
