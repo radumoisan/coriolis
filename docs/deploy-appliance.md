@@ -373,66 +373,72 @@ Pod suffixes and ages will differ. Stop if a Pod is missing, a running Pod is no
 
 ### :material-application-edit-outline: PVCs, Ingresses, And Certificate
 
-<!-- List the appliance PersistentVolumeClaims; stable fields only, no volatile age. -->
+<!-- List the appliance PersistentVolumeClaims. -->
 ```bash
-kubectl -n coriolis get pvc -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
+kubectl -n coriolis get pvc
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                                        STATUS   VOLUME                                     CAPACITY   STORAGECLASS
-    coriolis-appliance-advanced-loki-data       Bound    pvc-6359c0f0-08c5-440a-9055-d2126e340196   10Gi       local-path
-    coriolis-appliance-advanced-mariadb-data    Bound    pvc-032c16e5-a89e-40e7-892b-2a7c18523880   10Gi       local-path
-    coriolis-appliance-advanced-rabbitmq-data   Bound    pvc-e35e92fd-d0b3-438b-ad43-16f76b86fd70   1Gi        local-path
+    NAME                                        STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+    coriolis-appliance-advanced-loki-data       Bound    pvc-85f99a07-4ff8-465d-9476-eace63ba52a1   10Gi       RWO            local-path     <unset>                 43m
+    coriolis-appliance-advanced-mariadb-data    Bound    pvc-781a0c98-61ba-4bf5-9a18-899234c872fa   10Gi       RWO            local-path     <unset>                 42m
+    coriolis-appliance-advanced-rabbitmq-data   Bound    pvc-4779d7db-612a-46e8-839d-10cfe62a6cb6   1Gi        RWO            local-path     <unset>                 42m
     ```
 
-Exactly **three Bound PVCs**, created as direct resources with the names above (MariaDB, RabbitMQ, and Loki data), each `RWO` on `local-path`. The `VOLUME` names are cluster-generated, so the three values shown are representative, not literal; record your actual bound PV names from this output now, because the [Full Fresh Reset](#full-fresh-reset) section verifies their automatic reclaim after claim deletion. These are retained ownerless claims, so same-name recreation reuses them instead of reprovisioning.
+Check the following:
 
-<!-- List the appliance Ingress resources; stable fields only, no volatile address or age (the HTTPS check below proves routing). -->
+- MariaDB, RabbitMQ, and Loki each have one PVC in `Bound` status.
+- All three PVCs use `RWO` access and the `local-path` StorageClass.
+- MariaDB and Loki have `10Gi`; RabbitMQ has `1Gi`.
+- The `VOLUME` identifiers and ages are cluster-generated and will differ.
+
+The operator retains these PVCs when the appliance CR is removed. Recreating the appliance with the same name reuses them. The [Full Fresh Reset](#full-fresh-reset) section removes them and verifies that their volumes are reclaimed.
+
+<!-- List the appliance Ingress resources. -->
 ```bash
-kubectl -n coriolis get ingress -o custom-columns='NAME:.metadata.name,CLASS:.spec.ingressClassName,HOST:.spec.rules[0].host'
+kubectl -n coriolis get ingress
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                                       CLASS   HOST
-    coriolis-appliance-advanced-adaptor        nginx   coriolis.app.cloudbase.wiki
-    coriolis-appliance-advanced-barbican-api   nginx   coriolis.app.cloudbase.wiki
-    coriolis-appliance-advanced-coriolis-api   nginx   coriolis.app.cloudbase.wiki
-    coriolis-appliance-advanced-coriolis-web   nginx   coriolis.app.cloudbase.wiki
-    coriolis-appliance-advanced-keystone       nginx   coriolis.app.cloudbase.wiki
+    NAME                                       CLASS   HOSTS                         ADDRESS        PORTS     AGE
+    coriolis-appliance-advanced-adaptor        nginx   coriolis.app.cloudbase.wiki   10.254.11.50   80, 443   41m
+    coriolis-appliance-advanced-barbican-api   nginx   coriolis.app.cloudbase.wiki   10.254.11.50   80, 443   41m
+    coriolis-appliance-advanced-coriolis-api   nginx   coriolis.app.cloudbase.wiki   10.254.11.50   80, 443   41m
+    coriolis-appliance-advanced-coriolis-web   nginx   coriolis.app.cloudbase.wiki   10.254.11.50   80, 443   41m
+    coriolis-appliance-advanced-keystone       nginx   coriolis.app.cloudbase.wiki   10.254.11.50   80, 443   41m
     ```
 
-Five Ingress resources, all on the same class and host, one per routed service. Only the `coriolis-appliance-advanced-coriolis-web` Ingress carries the cert-manager ClusterIssuer annotation, so it is the resource that drives certificate issuance; the `coriolis-appliance-advanced-adaptor` Ingress serves the `/logs` and `/log-stream` routes.
+Check the following:
 
-<!-- Check the cert-manager Certificate readiness; stable fields only, no volatile age. -->
+- Five Ingress resources expose the routed appliance services.
+- All use the `nginx` class and `coriolis.app.cloudbase.wiki` host.
+- All show the same ingress address and ports `80, 443`.
+- The `coriolis-web` Ingress requests the certificate from cert-manager.
+- The `adaptor` Ingress serves the `/logs` and `/log-stream` routes.
+
+The ingress address and ages depend on the cluster and will differ.
+
+<!-- Check the cert-manager Certificate readiness. -->
 ```bash
-kubectl -n coriolis get certificate -o custom-columns='NAME:.metadata.name,READY:.status.conditions[?(@.type=="Ready")].status,SECRET:.spec.secretName'
+kubectl -n coriolis get certificate
 ```
 
 ??? example "Expected result"
 
     ```text
-    NAME                              READY   SECRET
-    coriolis.app.cloudbase.wiki-tls   True    coriolis.app.cloudbase.wiki-tls
+    NAME                              READY   SECRET                            AGE
+    coriolis.app.cloudbase.wiki-tls   True    coriolis.app.cloudbase.wiki-tls   42m
     ```
 
-The gate is one `Ready=True` Certificate whose `SECRET` is the TLS Secret for the configured host; the ingressed Secret name follows the ingress-shim `<host>-tls` convention. The issuer behind it is the `letsencrypt` ClusterIssuer annotated on the web Ingress (see above); the `get certificate` table itself does not show an `ISSUER` column.
+Check the following:
 
-<!-- Verify the Certificate's requested issuer and DNS names without reading private keys. -->
-```bash
-kubectl -n coriolis get certificate coriolis.app.cloudbase.wiki-tls -o jsonpath='{.spec.secretName}{" issuer="}{.spec.issuerRef.kind}{"/"}{.spec.issuerRef.name}{" dnsNames="}{.spec.dnsNames[*]}{"\n"}'
-```
-
-??? example "Expected result"
-
-    ```text
-    coriolis.app.cloudbase.wiki-tls issuer=ClusterIssuer/letsencrypt dnsNames=coriolis.app.cloudbase.wiki
-    ```
-
-These are the requested issuer and DNS subject alternative names (SANs), not proof of what the server presents. The next check verifies HTTPS with certificate and hostname validation enabled; do not add `--insecure` to make a TLS error disappear.
+- The Certificate is `Ready=True`.
+- Its Secret is `coriolis.app.cloudbase.wiki-tls`.
+- The age depends on when the Certificate was created and will differ.
 
 ### :material-application-edit-outline: HTTPS And Routes
 
