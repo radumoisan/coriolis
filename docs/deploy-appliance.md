@@ -505,16 +505,11 @@ Use the decoded value to log in, then clear the terminal scrollback. The operato
 
 ## :material-book-open-page-variant-outline: Web Login And Visual Inspection
 
-1. Open `https://coriolis.app.cloudbase.wiki/` in a browser.
-   **Expected outcome:** the Coriolis web UI loads over HTTPS with a valid TLS certificate (no browser warning) and presents a Welcome screen with privacy and end-user license agreement (EULA) checkboxes and a **Submit** button.
-2. Select both the privacy and EULA checkboxes, then click **Submit**.
-   **Expected outcome:** the UI proceeds to `/login`, which offers only `Username` and `Password` fields and a **Login** button (there is no domain field on this form).
-3. Log in with username `admin` and the password displayed by the command above.
-   **Expected outcome:** authentication succeeds and the Dashboard loads with a Signed in indicator, in an empty or near-empty state, because this fresh appliance has no endpoints or transfers yet.
-4. Use the sidebar navigation labels **Transfers**, **Deployments**, and **Cloud Endpoints** to open each area without creating anything.
-   **Expected outcome:** pages render without error banners; the transfer, deployment, and endpoint lists are empty. This confirms the UI can talk to the Coriolis API and Keystone through the ingress.
-5. From the already-loaded and authenticated web UI, click the **Logs** navigation item (UI route `/logging`) rather than browsing directly to the host `/logs` path (those adaptor APIs require the UI's authenticated session).
-   **Expected outcome:** the log viewer loads and queries the adaptor successfully, listing the appliance components (for example conductor, scheduler, API, web), confirming the Loki-backed logging path end to end.
+1. Open `https://coriolis.app.cloudbase.wiki/`. Confirm that the page loads over HTTPS without a certificate warning.
+2. Accept the privacy policy and EULA, then click **Submit**. The login page should appear.
+3. Log in with username `admin` and the password displayed above. The Dashboard should load successfully.
+4. Open **Transfers**, **Deployments**, and **Cloud Endpoints** from the sidebar. Each page should load without errors; the lists should be empty for a fresh appliance.
+5. Open **Logs** from the sidebar rather than browsing directly to `/logs`. Confirm that the log viewer lists the appliance components.
 
 !!! note "Licence Card In This Core Profile"
     The Dashboard's **Current Licence** card reports an error in this deployment: `/licensing/appliances` falls through to the Web UI and returns HTML, not a licensing API response. The core operator profile does not deploy a licensing backend or configure `LICENSING_SERVER_BASE_URL` for the conductor. Do not treat HTTP 200 on `/licensing` as a healthy licensing service or generalize this development configuration to a licensed production deployment.
