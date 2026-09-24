@@ -444,16 +444,25 @@ Check the following:
 
 <!-- Confirm the public endpoint answers with HTTP 200 over TLS. -->
 ```bash
-curl --fail --silent --show-error -o /dev/null -w "%{http_code}\n" https://coriolis.app.cloudbase.wiki/
+curl -I https://coriolis.app.cloudbase.wiki/
 ```
 
 ??? example "Expected result"
 
     ```text
-    200
+    HTTP/2 200
+    date: Thu, 24 Sep 2026 10:57:30 GMT
+    content-type: text/html; charset=utf-8
+    content-length: 653
+    x-powered-by: Express
+    accept-ranges: bytes
+    cache-control: public, max-age=0
+    last-modified: Fri, 10 Jul 2026 12:25:38 GMT
+    etag: W/"28d-19f4bfd95d0"
+    strict-transport-security: max-age=31536000; includeSubDomains
     ```
 
-A `200` with a hostname-valid certificate proves the Ingress, the TLS Certificate, and the web frontend are all serving. The appliance exposes these routes on that host:
+`HTTP/2 200` confirms that the HTTPS endpoint and web frontend are responding. Header values such as dates and content length may differ. The appliance exposes these routes on that host:
 
 | Route | Serves |
 | --- | --- |
