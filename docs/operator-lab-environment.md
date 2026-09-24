@@ -24,11 +24,21 @@ The lab uses these concrete values:
 | IngressClass | `nginx` |
 | ClusterIssuer | `letsencrypt` |
 
-The operator is a single reconciler Pod in the `coriolis` namespace and watches `CoriolisAppliance` custom resources. The custom resource is the declaration of intent for the appliance runtime: version, storage, resources, ingress, logging, and retention. The operator does not install storage, ingress, or certificate infrastructure; those are cluster responsibilities.
+The operator is a single reconciler Pod in the `coriolis` namespace and watches `CoriolisAppliance` custom resources. The custom resource is the declaration of intent for the appliance runtime: version, storage, resources, ingress, logging, and retention. The operator does not install storage, ingress, certificate, or DNS infrastructure; those are cluster responsibilities.
 
 :material-lightbulb-on-outline: `regcred` is what the operator chart references via `imagePullSecrets`
 :material-lightbulb-on-outline: `coriolis-appliance-registry` is the prerequisite the appliance itself expects to already exist for its runtime images
 :material-lightbulb-on-outline: The `local-path` storage is dev-only: data is bound to a single node and has no backup or failover.
+
+## :material-book-open-page-variant-outline: Ingress, DNS, And Certificates
+
+Requests for `coriolis.app.cloudbase.wiki` follow this path: client -> DNS -> ingress-nginx -> an operator-managed Ingress -> the appliance Service. The `nginx` IngressClass selects the existing ingress-nginx controller.
+
+DNS for `coriolis.app.cloudbase.wiki` must point to the ingress controller's public endpoint. If external-dns is separately installed and configured, it may automate that DNS record. Otherwise, DNS is managed outside Kubernetes.
+
+cert-manager uses the existing `letsencrypt` ClusterIssuer to obtain and renew the certificate, then stores its TLS material in `coriolis.app.cloudbase.wiki-tls`. The operator manages the appliance Ingress resources, but not ingress-nginx, cert-manager, the ClusterIssuer, DNS, or external-dns.
+
+For hands-on checks, see [Cluster Services](deploy-appliance.md#cluster-services) and [PVCs, Ingresses, And Certificate](deploy-appliance.md#pvcs-ingresses-and-certificate) in the deployment guide.
 
 ## :material-book-open-page-variant-outline: Chosen Appliance Values
 
