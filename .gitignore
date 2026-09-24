@@ -1,4 +1,5 @@
 .env
+.kube/
 .openstack/
 site/
 __pycache__/

@@ -22,6 +22,157 @@ Connect both endpoints with project-scoped permissions required by the selected 
 
 Verify that the source and destination projects expose the selected images, networks, flavors, volume types, security groups, keypairs, and availability zones. Shared resources are usable only when visible to the endpoint project.
 
+## :material-book-open-page-variant-outline: Demo Project Provisioning
+
+Use administrator credentials only for this one-time setup. Each cloud receives a separate `coriolis` user and project for migration; although the projects share a name, they are independent.
+
+!!! warning
+    These commands create identity state and replace project quotas. Do not rerun them blindly against existing resources.
+
+The ignored `.openstack/coriolis-passwords.env` file contains `SOURCE_CORIOLIS_PASSWORD` and `DESTINATION_CORIOLIS_PASSWORD`. Do not place password values in documentation or shell history.
+
+<!-- Load the local Coriolis project passwords. -->
+```bash
+source .openstack/coriolis-passwords.env
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+### :material-application-edit-outline: Source Cloud
+
+<!-- Load source-cloud administrator credentials. -->
+```bash
+source .openstack/admin-openrc-source.sh
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Create the source Coriolis project and print its ID. -->
+```bash
+openstack project create --domain Default --description "Coriolis migration demo source project" -f value -c id coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    be3c7405df8149bc84e65217576c1dd4
+    ```
+
+<!-- Create the source Coriolis user and print its ID. -->
+```bash
+openstack user create --domain Default --project coriolis --project-domain Default --password "$SOURCE_CORIOLIS_PASSWORD" -f value -c id coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    340ad8ce46ea42f381fcdcf135c4baaf
+    ```
+
+<!-- Grant the source Coriolis user the member role in its project. -->
+```bash
+openstack role add --project coriolis --project-domain Default --user coriolis --user-domain Default member
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Set the source Coriolis project quota. -->
+```bash
+openstack quota set \
+  --instances 1 --cores 2 --ram 4096 --key-pairs 1 \
+  --server-groups 0 --server-group-members 0 \
+  --volumes 1 --gigabytes 20 --per-volume-gigabytes 20 --snapshots 1 \
+  --backups 1 --backup-gigabytes 20 \
+  --networks 1 --subnets 1 --ports 5 --routers 1 --floating-ips 0 \
+  --secgroups 1 --secgroup-rules 10 coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+### :material-application-edit-outline: Destination Cloud
+
+<!-- Load destination-cloud administrator credentials. -->
+```bash
+source .openstack/admin-openrc-dest.sh
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Create the destination Coriolis project and print its ID. -->
+```bash
+openstack project create --domain Default --description "Coriolis migration demo destination project" -f value -c id coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    6686f045c51b4f1da7b9742dbe9622cd
+    ```
+
+<!-- Create the destination Coriolis user and print its ID. -->
+```bash
+openstack user create --domain Default --project coriolis --project-domain Default --password "$DESTINATION_CORIOLIS_PASSWORD" -f value -c id coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    1cd2b476c942495fb7ae03e0412cdc90
+    ```
+
+<!-- Grant the destination Coriolis user the member role in its project. -->
+```bash
+openstack role add --project coriolis --project-domain Default --user coriolis --user-domain Default member
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Set the destination Coriolis project quota. -->
+```bash
+openstack quota set \
+  --instances 2 --cores 4 --ram 8192 --key-pairs 2 \
+  --server-groups 0 --server-group-members 0 \
+  --volumes 2 --gigabytes 40 --per-volume-gigabytes 20 --snapshots 1 \
+  --backups 0 --backup-gigabytes 0 \
+  --networks 1 --subnets 1 --ports 6 --routers 1 --floating-ips 2 \
+  --secgroups 2 --secgroup-rules 20 coriolis
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+Use these validated connection values: source auth URL `https://keystone.virtomat.dev/v3`; destination auth URL `https://devopscentral.cloud:5000`; username and project `coriolis`; user and project domains `Default`; region `RegionOne`; interface `public`; Identity API version `3`; and Glance API version `2`. Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image, and `__DEFAULT__` volume type.
+
+!!! warning
+    Unified project quotas cap Nova, Neutron, and Cinder, not Swift bytes. The safely verified source RGW account is `AUTH_be3c7405df8149bc84e65217576c1dd4` and currently has no byte quota. A reseller-admin request with the explicit target path resolved to the admin account, so no byte quota was applied; do not use this project for unrelated object storage.
+
 ## :material-book-open-page-variant-outline: Source Disk Access
 
 First decide whether the transfer is a migration or a repeatable replica, because their source disk-access prerequisites differ. The source boot method further limits the usable path.
