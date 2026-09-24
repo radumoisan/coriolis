@@ -159,7 +159,7 @@ A `NotFound` for this Secret means it is absent. If the Secret exists, it predat
 
 ## :material-book-open-page-variant-outline: Apply The Appliance
 
-Create or use a local `coriolis-appliance.yaml` with the values shown below. The [chosen appliance values](operator-lab-environment.md#chosen-appliance-values) are defined in the lab environment.
+Create or use a local `coriolis-appliance.yaml` with the values shown below.
 
 ??? quote "coriolis-appliance.yaml"
 
