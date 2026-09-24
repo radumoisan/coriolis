@@ -7,22 +7,7 @@
 
 This diagram shows product roles rather than detailed RPC or network paths.
 
-```text
-User
-  |
-Web UI
-  |
-Coriolis API
-  |
-Migration control services ---- Worker services ---- Provider plugins
-  |                                               |
-  +-- Conductor, Scheduler, Transfer Cron,         +-- Source OpenStack
-      Minion Manager, Deployer Manager             +-- Destination OpenStack
-
-Supporting services: Keystone | RabbitMQ | MariaDB | Memcached
-
-Kubernetes operator -> deploys and reconciles the Coriolis runtime
-```
+![Coriolis conceptual architecture](assets/architecture-conceptual-view.png)
 
 ## :material-book-open-page-variant-outline: Migration Product
 
