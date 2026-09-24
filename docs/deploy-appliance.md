@@ -12,21 +12,6 @@ Run each check and compare with the expected result before continuing. Any misma
 
 Use Bash for the workstation commands; later cleanup steps use shell variables and an array. Have `kubectl`, Helm, `jq`, `curl`, Python 3, and standard shell utilities available. Keep command tracing disabled when handling credentials.
 
-### :material-application-edit-outline: Repository Location
-
-All file paths in this tutorial are relative to the repository root, so apply the asset from there.
-
-<!-- Confirm the current working directory is the repository root. -->
-```bash
-pwd
-```
-
-??? example "Expected result"
-
-    ```text
-    /home/radu/Dev/cb-coriolis
-    ```
-
 ### :material-application-edit-outline: Argo CD Application
 
 <!-- Verify the shared coriolis Application is Synced and Healthy. -->
