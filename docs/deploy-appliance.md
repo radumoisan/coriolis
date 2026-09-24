@@ -159,13 +159,108 @@ A `NotFound` for this Secret means it is absent. If the Secret exists, it predat
 
 ## :material-book-open-page-variant-outline: Apply The Appliance
 
-From the repository root, apply the asset exactly as committed:
+Create or use a local `coriolis-appliance.yaml` with the values shown below. The [chosen appliance values](operator-lab-environment.md#chosen-appliance-values) are defined in the lab environment.
 
-The [chosen appliance values](operator-lab-environment.md#chosen-appliance-values) are defined in the lab environment.
+??? quote "coriolis-appliance.yaml"
 
-<!-- Create the CoriolisAppliance from the tutorial asset. -->
+    ```yaml
+    # CoriolisAppliance example, directly applicable to the current
+    # approved dev namespace.
+    #
+    # Prerequisite (not part of this resource): the `coriolis-appliance-registry`
+    # secret must already exist in the `coriolis` namespace before applying.
+    #
+    # Apply with an explicit namespace, for example:
+    #   kubectl -n coriolis apply -f coriolis-appliance.yaml
+    apiVersion: coriolis.cloudbase.it/v1alpha1
+    kind: CoriolisAppliance
+    metadata:
+      name: coriolis-appliance-advanced
+      namespace: coriolis
+    spec:
+      profile: core
+      # Supported immutable Coriolis runtime version deployed by the operator.
+      version: "2603.4"
+      storage:
+        # local-path storage is dev-only: data is bound to a single node and has
+        # no backup or failover. Use a production storage class elsewhere.
+        mariadb:
+          storageClassName: local-path
+          size: 10Gi
+        rabbitmq:
+          storageClassName: local-path
+          size: 1Gi
+      resources:
+        mariadb:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        rabbitmq:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+      ingress:
+        host: coriolis.app.cloudbase.wiki
+        ingressClassName: nginx
+        tls:
+          mode: certManager
+          clusterIssuer: letsencrypt
+      logging:
+        # retentionHours: logs older than this are marked for deletion.
+        retentionHours: 24
+        # compactionIntervalMinutes: how often stored log chunks are compacted.
+        compactionIntervalMinutes: 15
+        # retentionDeleteDelayMinutes: extra grace period before marked data is physically removed,
+        # so retention changes can be reverted safely.
+        retentionDeleteDelayMinutes: 120
+        # coriolisDebug stays false: enabling it raises verbosity of all appliance components and can
+        # expose sensitive request detail in logs.
+        coriolisDebug: false
+        storage:
+          # local-path Loki volume is dev-only (single node, no redundancy).
+          loki:
+            storageClassName: local-path
+            size: 10Gi
+        resources:
+          loki:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          gateway:
+            requests:
+              cpu: 100m
+              memory: 32Mi
+            limits:
+              cpu: "1"
+              memory: 64Mi
+          alloy:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          adaptor:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+    ```
+
+<!-- Create the CoriolisAppliance from the local manifest. -->
 ```bash
-kubectl -n coriolis apply -f docs/assets/manifests/coriolis-appliance.yaml
+kubectl -n coriolis apply -f coriolis-appliance.yaml
 ```
 
 ??? example "Expected result"

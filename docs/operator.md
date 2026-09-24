@@ -588,8 +588,8 @@ The lab uses this appliance CR:
     # Prerequisite (not part of this resource): the `coriolis-appliance-registry`
     # secret must already exist in the `coriolis` namespace before applying.
     #
-    # Apply with an explicit context and namespace, for example:
-    #   kubectl --context virt-infra-dev-buc-hq -n coriolis apply -f coriolis-appliance.yaml
+    # Apply with an explicit namespace, for example:
+    #   kubectl -n coriolis apply -f coriolis-appliance.yaml
     apiVersion: coriolis.cloudbase.it/v1alpha1
     kind: CoriolisAppliance
     metadata:
