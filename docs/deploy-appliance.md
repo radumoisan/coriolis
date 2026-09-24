@@ -332,35 +332,44 @@ The `REASON` values provide additional context and may change while the applianc
 
 Every resource owned by the appliance carries the label `coriolis.cloudbase.it/appliance=coriolis-appliance-advanced`.
 
-<!-- Show each component's ready/total containers, Pod phase, and restart count. -->
+<!-- List the appliance Pods and their current status. -->
 ```bash
-kubectl -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.metadata.labels["coriolis.cloudbase.it/component"]) | .[] | [.metadata.labels["coriolis.cloudbase.it/component"], "\(((.status.containerStatuses // []) | map(select(.ready)) | length))/\(.spec.containers | length)", .status.phase, (((.status.containerStatuses // []) | map(.restartCount) | add) // 0)] | map(tostring) | join(" ")'
+kubectl -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced
 ```
 
 ??? example "Expected result"
 
     ```text
-    adaptor 1/1 Running 0
-    alloy 1/1 Running 0
-    barbican-api 1/1 Running 0
-    barbican-worker 1/1 Running 0
-    common-bootstrap-v3 0/1 Succeeded 0
-    coriolis-api 1/1 Running 0
-    coriolis-conductor 1/1 Running 0
-    coriolis-deployer-manager 1/1 Running 0
-    coriolis-minion-manager 1/1 Running 0
-    coriolis-scheduler 1/1 Running 0
-    coriolis-transfer-cron 1/1 Running 0
-    coriolis-web 1/1 Running 0
-    coriolis-worker 1/1 Running 0
-    keystone 1/1 Running 0
-    loki 2/2 Running 0
-    mariadb 1/1 Running 0
-    memcached 1/1 Running 0
-    rabbitmq 1/1 Running 0
+    NAME                                                              READY   STATUS      RESTARTS   AGE
+    coriolis-appliance-advanced-adaptor-566d96f6bd-qnqdx              1/1     Running     0          30m
+    coriolis-appliance-advanced-alloy-8475d6d496-86dfc                1/1     Running     0          33m
+    coriolis-appliance-advanced-barbican-api-59dd6fb6-dj5x9           1/1     Running     0          33m
+    coriolis-appliance-advanced-barbican-worker-584b8d5fb9-p8ltn      1/1     Running     0          33m
+    coriolis-appliance-advanced-common-bootstrap-v3-lrmth             0/1     Completed   0          33m
+    coriolis-appliance-advanced-coriolis-api-7d9446f8c4-mnv8z         1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-conductor-654776d579-rqs7z   1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-deployer-manager-748dkt66n   1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-minion-manager-79d89bxklkl   1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-scheduler-869cd9686d-ztbx6   1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-transfer-cron-8477564ppvwj   1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-web-fdf47cbc-qm5km           1/1     Running     0          30m
+    coriolis-appliance-advanced-coriolis-worker-6889fcddb9-9qzlh      1/1     Running     0          30m
+    coriolis-appliance-advanced-keystone-d7679cbd6-77m82              1/1     Running     0          33m
+    coriolis-appliance-advanced-loki-0                                2/2     Running     0          34m
+    coriolis-appliance-advanced-mariadb-0                             1/1     Running     0          33m
+    coriolis-appliance-advanced-memcached-67dc8c9fb7-x574c            1/1     Running     0          33m
+    coriolis-appliance-advanced-rabbitmq-0                            1/1     Running     0          33m
     ```
 
-Component labels come from the operator source (the logging gateway runs as a sidecar container inside the `loki` Pod, which is why that row shows `2/2`). The gate is **18 appliance rows: 17 `Running` with all containers ready plus exactly one `Succeeded` bootstrap Job row, with zero restarts everywhere**. The namespace-wide Pod total is 19 because the already-running operator Pod joins it but carries operator labels, not the appliance label. Any nonzero restart count, a phase other than `Running`/`Succeeded`, or a missing component row blocks the tutorial; read the relevant condition and Pod logs before acting.
+Check the following:
+
+- The output contains 18 appliance Pods.
+- Seventeen Pods are `Running` with all containers ready.
+- The `loki` Pod shows `2/2` because it also contains the logging gateway sidecar.
+- The one-time `common-bootstrap-v3` Pod shows `0/1 Completed`.
+- Every Pod shows `0` restarts.
+
+Pod suffixes and ages will differ. Stop if a Pod is missing, a running Pod is not fully ready, the bootstrap Pod did not complete, or any restart count is nonzero.
 
 ### :material-application-edit-outline: PVCs, Ingresses, And Certificate
 
