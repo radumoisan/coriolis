@@ -19,9 +19,12 @@ REPO_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 HELPER_PATH = os.path.join(
     REPO_ROOT, "deploy", "coriolis-headless-migration.py")
-EXAMPLE_PATH = os.path.join(
+MANIFEST_PATH = os.path.join(
     REPO_ROOT, "docs", "assets", "manifests",
-    "headless-migration.example.json")
+    "headless-migration.jsonc")
+DOWNLOAD_PATH = os.path.join(
+    REPO_ROOT, "docs", "assets", "scripts",
+    "coriolis-headless-migration.py")
 
 
 def _load_helper():
@@ -233,6 +236,71 @@ class HelperTestCase(unittest.TestCase):
             recorder.calls.count(
                 ("GET", PROJECT_PATH + "/deployments")), 2)
 
+    def test_validate_config_succeeds_without_stdin_or_network(self):
+        with tempfile.NamedTemporaryFile(
+                "w", suffix=".jsonc", delete=False) as handle:
+            handle.write("// Valid JSONC configuration\n")
+            json.dump(valid_config(), handle)
+            config_path = handle.name
+        self.addCleanup(os.unlink, config_path)
+        recorder = RecordingUrlopen(success_routes())
+        stdin = mock.Mock(buffer=mock.Mock())
+        stdout = io.StringIO()
+        with mock.patch.object(urllib.request, "urlopen", recorder), \
+                mock.patch.object(sys, "stdin", stdin), \
+                contextlib.redirect_stdout(stdout):
+            code = HELPER.main([
+                "--config", config_path,
+                "--validate-config",
+            ])
+        self.assertEqual(code, 0)
+        self.assertEqual(stdout.getvalue(), "PASS config\n")
+        stdin.buffer.read.assert_not_called()
+        self.assertEqual(recorder.calls, [])
+
+    def test_validate_config_rejects_invalid_and_unresolved_configs(self):
+        unresolved = HELPER.load_config_file(MANIFEST_PATH)
+        for config, category in (({}, "config_invalid"), (
+                unresolved, "config_unresolved_placeholder")):
+            with self.subTest(category=category), tempfile.NamedTemporaryFile(
+                    "w", suffix=".jsonc", delete=False) as handle:
+                json.dump(config, handle)
+                config_path = handle.name
+            self.addCleanup(os.unlink, config_path)
+            recorder = RecordingUrlopen(success_routes())
+            stdin = mock.Mock(buffer=mock.Mock())
+            stdout = io.StringIO()
+            with mock.patch.object(urllib.request, "urlopen", recorder), \
+                    mock.patch.object(sys, "stdin", stdin), \
+                    contextlib.redirect_stdout(stdout):
+                code = HELPER.main([
+                    "--config", config_path,
+                    "--validate-config",
+                ])
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                stdout.getvalue(),
+                "ERROR category=%s http_status=none\n" % category)
+            stdin.buffer.read.assert_not_called()
+            self.assertEqual(recorder.calls, [])
+
+    def test_normal_mode_requires_migration_arguments_before_side_effects(self):
+        recorder = RecordingUrlopen(success_routes())
+        stdin = mock.Mock(buffer=mock.Mock())
+        stderr = io.StringIO()
+        with mock.patch.object(urllib.request, "urlopen", recorder), \
+                mock.patch.object(sys, "stdin", stdin), \
+                contextlib.redirect_stderr(stderr), \
+                self.assertRaises(SystemExit) as raised:
+            HELPER.main(["--config", "unused.json"])
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("usage:", stderr.getvalue())
+        self.assertIn(
+            "the following arguments are required: --api-base, "
+            "--keystone-base, --run", stderr.getvalue())
+        stdin.buffer.read.assert_not_called()
+        self.assertEqual(recorder.calls, [])
+
     def test_cli_username_and_project_override_keystone_auth(self):
         with tempfile.NamedTemporaryFile(
                 "w", suffix=".json", delete=False) as handle:
@@ -300,8 +368,7 @@ class HelperTestCase(unittest.TestCase):
             execution_posts, [{"execution": config["execution"]}])
 
     def test_unresolved_placeholder_rejected_before_network(self):
-        with open(EXAMPLE_PATH, "r", encoding="utf-8") as handle:
-            config = json.load(handle)
+        config = HELPER.load_config_file(MANIFEST_PATH)
         code, out, recorder = self.run_cli(config, success_routes())
         self.assertNotEqual(code, 0)
         self.assertEqual(recorder.calls, [])
@@ -529,10 +596,44 @@ class HelperTestCase(unittest.TestCase):
         self.assertEqual(recorder.calls, [])
 
 
-class ExampleManifestTestCase(unittest.TestCase):
-    def test_example_validates_once_placeholders_are_filled(self):
-        with open(EXAMPLE_PATH, "r", encoding="utf-8") as handle:
-            raw = json.load(handle)
+class JsoncConfigTestCase(unittest.TestCase):
+    def load_config(self, suffix, text):
+        with tempfile.NamedTemporaryFile(
+                "w", suffix=suffix, delete=False) as handle:
+            handle.write(text)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        return HELPER.load_config_file(path)
+
+    def test_json_and_jsonc_comments_load_without_corrupting_urls(self):
+        config = valid_config()
+        config["transfer"]["notes"] = "https://example.invalid/run"
+        body = json.dumps(config, indent=2)
+        commented = "/* JSONC configuration */\n" + body.replace(
+            '"scenario": "live_migration",',
+            '"scenario": "live_migration", // required scenario')
+        for suffix in (".json", ".jsonc"):
+            with self.subTest(suffix=suffix):
+                loaded = self.load_config(suffix, commented)
+                self.assertEqual(
+                    loaded["transfer"]["notes"],
+                    "https://example.invalid/run")
+
+    def test_malformed_or_unterminated_comments_are_config_errors(self):
+        for text in ("{ /* unterminated", "{ // comment\n"):
+            with self.subTest(text=text):
+                with self.assertRaisesRegex(
+                        HELPER.MigrationError, "config_invalid"):
+                    self.load_config(".jsonc", text)
+
+    def test_comments_do_not_join_json_tokens(self):
+        with self.assertRaisesRegex(HELPER.MigrationError, "config_invalid"):
+            self.load_config(".jsonc", '{"value": 1/* comment */2}')
+
+
+class ManifestTestCase(unittest.TestCase):
+    def test_manifest_validates_once_placeholders_are_filled(self):
+        raw = HELPER.load_config_file(MANIFEST_PATH)
         filled = fill_placeholders(raw)
         config = HELPER.validate_config(filled)
         transfer = config["transfer"]
@@ -547,8 +648,8 @@ class ExampleManifestTestCase(unittest.TestCase):
         self.assertEqual(
             raw["transfer"]["storage_mappings"]["default"], "__DEFAULT__")
 
-    def test_example_contains_no_secrets_or_historical_ids(self):
-        with open(EXAMPLE_PATH, "r", encoding="utf-8") as handle:
+    def test_manifest_contains_no_secrets_or_historical_ids(self):
+        with open(MANIFEST_PATH, "r", encoding="utf-8") as handle:
             text = handle.read()
         self.assertIsNone(
             UUID_PATTERN.search(text),
@@ -561,6 +662,11 @@ class ExampleManifestTestCase(unittest.TestCase):
         lowered = text.lower()
         for secret_word in ("password", "secret", "token"):
             self.assertNotIn(secret_word, lowered)
+
+    def test_downloadable_helper_matches_runtime_helper(self):
+        with open(HELPER_PATH, "rb") as runtime, \
+                open(DOWNLOAD_PATH, "rb") as downloadable:
+            self.assertEqual(downloadable.read(), runtime.read())
 
 
 UUID_PATTERN = re.compile(

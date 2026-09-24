@@ -57,7 +57,7 @@
 
 ### :material-application-edit-outline: Operator Guide Embedded YAML Can Drift
 
-**Current state:** The [operator guide](architecture.md#helm-installation) embeds copies of `coriolis-operator/helm/values.yaml`, `coriolis-operator/helm/crds/coriolisappliances.yaml`, and `docs/assets/manifests/coriolis-appliance.yaml`; the current MkDocs configuration has no automatic source inclusion.
+**Current state:** The [operator guide](architecture.md#helm-installation) embeds copies of `coriolis-operator/helm/values.yaml`, `coriolis-operator/helm/crds/coriolisappliances.yaml`, and `docs/assets/manifests/coriolis-appliance.yaml` instead of including their canonical sources.
 
 **Impact:** Chart defaults, CRD schema, or appliance example can become stale after canonical source changes, especially because the standalone Helm command resolves the latest published chart.
 

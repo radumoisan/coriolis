@@ -1,156 +1,107 @@
 # Phase 1: Headless Migration
 
-This first phase uses the concrete setup described in [Lab Environment](operator-lab-environment.md). It assumes the successful deployment and login described in [Web Login And Visual Inspection](deploy-appliance.md#web-login-and-visual-inspection) and completion of [OpenStack Migration Prerequisites](openstack-provider.md#openstack-migration-prerequisites). Prepare the endpoints through the Web UI, then perform the headless migration before continuing to Phase 2.
+This tutorial creates one real Coriolis live migration from the command line. The helper reads a configuration file, receives the Keystone password on standard input, validates its URLs, configuration, and saved endpoints, creates one transfer and execution, and polls them to completion. When auto-deploy is enabled, it also finds and follows the correlated deployment. It deliberately performs no cleanup.
 
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
-The helper requires two saved, validated endpoints. Create the source endpoint first, then repeat these same three steps for the destination using that cloud's values.
+Create and validate the source and destination OpenStack endpoints in the Web UI before using the helper. The endpoint names are up to you, but record both endpoint IDs after they are saved.
 
-1. Open **Cloud Endpoints**.<br>
-   &emsp;⤷ Choose **Add Endpoint** (or **New > Endpoint** for a non-empty list).<br>
-   &emsp;&emsp;⤷ Select **OpenStack**.
-2. Fill in the required parameters:
+1. Open **Cloud Endpoints** and select **Add Endpoint** (or **New > Endpoint**).
+2. Select **OpenStack** and enter the credentials and API details for one cloud.
+3. Validate and save the endpoint, then repeat for the other cloud.
 
-    | Parameter | Value (source) | Value (destination) |
-    | --- | --- | --- |
-    | Name | `source-openstack` | `destination-openstack` |
-    | Description | `Source OpenStack cloud` | `Destination OpenStack cloud` |
-    | Username | `coriolis` | `coriolis` |
-    | Password | `Passw0rd123!` | `Passw0rd123!` |
-    | Authentication URL | `https://keystone.virtomat.dev/v3` | `https://devopscentral.cloud:5000` |
-    | Project Name | `coriolis` | `coriolis` |
-    | Glance API Version | `2` | `2` |
-    | Identity API Version | `3` | `3` |
-    | User Domain | `Default` | `Default` |
-    | Project Domain | `Default` | `Default` |
-    | Region | `RegionOne` | `RegionOne` |
-    | Interface | `public` | `public` |
-
-    !!! warning "Replace the placeholder password"
-        `Passw0rd123!` is an example only. Enter the actual password for each cloud's `coriolis` user before validating the endpoints.
-
-3. Validate and save
-
-!!! tip "Where the credentials actually live"
-    The operator-managed Barbican on this appliance stores the encrypted connection payload as a Barbican secret; the Coriolis endpoint object itself contains only the returned `secret_ref`. That is why the UI reports the endpoint valid only after both the secret is `ACTIVE` and the provider connection test succeeds, and why deleting the endpoint is expected to remove its Barbican-backed credential as part of cleanup.
+The helper authenticates to the appliance as a Keystone user; it does not send the source or destination cloud passwords. Those credentials remain in the saved endpoint secrets.
 
 ## :material-book-open-page-variant-outline: Headless Real Migration
 
 !!! danger "This is a real migration"
-    Running the helper creates a Transfer, executes it against both live clouds, deploys the destination VM, and can shut down the source. Use it only with the disposable fixture from [OpenStack Migration Prerequisites](openstack-provider.md#openstack-migration-prerequisites). The helper performs one migration, never any cleanup, and leaves the transfer, execution, deployment, and all cloud objects visible in the Web UI for observation.
+    The run creates cloud resources, can shut down the source instance, and can deploy a destination instance. Use a disposable fixture only.
 
-The helper `deploy/coriolis-headless-migration.py` works only against the two saved endpoints from the previous section. Its configuration contract is [headless-migration.example.json](assets/manifests/headless-migration.example.json).
+### :material-application-edit-outline: Prerequisites
 
-### :material-application-edit-outline: Prepare The Config File
+- A disposable, volume-backed source instance with one bootable volume. See [OpenStack Migration Prerequisites](openstack-provider.md#openstack-migration-prerequisites).
+- Saved and validated source and destination endpoints, plus their IDs, the source instance ID, and the destination resource names and IDs required by the configuration.
+- Python 3 and `kubectl` access to the appliance namespace and the Secret that contains the Keystone password. See [Web Login And Visual Inspection](deploy-appliance.md#web-login-and-visual-inspection) for appliance access.
+- Sufficient source and destination quota, capacity, network reachability, images, flavors, networks, security groups, keypairs, and floating-IP pools. The [Lab Environment](operator-lab-environment.md) describes a suitable test environment.
 
-The edited config contains real cloud identifiers, so keep it in `.openstack/tutorial-validation/` at the repository root. The `.openstack/` directory is repository-ignored; never force-add private files or include their contents in documentation.
+### :material-application-edit-outline: Download And Configure
 
-<!-- Create the private, repository-ignored tutorial workspace. -->
+In a local working directory, download these two files:
+
+- Download [coriolis-headless-migration.py](assets/scripts/coriolis-headless-migration.py).
+- Download [headless-migration.jsonc](assets/manifests/headless-migration.jsonc).
+
+??? quote "coriolis-headless-migration.py"
+
+    ```python
+    --8<-- "assets/scripts/coriolis-headless-migration.py"
+    ```
+
+??? quote "headless-migration.jsonc"
+
+    ```jsonc
+    --8<-- "assets/manifests/headless-migration.jsonc"
+    ```
+
+The JSONC comments explain every setting. Replace every angle-bracket placeholder before continuing. `transfer.notes` must be unique for this run; `shutdown_instances` controls whether the source is powered off after migration, and `auto_deploy` controls whether the helper creates and follows the destination deployment. Keep `skip_os_morphing` enabled only for a known-compatible disposable fixture.
+
+The helper accepts JSON or JSONC. Validate the completed file locally before making API calls:
+
+<!-- Validate the completed JSONC file with the downloaded helper. -->
 ```bash
-mkdir -p .openstack/tutorial-validation
+python3 coriolis-headless-migration.py --config headless-migration.jsonc --validate-config
 ```
 
 ??? example "Expected result"
 
     ```text
-    No output.
+    PASS config
     ```
 
-<!-- Copy the example config into the private ignored workspace. -->
+### :material-application-edit-outline: Run The Migration
+
+Replace every angle-bracket value in this command with your appliance details. The helper defaults to the `coriolis` user and `service` project; specify `--username` and `--project-name` when the endpoints are visible in a different Keystone scope. It authenticates with the `Default` user and project domains.
+
+The password is read through standard input rather than placed in a command argument, shell history, or configuration file. Use the correct password key from your appliance Secret.
+
+<!-- Pipe the Keystone password into the helper without exposing it in the command line. -->
 ```bash
-cp docs/assets/manifests/headless-migration.example.json .openstack/tutorial-validation/headless-migration.json
-```
-
-??? example "Expected result"
-
-    ```text
-    No output.
-    ```
-
-In `.openstack/tutorial-validation/headless-migration.json`, replace **every** `<...>` placeholder with a real value; the helper refuses to run while any placeholder remains (`config_unresolved_placeholder`). The keys mean:
-
-| Key | What to set |
-| --- | --- |
-| `transfer.notes` | A unique label for this run; the helper preflights that no transfer or deployment already carries it. |
-| `transfer.origin_endpoint_id` / `destination_endpoint_id` | The two endpoint IDs you recorded from the Web UI. |
-| `transfer.instances` | The fixture VM's source instance ID. |
-| `source_environment.replica_export_mechanism` | `swift_backups`, matching the source permissions you verified. |
-| `destination_environment.migr_image_map.linux`, `migr_network`, `migr_flavor_name`, `migr_fip_pool_name`, `security_groups`, `keypair_name`, `migr_worker_volume_type` | The destination temporary-worker resources: Linux image ID, network ID, flavor name, floating-IP pool, worker security group, keypair, and worker volume type (`__DEFAULT__` if unset placement is fine). |
-| `destination_environment.use_floating_ip` / `floating_ip_pool` | Whether and from which pool the migrated destination VM gets its own floating IP. |
-| `network_map` | One entry per source NIC: each source network name mapped to a destination network ID. |
-| `storage_mappings` | `{"default": "__DEFAULT__"}` to let the destination place disks. |
-| `clone_disks` | `true` for this POC path. |
-| `skip_os_morphing` | `true` **only** for the known-compatible disposable fixture; use `false` otherwise. |
-| `execution.shutdown_instances` / `auto_deploy` | `true` / `true` for this tutorial flow: shut the source down and deploy automatically. |
-
-<!-- Parse the edited config to catch JSON syntax errors before any API call. -->
-```bash
-python3 -m json.tool .openstack/tutorial-validation/headless-migration.json > /dev/null
-```
-
-??? example "Expected result"
-
-    ```text
-    No output.
-    ```
-
-### :material-application-edit-outline: Run The Headless Migration
-
-Use the same Keystone project as the Web UI: this walkthrough logs in as `admin` in project `admin`. The helper defaults to `coriolis` in project `service`, which cannot see these UI-created endpoints; the explicit `--username admin --project-name admin` options below are required. The pipeline reads the corresponding admin password from the retained infrastructure Secret directly into stdin without printing it. The public `/identity` and `/coriolis` bases already include the Ingress version rewrites, so the helper appends only `/auth/tokens` and `/<project_id>` itself.
-
-The helper currently requires both the user and project to be in Keystone's `Default` domain.
-
-A small migration often takes 10 to 30+ minutes. `--timeout 1800` gives each polling phase up to 30 minutes; it is not a total run limit.
-
-<!-- Feed the Keystone admin password into the helper in the same project as the Web UI. -->
-```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d | python3 deploy/coriolis-headless-migration.py --api-base https://coriolis.app.cloudbase.wiki/coriolis --keystone-base https://coriolis.app.cloudbase.wiki/identity --username admin --project-name admin --config .openstack/tutorial-validation/headless-migration.json --timeout 1800 --poll-interval 10 --run
+kubectl -n "<appliance-namespace>" get secret "<keystone-password-secret>" -o jsonpath='{.data.<password-key>}' | base64 -d | python3 coriolis-headless-migration.py --api-base "https://<appliance-host>/coriolis" --keystone-base "https://<appliance-host>/identity" --username "<keystone-username>" --project-name "<keystone-project>" --config headless-migration.jsonc --timeout 1800 --poll-interval 10 --run
 ```
 
 ??? example "Expected result"
 
     ```text
     PASS preflight
-    PASS transfer id=3f205a3f-581a-48c4-8357-774525052e73
-    PASS execution id=bfcd1c48-d37c-4549-b880-cbbdd473c7f6 status=COMPLETED
-    PASS deployment id=cc2c27cb-877e-456f-a9ab-04828669458d status=COMPLETED
+    PASS transfer id=<transfer-id>
+    PASS execution id=<execution-id> status=COMPLETED
+    PASS deployment id=<deployment-id> status=COMPLETED
     SUMMARY headless-migration passed
     ```
 
-The three IDs are the objects created by the current run. Your IDs will differ: record them for the observation and cleanup steps, never configure or reuse them as inputs.
+`--run` is an explicit acknowledgement that the command writes to both clouds. `--timeout 1800` allows up to 30 minutes for each polling phase, rather than imposing a 30-minute limit on the whole run. `--poll-interval 10` checks progress every 10 seconds. With `auto_deploy` enabled, success includes the correlated deployment; without it, the helper stops after the transfer execution completes.
 
-The helper's output contract is fixed and safe to keep on screen:
-
-- It prints only the `PASS` lines above and the final `SUMMARY`; no password, token, request payload, or error body is ever printed.
-- `--timeout 1800` is a per-phase polling budget (execution, deployment discovery, deployment), not a total run limit.
-- GET-only polling tolerates up to three consecutive transient network failures; POST requests are never retried.
-- Writes are never blindly retried: an ambiguous transfer or execution POST fails with the fixed `post_ambiguous` category instead of guessing.
-- The unique `notes` value is collision-checked against existing transfers and deployments during preflight, so a second run with the same notes is refused.
-- Nothing is cleaned up: objects and cloud resources remain for the observation and cleanup sections.
-- Any `ERROR category=...` line is terminal: stop, record the category, and diagnose before re-running.
+The output contains fixed status lines and never prints the password, token, request payload, or error body. Keep the reported object IDs for observation. The helper does not clean up the transfer, execution, deployment, or cloud resources.
 
 ## :material-book-open-page-variant-outline: Observe The Headless Result
 
-Verify the same facts a UI-driven run would show, through the Web UI and the clouds:
-
 1. Open **Cloud Endpoints**.
-   **Expected outcome:** both endpoints still list as valid and usable.
-2. Open the migrations area and find the transfer matching your unique notes; open its executions.
-   **Expected outcome:** the single transfer execution shows `COMPLETED`.
-3. Open the correlated deployment (same notes, deployed automatically).
-   **Expected outcome:** the deployment and its last execution show `COMPLETED`.
-4. Expand the execution and deployment task timelines.
-   **Expected outcome:** every task is completed; no task is in `ERROR`.
-5. Check the source VM in the source cloud.
-   **Expected outcome:** it is `SHUTOFF`, because `shutdown_instances` was `true`.
-6. Check the destination VM in the destination cloud: power state, attached cloned boot disk, mapped networks, floating IP if requested, security groups, and the marker file inside the guest.
-   **Expected outcome:** the VM is `ACTIVE` with the expected disks and networking, and the marker is reachable (for example over its floating IP and keypair). In this run the guest security groups contained the dedicated group plus the existing default group, and the cloned boot volume reported 9Gi on the destination against a nominal 8Gi source disk because the provider rounds sizes up: compare disk content and layout, not the exact nominal size.
-7. Open the Logs navigation and browse the appliance components around the migration window.
-   **Expected outcome:** conductor, scheduler, worker, and deployer activity is visible for the run; you never search logs for secret values to confirm any of this. For detailed log observation, see [Log Observation](web-ui-migration.md#log-observation).
+   **Expected outcome:** both endpoints remain valid and usable.
+2. Find the transfer with your unique notes and open its execution.
+   **Expected outcome:** the execution is `COMPLETED`.
+3. When auto-deploy is enabled, open the correlated deployment and its latest execution.
+   **Expected outcome:** both are `COMPLETED`.
+4. Review the execution and deployment task timelines.
+   **Expected outcome:** all tasks are complete and none is in `ERROR`.
+5. Check the source instance.
+   **Expected outcome:** it is `SHUTOFF` when `shutdown_instances` is `true`.
+6. Check the destination instance, boot volume, mapped network, security groups, and floating IP when requested. Verify the workload marker inside the guest.
+   **Expected outcome:** the instance is `ACTIVE` and the workload is usable. A completed Coriolis workflow alone does not prove guest usability.
+7. Review appliance logs around the migration window if further evidence is needed. See [Log Observation](web-ui-migration.md#log-observation).
 
-Inside the migrated guest, reached over SSH using its floating IP and keypair, also check cloud-init. Run this in the guest, not on the Kubernetes workstation:
+From inside the migrated guest, confirm cloud-init has finished:
 
-<!-- Inside the migrated guest, confirm cloud-init completed. -->
+<!-- Inside the migrated guest, check cloud-init status. -->
 ```bash
 cloud-init status
 ```
@@ -161,31 +112,23 @@ cloud-init status
     status: done
     ```
 
-If it is still running, wait and check again. Investigate errors inside the guest before declaring it usable. Even `done` does not replace reading your marker file and checking the disks and network: a cloned disk can preserve cloud-init state from the source.
-
-!!! warning "Completion is not usability"
-    `COMPLETED` statuses prove the Coriolis workflow finished. Guest usability is a separate conclusion you only reach from step 6: boot state, disks, networking, and your marker.
+Check the workload marker, disks, and networking even when cloud-init reports `done`; a cloned boot disk can preserve state from the source.
 
 ## :material-book-open-page-variant-outline: Reset Before Repeating In The Web UI
 
-Do not start Phase 2 on top of the headless migration leftovers.
-
-1. Perform the [Migration Cleanup](web-ui-migration.md#migration-cleanup) section first, for the headless transfer, deployment, disks, and cloud artifacts, but intentionally skip its endpoint-deletion step: this reset keeps both endpoints.
-   **Expected outcome:** no headless transfer, deployment, or migration artifacts remain. Keep the fixture infrastructure and both endpoints; an empty run-created Swift export container may also be kept for the repeat, then removed during final cleanup.
-2. Intentionally restore the fixture: restart, recreate, or rebuild the disposable source VM so it is `ACTIVE` with the marker again, on the same source network. Verify the marker before starting Phase 2.
-   **Expected outcome:** the source VM matches the prerequisites table again.
-3. Keep both endpoints.
-   **Expected outcome:** the UI walkthrough can reuse the saved endpoints without re-entering credentials.
-
-!!! note "Cloud-init markers run once per instance"
-    A normal restart does not rerun cloud-init `runcmd` or produce a new first-boot serial marker. After restoring the source, check the persisted marker inside the guest; if you recreated or rebuilt it, verify that initialization wrote the marker again. Do not mistake an old console message or `cloud-init status: done` for proof of a new initialization run.
-
-The reset is an explicit prerequisite for [Phase 2: Full Web UI Migration Walkthrough](web-ui-migration.md#full-web-ui-migration-walkthrough); continue with the same appliance and saved endpoints, not a fresh appliance.
+1. Follow [Migration Cleanup](web-ui-migration.md#migration-cleanup) for the transfer, deployment, disks, and other run-created cloud artifacts, but keep both endpoints.
+   **Expected outcome:** no migration artifacts remain while the endpoints remain available.
+2. Restore or rebuild the disposable source instance so it is `ACTIVE`, attached to the expected source network, and contains the workload marker.
+   **Expected outcome:** the source satisfies the migration prerequisites again.
+3. Continue with [Phase 2: Full Web UI Migration Walkthrough](web-ui-migration.md#full-web-ui-migration-walkthrough) using the same endpoints.
 
 ## :material-book-open-page-variant-outline: Troubleshooting
 
-| Symptom | Likely cause and response |
+| Symptom | Response |
 | --- | --- |
-| Helper prints `ERROR category=post_ambiguous` | A POST's outcome could not be confirmed and the helper refused to guess. Inspect transfers and deployments for the unique notes in the UI before deciding; never blindly retry a write. |
-| Any other helper `ERROR category=...` | Each category is fixed and terminal (config, preflight, authentication, network, execution/deployment failure or timeout). Stop, match the category to the phase, and diagnose before re-running. |
-| Helper prints `ERROR category=preflight_failed` | No migration write occurred. Check endpoint IDs and the Keystone project scope first, then inspect existing transfers/deployments with the same notes. Resolve or clean the existing run before retrying; choose fresh notes only for a deliberately new migration, not to bypass duplicate protection. |
+| `ERROR category=config_unresolved_placeholder` | Replace every angle-bracket placeholder in `headless-migration.jsonc`, then run the local validation command again. |
+| `ERROR category=preflight_failed` | No migration write occurred. Confirm the endpoint IDs are visible to the selected Keystone project and that no transfer or deployment already uses the notes value. Resolve the existing run instead of bypassing duplicate protection. |
+| `ERROR category=post_ambiguous` | A create request could not be confirmed. Inspect the UI for objects with the unique notes before deciding what happened. Do not blindly retry a POST request. |
+| A transient network error while polling | Polling GET requests tolerate up to three consecutive transient network failures. If the helper stops, verify appliance connectivity and the object state before running anything again. |
+| Execution or deployment failure or timeout | Inspect the associated object, task timeline, endpoint validity, destination capacity, and appliance logs. `--timeout` applies separately to execution, deployment discovery, and deployment polling. |
+| Any other `ERROR category=...` | The error is terminal and safely reports only a category and HTTP status. Stop and diagnose the indicated phase before retrying. |

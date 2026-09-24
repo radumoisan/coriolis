@@ -27,6 +27,9 @@ markdown_extensions:
   - tables
   - admonition
   - pymdownx.details
+  - pymdownx.snippets:
+      base_path:
+        - docs
   - pymdownx.superfences
   - codehilite
   - pymdownx.critic
