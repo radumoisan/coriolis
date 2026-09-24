@@ -5,8 +5,8 @@
 
 ## :material-book-open-page-variant-outline: Hands-On Prerequisites
 
-!!! danger "Development cluster only"
-    The hands-on `kubectl` commands target context `virt-infra-dev-buc-hq`. Do not run them against another cluster accidentally.
+!!! note ""
+    Commands on this page assume `virt-infra-dev-buc-hq` is already the current `kubectl` context. Confirm it before starting.
 
 Run each check and compare with the expected result before continuing. Any mismatch means stop and fix the prerequisite, not the tutorial.
 
@@ -16,7 +16,7 @@ Use Bash for the workstation commands; later cleanup steps use shell variables a
 
 <!-- Verify the shared coriolis Application is Synced and Healthy. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
+kubectl -n argocd get application coriolis
 ```
 
 ??? example "Expected result"
@@ -30,7 +30,7 @@ kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
 
 <!-- Verify the operator Deployment is running in the coriolis namespace. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
+kubectl -n coriolis get deployment coriolis-operator
 ```
 
 ??? example "Expected result"
@@ -44,7 +44,7 @@ The operator Deployment should show `1/1` ready, `1` up to date, and `1` availab
 
 <!-- Inspect the operator Pod's readiness, status, and restart count. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l app.kubernetes.io/name=coriolis-operator
+kubectl -n coriolis get pods -l app.kubernetes.io/name=coriolis-operator
 ```
 
 ??? example "Expected result"
@@ -58,7 +58,7 @@ The operator Pod should show `1/1` ready and `Running`. A single old restart, as
 
 <!-- Verify the CoriolisAppliance CRD is registered. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get crd coriolisappliances.coriolis.cloudbase.it
+kubectl -n coriolis get crd coriolisappliances.coriolis.cloudbase.it
 ```
 
 ??? example "Expected result"
@@ -74,7 +74,7 @@ Both registry pull Secrets must exist in the `coriolis` namespace. Query name an
 
 <!-- Verify the two required pull Secrets exist. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret regcred coriolis-appliance-registry
+kubectl -n coriolis get secret regcred coriolis-appliance-registry
 ```
 
 ??? example "Expected result"
@@ -93,7 +93,7 @@ The operator does not install storage, ingress, or certificate infrastructure. C
 
 <!-- Verify the dev local-path StorageClass exists; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get storageclass local-path -o custom-columns='NAME:.metadata.name,PROVISIONER:.provisioner,RECLAIM:.reclaimPolicy,BINDING:.volumeBindingMode'
+kubectl -n coriolis get storageclass local-path -o custom-columns='NAME:.metadata.name,PROVISIONER:.provisioner,RECLAIM:.reclaimPolicy,BINDING:.volumeBindingMode'
 ```
 
 ??? example "Expected result"
@@ -105,7 +105,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get storageclass local-path 
 
 <!-- Verify the nginx IngressClass exists; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get ingressclass nginx -o custom-columns='NAME:.metadata.name,CONTROLLER:.spec.controller'
+kubectl -n coriolis get ingressclass nginx -o custom-columns='NAME:.metadata.name,CONTROLLER:.spec.controller'
 ```
 
 ??? example "Expected result"
@@ -117,7 +117,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get ingressclass nginx -o cu
 
 <!-- Verify the letsencrypt ClusterIssuer is Ready. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get clusterissuer letsencrypt -o jsonpath='{.metadata.name}{" ready="}{.status.conditions[?(@.type=="Ready")].status}{"\n"}'
+kubectl -n coriolis get clusterissuer letsencrypt -o jsonpath='{.metadata.name}{" ready="}{.status.conditions[?(@.type=="Ready")].status}{"\n"}'
 ```
 
 ??? example "Expected result"
@@ -132,7 +132,7 @@ The chosen appliance name must be free; the operator fails closed on collisions 
 
 <!-- Confirm no coriolis-appliance-advanced CR exists yet. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get coriolisappliance coriolis-appliance-advanced
+kubectl -n coriolis get coriolisappliance coriolis-appliance-advanced
 ```
 
 ??? example "Expected result"
@@ -145,7 +145,7 @@ A `NotFound` here is the success condition. If the CR already exists, stop and r
 
 <!-- Check whether the TLS Secret already exists before this run. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis.app.cloudbase.wiki-tls --ignore-not-found -o name
+kubectl -n coriolis get secret coriolis.app.cloudbase.wiki-tls --ignore-not-found -o name
 ```
 
 ??? example "Expected result"
@@ -164,7 +164,7 @@ The [chosen appliance values](operator-lab-environment.md#chosen-appliance-value
 
 <!-- Create the CoriolisAppliance from the tutorial asset. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis apply -f docs/assets/manifests/coriolis-appliance.yaml
+kubectl -n coriolis apply -f docs/assets/manifests/coriolis-appliance.yaml
 ```
 
 ??? example "Expected result"
@@ -179,7 +179,7 @@ Reconciliation stages the core runtime first and the logging stack alongside it,
 
 <!-- Wait for the core runtime Ready condition. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis wait --for=condition=Ready --timeout=15m coriolisappliance/coriolis-appliance-advanced
+kubectl -n coriolis wait --for=condition=Ready --timeout=15m coriolisappliance/coriolis-appliance-advanced
 ```
 
 ??? example "Expected result"
@@ -190,7 +190,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis wait --for=condition=Ready -
 
 <!-- Wait for the independent LoggingReady condition. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis wait --for=condition=LoggingReady --timeout=15m coriolisappliance/coriolis-appliance-advanced
+kubectl -n coriolis wait --for=condition=LoggingReady --timeout=15m coriolisappliance/coriolis-appliance-advanced
 ```
 
 ??? example "Expected result"
@@ -209,7 +209,7 @@ The status block, not the Pod list, is the operator's own verdict. Extract only 
 
 <!-- Show all appliance conditions in one safe line each. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get coriolisappliance coriolis-appliance-advanced -o json | jq -r '.status.conditions[] | "\(.type)=\(.status) reason=\(.reason)"'
+kubectl -n coriolis get coriolisappliance coriolis-appliance-advanced -o json | jq -r '.status.conditions[] | "\(.type)=\(.status) reason=\(.reason)"'
 ```
 
 ??? example "Expected result"
@@ -232,7 +232,7 @@ Every resource owned by the appliance carries the label `coriolis.cloudbase.it/a
 
 <!-- Show each component's ready/total containers, Pod phase, and restart count. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.metadata.labels["coriolis.cloudbase.it/component"]) | .[] | [.metadata.labels["coriolis.cloudbase.it/component"], "\(((.status.containerStatuses // []) | map(select(.ready)) | length))/\(.spec.containers | length)", .status.phase, (((.status.containerStatuses // []) | map(.restartCount) | add) // 0)] | map(tostring) | join(" ")'
+kubectl -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.metadata.labels["coriolis.cloudbase.it/component"]) | .[] | [.metadata.labels["coriolis.cloudbase.it/component"], "\(((.status.containerStatuses // []) | map(select(.ready)) | length))/\(.spec.containers | length)", .status.phase, (((.status.containerStatuses // []) | map(.restartCount) | add) // 0)] | map(tostring) | join(" ")'
 ```
 
 ??? example "Expected result"
@@ -264,7 +264,7 @@ Component labels come from the operator source (the logging gateway runs as a si
 
 <!-- List the appliance PersistentVolumeClaims; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
+kubectl -n coriolis get pvc -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
 ```
 
 ??? example "Expected result"
@@ -280,7 +280,7 @@ Exactly **three Bound PVCs**, created as direct resources with the names above (
 
 <!-- List the appliance Ingress resources; stable fields only, no volatile address or age (the HTTPS check below proves routing). -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get ingress -o custom-columns='NAME:.metadata.name,CLASS:.spec.ingressClassName,HOST:.spec.rules[0].host'
+kubectl -n coriolis get ingress -o custom-columns='NAME:.metadata.name,CLASS:.spec.ingressClassName,HOST:.spec.rules[0].host'
 ```
 
 ??? example "Expected result"
@@ -298,7 +298,7 @@ Five Ingress resources, all on the same class and host, one per routed service. 
 
 <!-- Check the cert-manager Certificate readiness; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate -o custom-columns='NAME:.metadata.name,READY:.status.conditions[?(@.type=="Ready")].status,SECRET:.spec.secretName'
+kubectl -n coriolis get certificate -o custom-columns='NAME:.metadata.name,READY:.status.conditions[?(@.type=="Ready")].status,SECRET:.spec.secretName'
 ```
 
 ??? example "Expected result"
@@ -312,7 +312,7 @@ The gate is one `Ready=True` Certificate whose `SECRET` is the TLS Secret for th
 
 <!-- Verify the Certificate's requested issuer and DNS names without reading private keys. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate coriolis.app.cloudbase.wiki-tls -o jsonpath='{.spec.secretName}{" issuer="}{.spec.issuerRef.kind}{"/"}{.spec.issuerRef.name}{" dnsNames="}{.spec.dnsNames[*]}{"\n"}'
+kubectl -n coriolis get certificate coriolis.app.cloudbase.wiki-tls -o jsonpath='{.spec.secretName}{" issuer="}{.spec.issuerRef.kind}{"/"}{.spec.issuerRef.name}{" dnsNames="}{.spec.dnsNames[*]}{"\n"}'
 ```
 
 ??? example "Expected result"
@@ -351,7 +351,7 @@ A `200` with a hostname-valid certificate proves the Ingress, the TLS Certificat
 
 <!-- Capture the admin password privately and fail if it cannot be read or is empty. -->
 ```bash
-KEYSTONE_ADMIN_PASSWORD="$(set -o pipefail; kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d)" && test -n "$KEYSTONE_ADMIN_PASSWORD"
+KEYSTONE_ADMIN_PASSWORD="$(set -o pipefail; kubectl -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d)" && test -n "$KEYSTONE_ADMIN_PASSWORD"
 ```
 
 ??? example "Expected result"
@@ -419,7 +419,7 @@ If you intend to perform the full fresh reset, capture the TLS Secret's UID befo
 
 <!-- Remember the TLS Secret identity for the optional destructive reset. -->
 ```bash
-TUTORIAL_TLS_UID="$(kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis.app.cloudbase.wiki-tls -o jsonpath='{.metadata.uid}')" && test -n "$TUTORIAL_TLS_UID"
+TUTORIAL_TLS_UID="$(kubectl -n coriolis get secret coriolis.app.cloudbase.wiki-tls -o jsonpath='{.metadata.uid}')" && test -n "$TUTORIAL_TLS_UID"
 ```
 
 ??? example "Expected result"
@@ -432,7 +432,7 @@ Proceed only on exit status zero. Recording the UID does not establish ownership
 
 <!-- Delete the appliance CR through the operator's supported path and wait for finalization. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis delete coriolisappliance coriolis-appliance-advanced --wait=true --timeout=10m
+kubectl -n coriolis delete coriolisappliance coriolis-appliance-advanced --wait=true --timeout=10m
 ```
 
 ??? example "Expected result"
@@ -443,7 +443,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete coriolisappliance cor
 
 <!-- List the appliance Pods by label after deletion. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced
+kubectl -n coriolis get pods -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced
 ```
 
 ??? example "Expected result"
@@ -454,7 +454,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get pods -l coriolis.cloudba
 
 <!-- List the three retained data PVCs explicitly; stable fields only, no volatile age. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
+kubectl -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data -o custom-columns='NAME:.metadata.name,STATUS:.status.phase,VOLUME:.spec.volumeName,CAPACITY:.status.capacity.storage,STORAGECLASS:.spec.storageClassName'
 ```
 
 ??? example "Expected result"
@@ -477,7 +477,7 @@ Retained state is kept by default (see [Optional Runtime Removal](#optional-runt
 
 <!-- Enumerate the retained Secrets and PVCs by appliance label, metadata only. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret,pvc -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.kind, .metadata.name) | .[] | "\(.kind) \(.metadata.name)"'
+kubectl -n coriolis get secret,pvc -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o json | jq -r '.items | sort_by(.kind, .metadata.name) | .[] | "\(.kind) \(.metadata.name)"'
 ```
 
 ??? example "Expected result"
@@ -501,7 +501,7 @@ The `local-path` StorageClass uses `Delete` reclaim: after claim deletion, each 
 
 <!-- Capture exactly three bound PV names from the tutorial claims. -->
 ```bash
-TUTORIAL_PVS=($(kubectl --context virt-infra-dev-buc-hq -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data -o jsonpath='{.items[*].spec.volumeName}')) && test "${#TUTORIAL_PVS[@]}" -eq 3
+TUTORIAL_PVS=($(kubectl -n coriolis get pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data -o jsonpath='{.items[*].spec.volumeName}')) && test "${#TUTORIAL_PVS[@]}" -eq 3
 ```
 
 ??? example "Expected result"
@@ -514,7 +514,7 @@ Exit status zero confirms three names were captured. Stop if the read fails or a
 
 <!-- Delete the three appliance data PVCs by exact name and wait for completion. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis delete pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data --wait=true --timeout=5m
+kubectl -n coriolis delete pvc coriolis-appliance-advanced-mariadb-data coriolis-appliance-advanced-rabbitmq-data coriolis-appliance-advanced-loki-data --wait=true --timeout=5m
 ```
 
 ??? example "Expected result"
@@ -527,7 +527,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete pvc coriolis-applianc
 
 <!-- Check only the captured PVs; ignore NotFound responses, not other errors. -->
 ```bash
-test "${#TUTORIAL_PVS[@]}" -eq 3 && kubectl --context virt-infra-dev-buc-hq -n coriolis get pv "${TUTORIAL_PVS[@]}" --ignore-not-found -o name
+test "${#TUTORIAL_PVS[@]}" -eq 3 && kubectl -n coriolis get pv "${TUTORIAL_PVS[@]}" --ignore-not-found -o name
 ```
 
 ??? example "Expected result"
@@ -540,7 +540,7 @@ Exit status zero with no names means all three PVs are absent. If a name remains
 
 <!-- Delete the seven generated credential Secrets by exact name. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis-appliance-advanced-barbican-credentials coriolis-appliance-advanced-coriolis-credentials coriolis-appliance-advanced-infrastructure-credentials coriolis-appliance-advanced-keystone-credential-keys coriolis-appliance-advanced-keystone-database-credentials coriolis-appliance-advanced-keystone-fernet-keys coriolis-appliance-advanced-logging-credentials
+kubectl -n coriolis delete secret coriolis-appliance-advanced-barbican-credentials coriolis-appliance-advanced-coriolis-credentials coriolis-appliance-advanced-infrastructure-credentials coriolis-appliance-advanced-keystone-credential-keys coriolis-appliance-advanced-keystone-database-credentials coriolis-appliance-advanced-keystone-fernet-keys coriolis-appliance-advanced-logging-credentials
 ```
 
 ??? example "Expected result"
@@ -557,7 +557,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis-appli
 
 <!-- Confirm no Certificate or Ingress remains before deleting the TLS Secret. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o name
+kubectl -n coriolis get certificate,ingress -o name
 ```
 
 ??? example "Expected result"
@@ -571,7 +571,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get certificate,ingress -o n
 
 <!-- Verify that the TLS Secret still has the UID captured before runtime removal. -->
 ```bash
-test -n "${TUTORIAL_TLS_UID:-}" && test "$TUTORIAL_TLS_UID" = "$(kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis.app.cloudbase.wiki-tls -o jsonpath='{.metadata.uid}')"
+test -n "${TUTORIAL_TLS_UID:-}" && test "$TUTORIAL_TLS_UID" = "$(kubectl -n coriolis get secret coriolis.app.cloudbase.wiki-tls -o jsonpath='{.metadata.uid}')"
 ```
 
 ??? example "Expected result"
@@ -584,7 +584,7 @@ Only exit status zero is success. A lost variable, changed UID, missing Secret, 
 
 <!-- Delete the run-created TLS Secret after the verification above. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis delete secret coriolis.app.cloudbase.wiki-tls
+kubectl -n coriolis delete secret coriolis.app.cloudbase.wiki-tls
 ```
 
 ??? example "Expected result"
@@ -597,7 +597,7 @@ The remaining commands are verification gates for the wipe, plus the health proo
 
 <!-- Confirm no appliance-labeled workload, config, or storage resources remain. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,cm,secret,pvc,ingress,sa,role,rolebinding -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o name
+kubectl -n coriolis get deploy,sts,pod,job,svc,cm,secret,pvc,ingress,sa,role,rolebinding -l coriolis.cloudbase.it/appliance=coriolis-appliance-advanced -o name
 ```
 
 ??? example "Expected result"
@@ -608,7 +608,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get deploy,sts,pod,job,svc,c
 
 <!-- Confirm the operator Deployment is untouched and still ready. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-operator
+kubectl -n coriolis get deployment coriolis-operator
 ```
 
 ??? example "Expected result"
@@ -620,7 +620,7 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get deployment coriolis-oper
 
 <!-- Confirm the Argo CD Application is still Synced and Healthy. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n argocd get application coriolis
+kubectl -n argocd get application coriolis
 ```
 
 ??? example "Expected result"
