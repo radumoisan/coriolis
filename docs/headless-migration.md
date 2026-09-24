@@ -11,27 +11,25 @@ The helper requires two saved, validated endpoints. Create the source endpoint f
    &emsp;&emsp;⤷ Select **OpenStack**.
 2. Fill in the required parameters:
 
-   | Parameter | Value (source) | Value (destination) |
-   | --- | --- | --- |
-   | Name | `source-openstack` | `destination-openstack` |
-   | Description | `Source OpenStack cloud` | `Destination OpenStack cloud` |
-   | Username | `coriolis` | `coriolis` |
-   | Password | `Passw0rd123!` | `Passw0rd123!` |
-   | Authentication URL | `https://keystone.virtomat.dev/v3` | `https://devopscentral.cloud:5000` |
-   | Project Name | `coriolis` | `coriolis` |
-   | Glance API Version | `2` | `2` |
-   | Identity API Version | `3` | `3` |
-   | User Domain | `Default` | `Default` |
-   | Project Domain | `Default` | `Default` |
-   | Region | `RegionOne` | `RegionOne` |
-   | Interface | `public` | `public` |
+    | Parameter | Value (source) | Value (destination) |
+    | --- | --- | --- |
+    | Name | `source-openstack` | `destination-openstack` |
+    | Description | `Source OpenStack cloud` | `Destination OpenStack cloud` |
+    | Username | `coriolis` | `coriolis` |
+    | Password | `Passw0rd123!` | `Passw0rd123!` |
+    | Authentication URL | `https://keystone.virtomat.dev/v3` | `https://devopscentral.cloud:5000` |
+    | Project Name | `coriolis` | `coriolis` |
+    | Glance API Version | `2` | `2` |
+    | Identity API Version | `3` | `3` |
+    | User Domain | `Default` | `Default` |
+    | Project Domain | `Default` | `Default` |
+    | Region | `RegionOne` | `RegionOne` |
+    | Interface | `public` | `public` |
 
-   !!! warning "Replace the placeholder password"
-       `Passw0rd123!` is an example only. Enter the actual password for each cloud's `coriolis` user before validating the endpoints.
+    !!! warning "Replace the placeholder password"
+        `Passw0rd123!` is an example only. Enter the actual password for each cloud's `coriolis` user before validating the endpoints.
 
-   Selecting **Identity API Version** `3` reveals the domain fields. Expand **Advanced** to set the region and interface.
-3. **Validate and save:** Click **Validate and save**, open the saved endpoint details, click **Validate Endpoint**, and record the non-secret endpoint ID from the page URL or details.
-   **Expected outcome:** the form closes, the endpoint is listed, explicit validation reports `Endpoint is Valid` and `All tests passed succesfully.`, and the endpoint ID is recorded without recording credentials.
+3. Validate and save
 
 !!! tip "Where the credentials actually live"
     The operator-managed Barbican on this appliance stores the encrypted connection payload as a Barbican secret; the Coriolis endpoint object itself contains only the returned `secret_ref`. That is why the UI reports the endpoint valid only after both the secret is `ACTIVE` and the provider connection test succeeds, and why deleting the endpoint is expected to remove its Barbican-backed credential as part of cleanup.

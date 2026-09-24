@@ -88,6 +88,17 @@ openstack role add --project coriolis --project-domain Default --user coriolis -
     No output.
     ```
 
+<!-- Allow the source administrator to select the Coriolis project in Horizon. -->
+```bash
+openstack role add --project coriolis --project-domain Default --user admin --user-domain Default member
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
 <!-- Set the source Coriolis project quota. -->
 ```bash
 openstack quota set \
@@ -151,6 +162,17 @@ openstack role add --project coriolis --project-domain Default --user coriolis -
     No output.
     ```
 
+<!-- Allow the destination administrator to select the Coriolis project in Horizon. -->
+```bash
+openstack role add --project coriolis --project-domain Default --user admin --user-domain Default member
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
 <!-- Set the destination Coriolis project quota. -->
 ```bash
 openstack quota set \
@@ -167,6 +189,8 @@ openstack quota set \
     ```text
     No output.
     ```
+
+The `admin` membership makes the project available in Horizon's project selector. Continue to use the dedicated `coriolis` user, not `admin`, for Coriolis endpoints.
 
 Use these validated connection values: source auth URL `https://keystone.virtomat.dev/v3`; destination auth URL `https://devopscentral.cloud:5000`; username and project `coriolis`; user and project domains `Default`; region `RegionOne`; interface `public`; Identity API version `3`; and Glance API version `2`. Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image, and `__DEFAULT__` volume type.
 
