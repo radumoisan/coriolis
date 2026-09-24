@@ -205,22 +205,35 @@ openstack quota set \
 
 The `admin` membership makes the project available in Horizon's project selector. Continue to use the dedicated `coriolis` user, not `admin`, for Coriolis endpoints.
 
-Use these validated connection values: source auth URL `https://keystone.virtomat.dev/v3`; destination auth URL `https://devopscentral.cloud:5000`; username and project `coriolis`; user and project domains `Default`; region `RegionOne`; interface `public`; Identity API version `3`; and Glance API version `2`. Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image, and `__DEFAULT__` volume type.
+### :material-application-edit-outline: Validated Connection Values
+
+| Parameter | Value (source) | Value (destination) |
+| --- | --- | --- |
+| Authentication URL | `https://keystone.virtomat.dev/v3` | `https://devopscentral.cloud:5000` |
+| Username | `coriolis` | `coriolis` |
+| Project | `coriolis` | `coriolis` |
+| User domain | `Default` | `Default` |
+| Project domain | `Default` | `Default` |
+| Region | `RegionOne` | `RegionOne` |
+| Interface | `public` | `public` |
+| Identity API version | `3` | `3` |
+| Glance API version | `2` | `2` |
+
+Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image, and `__DEFAULT__` volume type.
 
 !!! warning
-    Unified project quotas cap Nova, Neutron, and Cinder, not Swift bytes. The safely verified source RGW account is `AUTH_be3c7405df8149bc84e65217576c1dd4` and currently has no byte quota. A reseller-admin request with the explicit target path resolved to the admin account, so no byte quota was applied; do not use this project for unrelated object storage.
+    Unified project quotas cap Nova, Neutron, and Cinder resources but do not enforce a Swift byte quota in this environment. Use the demo project only for migration-related object storage and monitor its usage separately.
 
 ## :material-book-open-page-variant-outline: Source Disk Access
 
-First decide whether the transfer is a migration or a repeatable replica, because their source disk-access prerequisites differ. The source boot method further limits the usable path.
+- **Glance-rooted instance:** The operating system disk is created from a Glance image and normally resides on Nova-managed ephemeral storage.
+- **Volume-backed instance:** The operating system resides on an attached Cinder volume. Coriolis expects exactly one attached volume marked `bootable` so it can identify the source operating-system disk. No bootable volume, or multiple bootable volumes, makes the root disk ambiguous.
+- **Select the disk path:** Decide how Coriolis will access and transfer that disk, such as Cinder backup through Swift, Ceph access, or a temporary worker VM. This choice determines the required OpenStack permissions and network connectivity.
 
-| Source disk path | When it applies | Access and temporary resources |
-| --- | --- | --- |
-| Cinder backup through object storage | Replica of Cinder-backed disks | Requires Cinder backup access and object-storage access. |
-| Ceph-backed Cinder backup or snapshot | Replica of Cinder-backed disks | Requires Cinder snapshot or backup access plus Coriolis Worker service reachability to the source Ceph cluster. |
-| Temporary source worker VM | Migration path or selected replica path; required for a Glance-rooted replica source | Creates source snapshots and temporary storage resources, then uses a temporary worker VM to export disk data. |
+!!! note "Demo disk path"
+    This demo uses a small, disposable, volume-backed source VM with exactly one attached bootable Cinder volume. Coriolis exports it with `swift_backups`, so the source project requires both Cinder backup and Swift access.
 
-A Glance-rooted instance has an image root disk. For a volume-backed instance, exactly one attached Cinder volume must be marked bootable for normal source inventory and export. Select the disk path before requesting permissions or connectivity.
+    This path does not require a floating IP or SSH access to the source VM. The destination uses a temporary worker VM and places the cloned disk on the `__DEFAULT__` volume type. The tutorial shuts down the source after the transfer and automatically deploys the destination VM.
 
 ## :material-book-open-page-variant-outline: Destination Mappings
 
