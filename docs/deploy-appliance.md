@@ -1,7 +1,7 @@
 # Deploy an Appliance
 
 !!! abstract
-    This lab uses the already-installed operator in the approved development environment to deploy a Coriolis appliance, validate `Ready` and `LoggingReady`, and log in through a browser. See [Coriolis Operator](operator.md) for the operator explanation and Helm configuration, and [Lab Environment](operator-lab-environment.md) for the concrete lab configuration.
+    This lab uses the already-installed operator in the approved development environment to deploy a Coriolis appliance, validate `Ready` and `LoggingReady`, and log in through a browser. See [Coriolis Operator](architecture.md#coriolis-operator) for the operator explanation and Helm configuration, and [Lab Environment](operator-lab-environment.md) for the concrete lab configuration.
 
 ## :material-book-open-page-variant-outline: Hands-On Prerequisites
 

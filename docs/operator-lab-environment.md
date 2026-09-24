@@ -7,7 +7,7 @@
 
 **Argo CD** (`argocd/coriolis` Application) continuously deploys the operator Helm chart from the OCI registry and keeps the operator Deployment in sync. CIXpress CI publishes chart and image versions, and the live Application selects them through a wildcard chart channel rather than a user-edited pin.
 
-The operator chart's Helm values are applied by Argo CD and are not changed during the lab. See [CR Versus Helm Values, And The Two Retention Profiles](operator.md#cr-versus-helm-values-and-the-two-retention-profiles) for the distinction between operator and appliance configuration.
+The operator chart's Helm values are applied by Argo CD and are not changed during the lab. See [CR Versus Helm Values, And The Two Retention Profiles](architecture.md#cr-versus-helm-values-and-the-two-retention-profiles) for the distinction between operator and appliance configuration.
 
 The lab uses these concrete values:
 
@@ -51,7 +51,7 @@ The tutorial uses [coriolis-appliance.yaml](assets/manifests/coriolis-appliance.
 | `spec.version` | `"2603.4"` | The accepted, immutable runtime version the current operator supports. |
 | MariaDB / RabbitMQ storage | `local-path`, `10Gi` / `1Gi` | Dev-only single-node storage; sizes proven in prior validations. |
 | Ingress | `coriolis.app.cloudbase.wiki`, class `nginx`, TLS via cert-manager `letsencrypt` ClusterIssuer | The managed dev hostname with real ACME certificates. |
-| Logging retention | `24` h keep, `15` min compaction, `120` min delete delay | A realistic steady-state profile (see [CR Versus Helm Values, And The Two Retention Profiles](operator.md#cr-versus-helm-values-and-the-two-retention-profiles)). |
+| Logging retention | `24` h keep, `15` min compaction, `120` min delete delay | A realistic steady-state profile (see [CR Versus Helm Values, And The Two Retention Profiles](architecture.md#cr-versus-helm-values-and-the-two-retention-profiles)). |
 | `coriolisDebug` | `false` | Safe default; debug is a bounded diagnostic mode only. |
 | Loki storage | `local-path`, `10Gi` | Same dev-only caveat as the databases. |
 | Resource bounds: MariaDB, RabbitMQ, Loki | requests `250m` CPU / `512Mi`, limits `1` CPU / `1Gi` | Sized stateful components; explicit bounds keep scheduling predictable on the shared dev node. |
