@@ -11,18 +11,25 @@ The helper requires two saved, validated endpoints. Create the source endpoint f
    &emsp;&emsp;⤷ Select **OpenStack**.
 2. Fill in the required parameters:
 
-   | Parameter | Value |
-   | --- | --- |
-   | Name | `source-openstack` for the source; `destination-openstack` for the destination |
-   | Description | `Source OpenStack cloud` for the source; `Destination OpenStack cloud` for the destination |
-   | Username | `<OPENSTACK_USERNAME>` |
-   | Password | `<OPENSTACK_PASSWORD>` |
-   | Authentication URL | `<KEYSTONE_URL>/v3` |
-   | Project Name | `<PROJECT_NAME>` |
-   | Glance API Version | `2` |
-   | Identity API Version | `3` |
+   | Parameter | Value (source) | Value (destination) |
+   | --- | --- | --- |
+   | Name | `source-openstack` | `destination-openstack` |
+   | Description | `Source OpenStack cloud` | `Destination OpenStack cloud` |
+   | Username | `coriolis` | `coriolis` |
+   | Password | `Passw0rd123!` | `Passw0rd123!` |
+   | Authentication URL | `https://keystone.virtomat.dev/v3` | `https://devopscentral.cloud:5000` |
+   | Project Name | `coriolis` | `coriolis` |
+   | Glance API Version | `2` | `2` |
+   | Identity API Version | `3` | `3` |
+   | User Domain | `Default` | `Default` |
+   | Project Domain | `Default` | `Default` |
+   | Region | `RegionOne` | `RegionOne` |
+   | Interface | `public` | `public` |
 
-   Selecting **Identity API Version** `3` reveals the domain fields; fill the **User Domain** and **Project Domain** names, and use **Advanced** region/interface only if required.
+   !!! warning "Replace the placeholder password"
+       `Passw0rd123!` is an example only. Enter the actual password for each cloud's `coriolis` user before validating the endpoints.
+
+   Selecting **Identity API Version** `3` reveals the domain fields. Expand **Advanced** to set the region and interface.
 3. **Validate and save:** Click **Validate and save**, open the saved endpoint details, click **Validate Endpoint**, and record the non-secret endpoint ID from the page URL or details.
    **Expected outcome:** the form closes, the endpoint is listed, explicit validation reports `Endpoint is Valid` and `All tests passed succesfully.`, and the endpoint ID is recorded without recording credentials.
 
