@@ -473,20 +473,35 @@ curl -I https://coriolis.app.cloudbase.wiki/
 | `/logs`, `/log-stream` | Authenticated log list, download, and streaming APIs served by the logging adaptor |
 
 !!! warning
-    The appliance's Keystone admin password is a real credential. The command below captures it into a shell variable without printing it. Use Bash with tracing (`set -x`) disabled, or the assignment will leak the value. Reveal it only in a private terminal, never while screen-sharing, in CI output, or against Production, and never store it in tracked files or notes.
+    The commands below print the encoded and decoded Keystone admin password. Both are sensitive. Run them only in a private terminal, never while screen-sharing or in CI output, and do not store their output in tracked files or notes. The examples use dummy values.
 
-<!-- Capture the admin password privately and fail if it cannot be read or is empty. -->
+<!-- Read the encoded Keystone admin password from the generated Secret. -->
 ```bash
-KEYSTONE_ADMIN_PASSWORD="$(set -o pipefail; kubectl -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d)" && test -n "$KEYSTONE_ADMIN_PASSWORD"
+kubectl get secret coriolis-appliance-advanced-infrastructure-credentials \
+    -n coriolis \
+    -o jsonpath='{.data.keystone_admin_password}'
 ```
 
 ??? example "Expected result"
 
     ```text
-    No output.
+    a2sxUWNDcWxUY3diZWRfa2VsNHkzbW1wbkoyWm1NZFNKdjMwVFFPNGwwZw==
     ```
 
-Success is exit status zero with no output; stop on any error or nonzero status. In that same private terminal, `printf '%s\n' "$KEYSTONE_ADMIN_PASSWORD"` reveals the value for browser login. Its output is deliberately not reproduced here. After logging in, use `unset KEYSTONE_ADMIN_PASSWORD` and clear the terminal scrollback. The operator generates the credential once and retains it across same-name appliance recreation.
+Copy the encoded value and use it in the next command. The value shown here decodes to the dummy password used in the expected result.
+
+<!-- Decode the value returned by the previous command. -->
+```bash
+echo 'a2sxUWNDcWxUY3diZWRfa2VsNHkzbW1wbkoyWm1NZFNKdjMwVFFPNGwwZw==' | base64 -d; echo
+```
+
+??? example "Expected result"
+
+    ```text
+    kk1QcCqlTcwbed_kel4y3mmpnJ2ZmMdSJv30TQO4l0g
+    ```
+
+Use the decoded value to log in, then clear the terminal scrollback. The operator generates this credential once and retains it across same-name appliance recreation.
 
 ## :material-book-open-page-variant-outline: Web Login And Visual Inspection
 
@@ -494,7 +509,7 @@ Success is exit status zero with no output; stop on any error or nonzero status.
    **Expected outcome:** the Coriolis web UI loads over HTTPS with a valid TLS certificate (no browser warning) and presents a Welcome screen with privacy and end-user license agreement (EULA) checkboxes and a **Submit** button.
 2. Select both the privacy and EULA checkboxes, then click **Submit**.
    **Expected outcome:** the UI proceeds to `/login`, which offers only `Username` and `Password` fields and a **Login** button (there is no domain field on this form).
-3. Log in with username `admin` and the password you captured into `KEYSTONE_ADMIN_PASSWORD` (reveal it in a private terminal as described above).
+3. Log in with username `admin` and the password displayed by the command above.
    **Expected outcome:** authentication succeeds and the Dashboard loads with a Signed in indicator, in an empty or near-empty state, because this fresh appliance has no endpoints or transfers yet.
 4. Use the sidebar navigation labels **Transfers**, **Deployments**, and **Cloud Endpoints** to open each area without creating anything.
    **Expected outcome:** pages render without error banners; the transfer, deployment, and endpoint lists are empty. This confirms the UI can talk to the Coriolis API and Keystone through the ingress.
