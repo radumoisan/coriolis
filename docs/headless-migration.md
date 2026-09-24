@@ -4,13 +4,35 @@ This tutorial creates one real Coriolis live migration from the command line. Th
 
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
-Create and validate the source and destination OpenStack endpoints in the Web UI before using the helper. The endpoint names are up to you, but record both endpoint IDs after they are saved.
+The helper requires two saved, validated endpoints. Create the source endpoint first, then repeat these same three steps for the destination using that cloud's values.
 
-1. Open **Cloud Endpoints** and select **Add Endpoint** (or **New > Endpoint**).
-2. Select **OpenStack** and enter the credentials and API details for one cloud.
-3. Validate and save the endpoint, then repeat for the other cloud.
+1. Open **Cloud Endpoints**.<br>
+   &emsp;⤷ Choose **Add Endpoint** (or **New > Endpoint** for a non-empty list).<br>
+   &emsp;&emsp;⤷ Select **OpenStack**.
+2. Fill in the required parameters:
 
-The helper authenticates to the appliance as a Keystone user; it does not send the source or destination cloud passwords. Those credentials remain in the saved endpoint secrets.
+    | Parameter | Value (source) | Value (destination) |
+    | --- | --- | --- |
+    | Name | `source-openstack` | `destination-openstack` |
+    | Description | `Source OpenStack cloud` | `Destination OpenStack cloud` |
+    | Username | `coriolis` | `coriolis` |
+    | Password | `Passw0rd123!` | `Passw0rd123!` |
+    | Authentication URL | `https://keystone.virtomat.dev/v3` | `https://devopscentral.cloud:5000` |
+    | Project Name | `coriolis` | `coriolis` |
+    | Glance API Version | `2` | `2` |
+    | Identity API Version | `3` | `3` |
+    | User Domain | `Default` | `Default` |
+    | Project Domain | `Default` | `Default` |
+    | Region | `RegionOne` | `RegionOne` |
+    | Interface | `public` | `public` |
+
+    !!! warning "Replace the placeholder password"
+        `Passw0rd123!` is an example only. Enter the actual password for each cloud's `coriolis` user before validating the endpoints.
+
+3. Validate and save
+
+!!! tip "Where the credentials actually live"
+    The operator-managed Barbican on this appliance stores the encrypted connection payload as a Barbican secret; the Coriolis endpoint object itself contains only the returned `secret_ref`. That is why the UI reports the endpoint valid only after both the secret is `ACTIVE` and the provider connection test succeeds, and why deleting the endpoint is expected to remove its Barbican-backed credential as part of cleanup.
 
 ## :material-book-open-page-variant-outline: Headless Real Migration
 
