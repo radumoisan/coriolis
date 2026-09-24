@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Focused standard-library tests for coriolis-headless-migration.py."""
+"""Focused PyYAML-dependent tests for coriolis-headless-migration.py."""
 
 import contextlib
 import importlib.util
@@ -21,7 +21,7 @@ HELPER_PATH = os.path.join(
     REPO_ROOT, "deploy", "coriolis-headless-migration.py")
 MANIFEST_PATH = os.path.join(
     REPO_ROOT, "docs", "assets", "manifests",
-    "headless-migration.jsonc")
+    "headless-migration.yaml")
 DOWNLOAD_PATH = os.path.join(
     REPO_ROOT, "docs", "assets", "scripts",
     "coriolis-headless-migration.py")
@@ -188,7 +188,7 @@ class HelperTestCase(unittest.TestCase):
     def run_cli(self, config, routes, argv=None, sleep=None,
                 monotonic=None):
         with tempfile.NamedTemporaryFile(
-                "w", suffix=".json", delete=False) as handle:
+                "w", suffix=".yaml", delete=False) as handle:
             json.dump(config, handle)
             config_path = handle.name
         self.addCleanup(os.unlink, config_path)
@@ -238,8 +238,8 @@ class HelperTestCase(unittest.TestCase):
 
     def test_validate_config_succeeds_without_stdin_or_network(self):
         with tempfile.NamedTemporaryFile(
-                "w", suffix=".jsonc", delete=False) as handle:
-            handle.write("// Valid JSONC configuration\n")
+                "w", suffix=".yaml", delete=False) as handle:
+            handle.write("# Valid YAML configuration\n")
             json.dump(valid_config(), handle)
             config_path = handle.name
         self.addCleanup(os.unlink, config_path)
@@ -263,7 +263,7 @@ class HelperTestCase(unittest.TestCase):
         for config, category in (({}, "config_invalid"), (
                 unresolved, "config_unresolved_placeholder")):
             with self.subTest(category=category), tempfile.NamedTemporaryFile(
-                    "w", suffix=".jsonc", delete=False) as handle:
+                    "w", suffix=".yaml", delete=False) as handle:
                 json.dump(config, handle)
                 config_path = handle.name
             self.addCleanup(os.unlink, config_path)
@@ -292,7 +292,7 @@ class HelperTestCase(unittest.TestCase):
                 mock.patch.object(sys, "stdin", stdin), \
                 contextlib.redirect_stderr(stderr), \
                 self.assertRaises(SystemExit) as raised:
-            HELPER.main(["--config", "unused.json"])
+            HELPER.main(["--config", "unused.yaml"])
         self.assertEqual(raised.exception.code, 2)
         self.assertIn("usage:", stderr.getvalue())
         self.assertIn(
@@ -303,7 +303,7 @@ class HelperTestCase(unittest.TestCase):
 
     def test_cli_username_and_project_override_keystone_auth(self):
         with tempfile.NamedTemporaryFile(
-                "w", suffix=".json", delete=False) as handle:
+                "w", suffix=".yaml", delete=False) as handle:
             json.dump(valid_config(), handle)
             config_path = handle.name
         self.addCleanup(os.unlink, config_path)
@@ -575,7 +575,7 @@ class HelperTestCase(unittest.TestCase):
     def test_http_requires_explicit_allow_http(self):
         config = valid_config()
         with tempfile.NamedTemporaryFile(
-                "w", suffix=".json", delete=False) as handle:
+                "w", suffix=".yaml", delete=False) as handle:
             json.dump(config, handle)
             config_path = handle.name
         self.addCleanup(os.unlink, config_path)
@@ -596,7 +596,7 @@ class HelperTestCase(unittest.TestCase):
         self.assertEqual(recorder.calls, [])
 
 
-class JsoncConfigTestCase(unittest.TestCase):
+class YamlConfigTestCase(unittest.TestCase):
     def load_config(self, suffix, text):
         with tempfile.NamedTemporaryFile(
                 "w", suffix=suffix, delete=False) as handle:
@@ -605,30 +605,60 @@ class JsoncConfigTestCase(unittest.TestCase):
         self.addCleanup(os.unlink, path)
         return HELPER.load_config_file(path)
 
-    def test_json_and_jsonc_comments_load_without_corrupting_urls(self):
-        config = valid_config()
-        config["transfer"]["notes"] = "https://example.invalid/run"
-        body = json.dumps(config, indent=2)
-        commented = "/* JSONC configuration */\n" + body.replace(
-            '"scenario": "live_migration",',
-            '"scenario": "live_migration", // required scenario')
-        for suffix in (".json", ".jsonc"):
-            with self.subTest(suffix=suffix):
-                loaded = self.load_config(suffix, commented)
-                self.assertEqual(
-                    loaded["transfer"]["notes"],
-                    "https://example.invalid/run")
+    def test_comments_above_keys_preserve_urls_containing_slashes(self):
+        loaded = self.load_config(".yaml", """\
+transfer:
+  # This URL contains // and must remain a string.
+  notes: "https://example.invalid/run"
+  scenario: live_migration
+  origin_endpoint_id: endpoint-origin
+  destination_endpoint_id: endpoint-destination
+  instances:
+    - instance-1
+  source_environment: {}
+  destination_environment: {}
+  network_map: {}
+  storage_mappings: {}
+  clone_disks: true
+  skip_os_morphing: true
+execution:
+  # This boolean controls deployment polling.
+  shutdown_instances: true
+  auto_deploy: true
+""")
+        self.assertEqual(
+            loaded["transfer"]["notes"], "https://example.invalid/run")
+        self.assertEqual(HELPER.validate_config(loaded)["transfer"]["notes"],
+                         "https://example.invalid/run")
 
-    def test_malformed_or_unterminated_comments_are_config_errors(self):
-        for text in ("{ /* unterminated", "{ // comment\n"):
-            with self.subTest(text=text):
-                with self.assertRaisesRegex(
-                        HELPER.MigrationError, "config_invalid"):
-                    self.load_config(".jsonc", text)
-
-    def test_comments_do_not_join_json_tokens(self):
+    def test_malformed_yaml_is_a_config_error(self):
         with self.assertRaisesRegex(HELPER.MigrationError, "config_invalid"):
-            self.load_config(".jsonc", '{"value": 1/* comment */2}')
+            self.load_config(".yaml", "transfer: [\n")
+
+    def test_empty_yaml_is_rejected_by_validation(self):
+        loaded = self.load_config(".yaml", "")
+        with self.assertRaisesRegex(HELPER.MigrationError, "config_invalid"):
+            HELPER.validate_config(loaded)
+
+    def test_unsafe_yaml_tag_is_a_config_error(self):
+        with self.assertRaisesRegex(HELPER.MigrationError, "config_invalid"):
+            self.load_config(
+                ".yaml", "!!python/object/apply:os.system ['false']\n")
+
+    def test_missing_pyyaml_reports_safe_dependency_error(self):
+        with tempfile.NamedTemporaryFile(
+                "w", suffix=".yaml", delete=False) as handle:
+            handle.write("transfer: {}\n")
+            config_path = handle.name
+        self.addCleanup(os.unlink, config_path)
+        stdout = io.StringIO()
+        with mock.patch.object(HELPER, "yaml", None), \
+                contextlib.redirect_stdout(stdout):
+            code = HELPER.main(["--config", config_path, "--validate-config"])
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            stdout.getvalue(),
+            "ERROR category=dependency_missing http_status=none\n")
 
 
 class ManifestTestCase(unittest.TestCase):

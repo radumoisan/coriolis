@@ -1,0 +1,55 @@
+transfer:
+  # Unique label; no existing transfer or deployment may use it.
+  notes: "<UNIQUE_TRANSFER_NOTES>"
+  # Required Coriolis live-migration scenario.
+  scenario: "live_migration"
+  # Source endpoint UUID from the Web UI.
+  origin_endpoint_id: "<SOURCE_ENDPOINT_ID>"
+  # Destination endpoint UUID from the Web UI.
+  destination_endpoint_id: "<DESTINATION_ENDPOINT_ID>"
+  # Source fixture instance UUID.
+  instances:
+    - "<SOURCE_INSTANCE_ID>"
+  source_environment:
+    # Use the verified Swift backup export path.
+    replica_export_mechanism: "swift_backups"
+  destination_environment:
+    migr_image_map:
+      # Linux image for the temporary migration worker.
+      linux: "<WORKER_LINUX_IMAGE_ID>"
+    # Network for the temporary migration worker.
+    migr_network: "<WORKER_NETWORK_ID>"
+    # Flavor for the temporary migration worker.
+    migr_flavor_name: "<WORKER_FLAVOR_NAME>"
+    # Give the temporary worker a floating IP.
+    migr_worker_use_fip: true
+    # Floating-IP pool for the temporary worker.
+    migr_fip_pool_name: "<WORKER_FLOATING_IP_POOL>"
+    # Worker volume type; __DEFAULT__ permits destination placement.
+    migr_worker_volume_type: "__DEFAULT__"
+    # Security group for the temporary migration worker.
+    security_groups:
+      - "<WORKER_SECURITY_GROUP_NAME>"
+    # Keypair for the temporary migration worker.
+    keypair_name: "<WORKER_KEYPAIR_NAME>"
+    # Give the deployed destination instance a floating IP.
+    use_floating_ip: true
+    # Floating-IP pool for the deployed destination instance.
+    floating_ip_pool: "<DESTINATION_FLOATING_IP_POOL>"
+    # Do not preserve source fixed IPs on the destination.
+    preserve_fixed_ips: false
+  network_map:
+    # Map each source NIC network name to a destination network ID.
+    "<SOURCE_NETWORK_NAME>": "<DESTINATION_NETWORK_ID>"
+  storage_mappings:
+    # Let the destination choose disk placement.
+    default: "__DEFAULT__"
+  # Clone disks for this proof-of-concept path.
+  clone_disks: true
+  # Use only for the known-compatible disposable fixture.
+  skip_os_morphing: true
+execution:
+  # Shut down the source instance after migration.
+  shutdown_instances: true
+  # Automatically deploy the migrated destination instance.
+  auto_deploy: true

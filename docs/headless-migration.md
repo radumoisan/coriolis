@@ -44,7 +44,7 @@ The helper requires two saved, validated endpoints. Create the source endpoint f
 In a local working directory, download these two files:
 
 - Download [coriolis-headless-migration.py](assets/scripts/coriolis-headless-migration.py).
-- Download [headless-migration.jsonc](assets/manifests/headless-migration.jsonc).
+- Download [headless-migration.yaml](assets/manifests/headless-migration.yaml).
 
 ??? quote "coriolis-headless-migration.py"
 
@@ -52,19 +52,32 @@ In a local working directory, download these two files:
     --8<-- "assets/scripts/coriolis-headless-migration.py"
     ```
 
-??? quote "headless-migration.jsonc"
+??? quote "headless-migration.yaml"
 
-    ```jsonc
-    --8<-- "assets/manifests/headless-migration.jsonc"
+    ```yaml
+    --8<-- "assets/manifests/headless-migration.yaml"
     ```
 
-The JSONC comments explain every setting. Replace every angle-bracket placeholder before continuing. `transfer.notes` must be unique for this run; `shutdown_instances` controls whether the source is powered off after migration, and `auto_deploy` controls whether the helper creates and follows the destination deployment. Keep `skip_os_morphing` enabled only for a known-compatible disposable fixture.
+The comments above each setting explain what to replace. Replace every angle-bracket placeholder before continuing. `transfer.notes` must be unique for this run; `shutdown_instances` controls whether the source is powered off after migration, and `auto_deploy` controls whether the helper creates and follows the destination deployment. Keep `skip_os_morphing` enabled only for a known-compatible disposable fixture.
 
-The helper accepts JSON or JSONC. Validate the completed file locally before making API calls:
+Install PyYAML in the Python environment that runs the helper:
 
-<!-- Validate the completed JSONC file with the downloaded helper. -->
+<!-- Install the YAML dependency for the downloaded helper. -->
 ```bash
-python3 coriolis-headless-migration.py --config headless-migration.jsonc --validate-config
+python3 -m pip install PyYAML
+```
+
+??? example "Expected result"
+
+    ```text
+    Successfully installed PyYAML-6.0.3
+    ```
+
+Validate the completed YAML file locally before making API calls:
+
+<!-- Validate the completed YAML file with the downloaded helper. -->
+```bash
+python3 coriolis-headless-migration.py --config headless-migration.yaml --validate-config
 ```
 
 ??? example "Expected result"
@@ -81,7 +94,7 @@ The password is read through standard input rather than placed in a command argu
 
 <!-- Pipe the Keystone password into the helper without exposing it in the command line. -->
 ```bash
-kubectl -n "<appliance-namespace>" get secret "<keystone-password-secret>" -o jsonpath='{.data.<password-key>}' | base64 -d | python3 coriolis-headless-migration.py --api-base "https://<appliance-host>/coriolis" --keystone-base "https://<appliance-host>/identity" --username "<keystone-username>" --project-name "<keystone-project>" --config headless-migration.jsonc --timeout 1800 --poll-interval 10 --run
+kubectl -n "<appliance-namespace>" get secret "<keystone-password-secret>" -o jsonpath='{.data.<password-key>}' | base64 -d | python3 coriolis-headless-migration.py --api-base "https://<appliance-host>/coriolis" --keystone-base "https://<appliance-host>/identity" --username "<keystone-username>" --project-name "<keystone-project>" --config headless-migration.yaml --timeout 1800 --poll-interval 10 --run
 ```
 
 ??? example "Expected result"
@@ -141,7 +154,8 @@ Check the workload marker, disks, and networking even when cloud-init reports `d
 
 | Symptom | Response |
 | --- | --- |
-| `ERROR category=config_unresolved_placeholder` | Replace every angle-bracket placeholder in `headless-migration.jsonc`, then run the local validation command again. |
+| `ERROR category=config_unresolved_placeholder` | Replace every angle-bracket placeholder in `headless-migration.yaml`, then run the local validation command again. |
+| `ERROR category=dependency_missing` | Install PyYAML in the Python environment used to run the helper. |
 | `ERROR category=preflight_failed` | No migration write occurred. Confirm the endpoint IDs are visible to the selected Keystone project and that no transfer or deployment already uses the notes value. Resolve the existing run instead of bypassing duplicate protection. |
 | `ERROR category=post_ambiguous` | A create request could not be confirmed. Inspect the UI for objects with the unique notes before deciding what happened. Do not blindly retry a POST request. |
 | A transient network error while polling | Polling GET requests tolerate up to three consecutive transient network failures. If the helper stops, verify appliance connectivity and the object state before running anything again. |

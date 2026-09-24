@@ -35,6 +35,11 @@ import urllib.parse
 import urllib.request
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 HTTP_REQUEST_TIMEOUT: int = 30
 DEFAULT_TIMEOUT: int = 1800
 DEFAULT_POLL_INTERVAL: int = 10
@@ -173,55 +178,13 @@ def validate_config(raw: object) -> Dict[str, Dict[str, Any]]:
     return {"transfer": transfer, "execution": execution}
 
 
-def strip_json_comments(text: str) -> str:
-    """Remove JSONC comments while leaving string contents unchanged."""
-    result: List[str] = []
-    index = 0
-    in_string = False
-    while index < len(text):
-        character = text[index]
-        if in_string:
-            result.append(character)
-            if character == "\\":
-                index += 1
-                if index < len(text):
-                    result.append(text[index])
-            elif character == '"':
-                in_string = False
-        elif character == '"':
-            in_string = True
-            result.append(character)
-        elif character == "/" and index + 1 < len(text):
-            next_character = text[index + 1]
-            if next_character == "/":
-                result.append(" ")
-                index += 2
-                while index < len(text) and text[index] not in "\r\n":
-                    index += 1
-                continue
-            if next_character == "*":
-                result.append(" ")
-                index += 2
-                while index + 1 < len(text) and text[index:index + 2] != "*/":
-                    if text[index] in "\r\n":
-                        result.append(text[index])
-                    index += 1
-                if index + 1 >= len(text):
-                    raise ValueError("unterminated JSONC comment")
-                index += 1
-            else:
-                result.append(character)
-        else:
-            result.append(character)
-        index += 1
-    return "".join(result)
-
-
 def load_config_file(path: str) -> object:
+    if yaml is None:
+        raise MigrationError("dependency_missing")
     try:
         with open(path, "r", encoding="utf-8") as handle:
-            return json.loads(strip_json_comments(handle.read()))
-    except (OSError, ValueError):
+            return yaml.safe_load(handle)
+    except (OSError, UnicodeError, ValueError, yaml.YAMLError):
         raise MigrationError("config_invalid")
 
 
@@ -596,7 +559,7 @@ def build_parser() -> argparse.ArgumentParser:
              "(HTTPS; requires --allow-http for development HTTP).")
     parser.add_argument(
         "--config", required=True,
-        help="Path to the JSON or JSONC migration configuration.")
+        help="Path to the YAML migration configuration.")
     parser.add_argument(
         "--validate-config", action="store_true",
         help="Validate the configuration without starting a migration.")
@@ -649,7 +612,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         emit("ERROR category=%s http_status=%s"
              % (error.category, error.http_status))
         if error.category.startswith("config_") or error.category in (
-                "missing_password",):
+                "dependency_missing", "missing_password"):
             return EXIT_CONFIG_ERROR
         return EXIT_FAILURE
     except Exception:
