@@ -39,12 +39,9 @@ The helper requires two saved, validated endpoints. Create the source endpoint f
 !!! danger "This is a real migration"
     The run creates cloud resources, can shut down the source instance, and can deploy a destination instance. Use a disposable fixture only.
 
-### :material-application-edit-outline: Download And Configure
+### :material-application-edit-outline: Configuration
 
-In a local working directory, download these two files:
-
-- Download [coriolis-headless-migration.py](assets/scripts/coriolis-headless-migration.py).
-- Download [headless-migration.yaml](assets/manifests/headless-migration.yaml).
+In a local working directory, create these two files using the content below:
 
 ??? quote "coriolis-headless-migration.py"
 
@@ -62,7 +59,7 @@ The included YAML contains the currently validated values provisioned in [Source
 
 Install PyYAML in the Python environment that runs the helper:
 
-<!-- Install the YAML dependency for the downloaded helper. -->
+<!-- Install the YAML dependency for the helper. -->
 ```bash
 python3 -m pip install PyYAML
 ```
@@ -75,7 +72,7 @@ python3 -m pip install PyYAML
 
 Validate the completed YAML file locally before making API calls:
 
-<!-- Validate the completed YAML file with the downloaded helper. -->
+<!-- Validate the completed YAML file with the helper. -->
 ```bash
 python3 coriolis-headless-migration.py --config headless-migration.yaml --validate-config
 ```
