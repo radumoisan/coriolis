@@ -736,6 +736,9 @@ class ManifestTestCase(unittest.TestCase):
             "b480e10c-edc9-400a-8b70-49883cb68392")
         self.assertEqual(destination["migr_network"],
                          "coriolis-destination-net")
+        self.assertEqual(destination["migr_flavor_name"], "coriolis-worker")
+        self.assertFalse(destination["migr_worker_boot_from_volume"])
+        self.assertNotIn("migr_worker_volume_type", destination)
         self.assertEqual(
             destination["migr_fip_pool_name"],
             "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c")

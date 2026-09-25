@@ -19,14 +19,14 @@ transfer:
       linux: "b480e10c-edc9-400a-8b70-49883cb68392"
     # Provider network option validated for the temporary migration worker.
     migr_network: "coriolis-destination-net"
-    # Validated flavor for the temporary migration worker.
-    migr_flavor_name: "c1.small"
+    # Validated private flavor for the temporary migration worker.
+    migr_flavor_name: "coriolis-worker"
+    # Boot the worker image directly on the flavor root disk.
+    migr_worker_boot_from_volume: false
     # Give the temporary worker a floating IP.
     migr_worker_use_fip: true
     # Validated floating-IP pool for the temporary worker.
     migr_fip_pool_name: "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c"
-    # Worker volume type; __DEFAULT__ permits destination placement.
-    migr_worker_volume_type: "__DEFAULT__"
     # Validated security group for the temporary migration worker.
     security_groups:
       - "coriolis-worker-sg"

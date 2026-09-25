@@ -205,6 +205,48 @@ openstack quota set \
 
 The `admin` membership makes the project available in Horizon's project selector. Continue to use the dedicated `coriolis` user, not `admin`, for Coriolis endpoints.
 
+### :material-application-edit-outline: Destination Worker Flavor
+
+Public flavors have a zero root disk, and destination Nova policy does not permit the endpoint user to direct-image-boot them. The private project-scoped `coriolis-worker` flavor provides an 8 GiB root disk for temporary workers.
+
+<!-- Create the private destination worker flavor and print its ID. -->
+```bash
+# Create the private destination worker flavor and print its ID.
+openstack flavor create coriolis-worker --private \
+  --project 6686f045c51b4f1da7b9742dbe9622cd \
+  --vcpus 2 --ram 4096 --disk 8 --ephemeral 0 --swap 0 \
+  --property architecture=x86_64 -f value -c id
+```
+
+??? example "Expected result"
+
+    ```text
+    6d8ebcdc-6dc7-41c0-a4d5-943aea3d0c3e
+    ```
+
+<!-- Verify the private worker flavor and its project access. -->
+```bash
+# Verify the private worker flavor and its project access.
+openstack flavor show 6d8ebcdc-6dc7-41c0-a4d5-943aea3d0c3e -f yaml \
+  -c id -c name -c ram -c vcpus -c disk -c properties \
+  -c os-flavor-access:is_public -c access_project_ids
+```
+
+??? example "Expected result"
+
+    ```yaml
+    access_project_ids:
+    - 6686f045c51b4f1da7b9742dbe9622cd
+    disk: 8
+    id: 6d8ebcdc-6dc7-41c0-a4d5-943aea3d0c3e
+    name: coriolis-worker
+    os-flavor-access:is_public: false
+    properties:
+      architecture: x86_64
+    ram: 4096
+    vcpus: 2
+    ```
+
 ### :material-application-edit-outline: Validated Connection Values
 
 | Parameter | Value (source) | Value (destination) |
@@ -219,7 +261,7 @@ The `admin` membership makes the project available in Horizon's project selector
 | Identity API version | `3` | `3` |
 | Glance API version | `2` | `2` |
 
-Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image, and `__DEFAULT__` volume type.
+Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image, and `__DEFAULT__` volume type. The destination `coriolis` endpoint user can also resolve the private `coriolis-worker` flavor (`6d8ebcdc-6dc7-41c0-a4d5-943aea3d0c3e`) for direct image boot.
 
 !!! warning
     Unified project quotas cap Nova, Neutron, and Cinder resources but do not enforce a Swift byte quota in this environment. Use the demo project only for migration-related object storage and monitor its usage separately.
@@ -541,7 +583,7 @@ Never make the external network globally shared. This RBAC policy grants `access
 | Source workload | `coriolis-source-boot` (`596f5c90-13bf-4773-97ec-33384873e94e`), 8 GiB, `__DEFAULT__`, bootable at `/dev/vda`; `coriolis-source-vm` (`deb91e29-7901-466c-b799-90d439145ab6`), `ACTIVE`, `c1.small`, `192.168.240.196`, default security group, config drive, one volume; marker `CORIOLIS_SOURCE_MARKER=coriolis-source-fixture`; no router or floating IP. |
 | Destination project | `6686f045c51b4f1da7b9742dbe9622cd`; `coriolis-destination-net` (`8f3f9804-e2f0-48ec-a9a9-d78a98234a69`), `coriolis-destination-subnet` (`b8b4dc44-9b53-444a-8b9e-281e6ec29351`), `192.168.241.0/24`, gateway `192.168.241.1`, DHCP, DNS `1.1.1.1`. |
 | Destination access | Router `coriolis-destination-router` (`dac8f647-763d-4c31-be0c-fadea00e469c`) uses external network `ext_net_gts` (`c5815350-3a4c-4a6a-a567-db9f0d6e5a19`) and external subnet `08e4c993-ad01-49fe-ada4-050f7339984c`; floating-IP payload `c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c`. |
-| Destination worker | `coriolis-worker-sg` (`5f10c045-785c-4003-93a9-4b3527787da9`) with TCP/22 rule `1bbc103d-f302-4d0b-8710-fe42b7b057cd` from `89.34.101.238/32`; `coriolis-worker-key` fingerprint `66:12:9c:d6:3c:bd:c3:60:2e:60:dc:16:ad:ca:06:35`, private key `.openstack/coriolis-worker-key.pem` mode `0600`; destination image `b480e10c-edc9-400a-8b70-49883cb68392`, flavor `c1.small`, volume type `__DEFAULT__`. |
+| Destination worker | `coriolis-worker-sg` (`5f10c045-785c-4003-93a9-4b3527787da9`) with TCP/22 rule `1bbc103d-f302-4d0b-8710-fe42b7b057cd` from `89.34.101.238/32`; `coriolis-worker-key` fingerprint `66:12:9c:d6:3c:bd:c3:60:2e:60:dc:16:ad:ca:06:35`, private key `.openstack/coriolis-worker-key.pem` mode `0600`; destination image `b480e10c-edc9-400a-8b70-49883cb68392`; private flavor `coriolis-worker` (`6d8ebcdc-6dc7-41c0-a4d5-943aea3d0c3e`), 2 vCPUs, 4096 MiB RAM, 8 GiB root disk, `architecture=x86_64`, for direct image boot. |
 | Scoped sharing | RBAC policy `955f7fe7-596c-4aff-98fb-14877d442fb6`, `access_as_shared`, network `c5815350-3a4c-4a6a-a567-db9f0d6e5a19`, target project `6686f045c51b4f1da7b9742dbe9622cd`. |
 
 These validated values feed the [headless configuration](assets/manifests/headless-migration.yaml), including source and destination resource mappings.

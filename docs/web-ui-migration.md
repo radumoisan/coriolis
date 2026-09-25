@@ -19,11 +19,11 @@ This second phase follows [Reset Before Repeating In The Web UI](headless-migrat
    **Expected outcome:** the destination cloud step appears with the instance inventory (disks and NICs) loaded.
 6. On the destination cloud step, pick `destination-openstack` from its **Select** dropdown and click **Next**.
    **Expected outcome:** the target options step appears.
-7. In the simple target options set: a unique **Title** (this run's notes), **Migration Flavor** `c1.small` (a searchable field), the Linux entry of the **Migration Image Map** to `ubuntu-24.04`, and **Migration Network** to `coriolis-destination-net`.
+7. In the simple target options set: a unique **Title** (this run's notes), **Migration Flavor** `coriolis-worker` (a searchable field), the Linux entry of the **Migration Image Map** to `ubuntu-24.04`, and **Migration Network** to `coriolis-destination-net`.
    **Expected outcome:** the form accepts every worker field.
-8. Expand the target options **Advanced** section. Set **Keypair Name** to `coriolis-worker-key`, **Security Groups** to `coriolis-worker-sg`, **Floating IP Pool** and **Migration Floating IP Pool Name** to `ext_net_gts/ext_subnet_gts`, and **Migration Worker Volume Type** to `__DEFAULT__`. Choose the IPv4 pool entry, not the IPv6 one.
+8. Expand the target options **Advanced** section. Set **Keypair Name** to `coriolis-worker-key`, **Security Groups** to `coriolis-worker-sg`, and **Floating IP Pool** and **Migration Floating IP Pool Name** to `ext_net_gts/ext_subnet_gts`. Choose the IPv4 pool entry, not the IPv6 one.
    **Expected outcome:** every advanced field is accepted and each pool selection resolves to an IPv4 network/subnet label.
-9. Set the tri-state toggles: both **Use Floating IP** and **Migration Worker Use FIP** to **Yes**, and **Preserve Fixed IPs** to **No**. The switch reads left = No, middle = not set, right = Yes; verify each displayed value, then click **Next**.
+9. Set the tri-state toggles: both **Use Floating IP** and **Migration Worker Use FIP** to **Yes**, and **Migration Worker Boot From Volume** and **Preserve Fixed IPs** to **No**. The switch reads left = No, middle = not set, right = Yes; verify each displayed value, then click **Next**.
    **Expected outcome:** each toggle's visible text matches its intended value.
 10. On the networks step, map `coriolis-source-net` to `coriolis-destination-net`; no interface may be left unmapped.
     **Expected outcome:** each source network has a destination mapping.
