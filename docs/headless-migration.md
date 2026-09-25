@@ -1,6 +1,6 @@
 # Phase 1: Headless Migration
 
-This tutorial creates one real Coriolis live migration from the command line. The helper reads a configuration file, receives the Keystone password on standard input, validates its URLs, configuration, and saved endpoints, creates one transfer and execution, and polls them to completion. When auto-deploy is enabled, it also finds and follows the correlated deployment. It deliberately performs no cleanup.
+This tutorial creates one real Coriolis live migration from the command line. The helper reads a configuration file and the Keystone password from `CORIOLIS_KEYSTONE_PASSWORD` (with standard input as a fallback), validates its URLs, configuration, and saved endpoints, creates one transfer and execution, and polls them to completion. When auto-deploy is enabled, it also finds and follows the correlated deployment. It deliberately performs no cleanup.
 
 ## :material-book-open-page-variant-outline: Create Source And Destination Endpoints
 
@@ -55,7 +55,9 @@ In a local working directory, create these two files using the content below:
     --8<-- "assets/manifests/headless-migration.yaml"
     ```
 
-The included YAML contains the currently validated values provisioned in [Source Fixture](openstack-provider.md#source-fixture) and [Destination Resources](openstack-provider.md#destination-resources). `headless-real-migration` is currently unused, but change `transfer.notes` before a later independent rerun if an existing transfer or deployment remains. Keep `skip_os_morphing` enabled only for the known-compatible disposable fixture.
+- The YAML is prefilled with the resource names and IDs created in the linked source and destination setup sections.
+- `transfer.notes: headless-real-migration` identifies this migration. It is unused now, but after running a migration, use a different value for another run unless the previous transfer and deployment were removed.
+- `skip_os_morphing: true` skips guest OS adaptation. Keep it enabled only for this tested disposable VM; other workloads may require OS morphing.
 
 Install PyYAML in the Python environment that runs the helper:
 
@@ -87,11 +89,31 @@ python3 coriolis-headless-migration.py --config headless-migration.yaml --valida
 
 The appliance `admin` user in the `admin` project owns the saved endpoint objects, so the helper authenticates in that same Keystone scope.
 
-The password is read through standard input rather than placed in a command argument, shell history, or configuration file.
+The helper reads `CORIOLIS_KEYSTONE_PASSWORD`; the password is not placed in command arguments, configuration, or command history.
 
-<!-- Pipe the Keystone password into the helper without exposing it in the command line. -->
+<!-- Store and export the decoded Keystone password for the helper. -->
 ```bash
-kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d | python3 coriolis-headless-migration.py --api-base "https://coriolis.app.cloudbase.wiki/coriolis" --keystone-base "https://coriolis.app.cloudbase.wiki/identity" --username admin --project-name admin --config headless-migration.yaml --timeout 1800 --poll-interval 10 --run
+export CORIOLIS_KEYSTONE_PASSWORD="$(
+  kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d
+)"
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Run the migration with the exported Keystone password. -->
+```bash
+python3 coriolis-headless-migration.py \
+    --api-base "https://coriolis.app.cloudbase.wiki/coriolis" \
+    --keystone-base "https://coriolis.app.cloudbase.wiki/identity" \
+    --username admin --project-name admin \
+    --config headless-migration.yaml \
+    --timeout 1800 \
+    --poll-interval 10 \
+    --run
 ```
 
 ??? example "Expected result"
@@ -104,9 +126,27 @@ kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-applianc
     SUMMARY headless-migration passed
     ```
 
-`--run` is an explicit acknowledgement that the command writes to both clouds. `--timeout 1800` allows up to 30 minutes for each polling phase, rather than imposing a 30-minute limit on the whole run. `--poll-interval 10` checks progress every 10 seconds. With `auto_deploy` enabled, success includes the correlated deployment; without it, the helper stops after the transfer execution completes.
+!!! note ""
+    `--run` is an explicit acknowledgement that the command writes to both clouds.
+
+    `--timeout 1800` allows up to 30 minutes for each polling phase, rather than imposing a 30-minute limit on the whole run.
+
+    `--poll-interval 10` checks progress every 10 seconds.
 
 The output contains fixed status lines and never prints the password, token, request payload, or error body. Keep the reported object IDs for observation. The helper does not clean up the transfer, execution, deployment, or cloud resources.
+
+After the helper finishes, remove the password from the current shell:
+
+<!-- Remove the Keystone password from the current shell. -->
+```bash
+unset CORIOLIS_KEYSTONE_PASSWORD
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
 
 ## :material-book-open-page-variant-outline: Observe The Headless Result
 
@@ -151,8 +191,9 @@ Check the workload marker, disks, and networking even when cloud-init reports `d
 
 | Symptom | Response |
 | --- | --- |
-| `ERROR category=config_unresolved_placeholder` | The published YAML has no placeholders. Remove placeholders introduced by local edits, or redownload the file, then run the local validation command again. |
+| `ERROR category=config_unresolved_placeholder` | The published YAML has no placeholders. Remove placeholders introduced by local edits, or restore or copy the included YAML content, then run the local validation command again. |
 | `ERROR category=dependency_missing` | Install PyYAML in the Python environment used to run the helper. |
+| `ERROR category=missing_password` | Set `CORIOLIS_KEYSTONE_PASSWORD`, or supply the password through the standard-input fallback. |
 | `ERROR category=preflight_failed` | No migration write occurred. Confirm the provisioned fixture and saved endpoints still exist, the endpoint IDs are visible to the selected Keystone project, and no transfer or deployment already uses the notes value. Resolve the existing run instead of bypassing duplicate protection. |
 | `ERROR category=post_ambiguous` | A create request could not be confirmed. Inspect the UI for objects with the unique notes before deciding what happened. Do not blindly retry a POST request. |
 | A transient network error while polling | Polling GET requests tolerate up to three consecutive transient network failures. If the helper stops, verify appliance connectivity and the object state before running anything again. |

@@ -12,8 +12,9 @@ resource paths and never duplicates version segments. This helper only:
 1. Authenticates to the appliance Keystone. The '--username' and
    '--project-name' arguments select the authentication user and the
    project scope (defaulting to the 'coriolis' service user in the
-   'service' project). The password is read from stdin and is never
-   printed or stored beyond the single authentication request.
+    'service' project). The password is read first from a non-empty
+    'CORIOLIS_KEYSTONE_PASSWORD' environment variable, falling back to
+    stdin. It is never printed or passed in a command argument.
 2. Preflights the configured endpoint IDs and transfer uniqueness.
 3. Creates one Transfer and starts one execution.
 4. Polls the exact execution to a terminal state and, when
@@ -27,6 +28,7 @@ safe messages are printed (never tokens, payloads, or error bodies).
 
 import argparse
 import json
+import os
 import re
 import sys
 import time
@@ -45,6 +47,7 @@ DEFAULT_TIMEOUT: int = 1800
 DEFAULT_POLL_INTERVAL: int = 10
 DEFAULT_USERNAME: str = "coriolis"
 DEFAULT_PROJECT_NAME: str = "service"
+CORIOLIS_KEYSTONE_PASSWORD_ENV: str = "CORIOLIS_KEYSTONE_PASSWORD"
 # GET-only polling reads may tolerate a small number of consecutive
 # transient network failures before giving up. POST/write requests and
 # non-network API errors are never retried.
@@ -197,6 +200,13 @@ def read_password_from_stdin() -> str:
     if not password:
         raise MigrationError("missing_password")
     return password
+
+
+def read_password() -> str:
+    password = os.environ.get(CORIOLIS_KEYSTONE_PASSWORD_ENV, "").strip()
+    if password:
+        return password
+    return read_password_from_stdin()
 
 
 class CoriolisClient:
@@ -514,7 +524,7 @@ def run_migration(args: argparse.Namespace) -> int:
     config = validate_config(load_config_file(args.config))
     transfer = config["transfer"]
     execution = config["execution"]
-    password = read_password_from_stdin()
+    password = read_password()
     client = CoriolisClient(
         api_base, keystone_base, args.username, args.project_name)
     client.authenticate(password)

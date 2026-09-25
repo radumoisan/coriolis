@@ -170,7 +170,7 @@ def success_routes(transfer_id="transfer-1", execution_statuses=None,
 
 class HelperTestCase(unittest.TestCase):
     def run_cli(self, config, routes, argv=None, sleep=None,
-                monotonic=None):
+                monotonic=None, stdin=None, environment=None):
         with tempfile.NamedTemporaryFile(
                 "w", suffix=".yaml", delete=False) as handle:
             json.dump(config, handle)
@@ -186,12 +186,16 @@ class HelperTestCase(unittest.TestCase):
                 "--poll-interval", "1",
                 "--run",
             ]
-        stdin = mock.Mock(buffer=io.BytesIO(b"service-password\n"))
+        if stdin is None:
+            stdin = mock.Mock(buffer=io.BytesIO(b"service-password\n"))
+        if environment is None:
+            environment = {}
         stdout = io.StringIO()
         patches = [
             mock.patch.object(urllib.request, "urlopen", recorder),
             mock.patch("time.sleep", sleep or (lambda seconds: None)),
             mock.patch.object(sys, "stdin", stdin),
+            mock.patch.dict(os.environ, environment, clear=True),
             contextlib.redirect_stdout(stdout),
         ]
         if monotonic is not None:
@@ -219,6 +223,50 @@ class HelperTestCase(unittest.TestCase):
         self.assertEqual(
             recorder.calls.count(
                 ("GET", PROJECT_PATH + "/deployments")), 2)
+
+    def test_environment_password_is_used_without_reading_stdin(self):
+        password = "environment-service-password"
+        stdin = mock.Mock()
+        code, out, recorder = self.run_cli(
+            valid_config(), success_routes(), stdin=stdin,
+            environment={
+                HELPER.CORIOLIS_KEYSTONE_PASSWORD_ENV: "  %s\n" % password,
+            })
+        self.assertEqual(code, 0)
+        stdin.buffer.read.assert_not_called()
+        auth = recorder.bodies[("POST", AUTH_PATH)][0]["auth"]
+        self.assertEqual(
+            auth["identity"]["password"]["user"]["password"], password)
+        self.assertNotIn(password, out)
+
+    def test_stdin_password_fallback_when_environment_is_absent_or_blank(self):
+        for environment in ({}, {
+                HELPER.CORIOLIS_KEYSTONE_PASSWORD_ENV: " \t\n"}):
+            with self.subTest(environment=environment):
+                stdin = mock.Mock()
+                stdin.buffer.read.return_value = b"stdin-password\n"
+                code, out, recorder = self.run_cli(
+                    valid_config(), success_routes(), stdin=stdin,
+                    environment=environment)
+                self.assertEqual(code, 0)
+                stdin.buffer.read.assert_called_once_with()
+                auth = recorder.bodies[("POST", AUTH_PATH)][0]["auth"]
+                self.assertEqual(
+                    auth["identity"]["password"]["user"]["password"],
+                    "stdin-password")
+                self.assertNotIn("stdin-password", out)
+
+    def test_missing_password_when_environment_and_stdin_are_empty(self):
+        stdin = mock.Mock()
+        stdin.buffer.read.return_value = b" \n"
+        code, out, recorder = self.run_cli(
+            valid_config(), success_routes(), stdin=stdin,
+            environment={HELPER.CORIOLIS_KEYSTONE_PASSWORD_ENV: "\t"})
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            out, "ERROR category=missing_password http_status=none\n")
+        stdin.buffer.read.assert_called_once_with()
+        self.assertEqual(recorder.calls, [])
 
     def test_validate_config_succeeds_without_stdin_or_network(self):
         with tempfile.NamedTemporaryFile(
@@ -311,6 +359,7 @@ class HelperTestCase(unittest.TestCase):
             stack.enter_context(mock.patch(
                 "time.sleep", lambda seconds: None))
             stack.enter_context(mock.patch.object(sys, "stdin", stdin))
+            stack.enter_context(mock.patch.dict(os.environ, {}, clear=True))
             stack.enter_context(contextlib.redirect_stdout(stdout))
             code = HELPER.main(argv)
         self.assertEqual(code, 0)
