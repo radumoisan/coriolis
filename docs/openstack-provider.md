@@ -194,7 +194,7 @@ openstack quota set \
   --volumes 2 --gigabytes 40 --per-volume-gigabytes 20 --snapshots 1 \
   --backups 0 --backup-gigabytes 0 \
   --networks 1 --subnets 1 --ports 6 --routers 1 --floating-ips 2 \
-  --secgroups 2 --secgroup-rules 20 coriolis
+  --secgroups 3 --secgroup-rules 20 coriolis
 ```
 
 ??? example "Expected result"
@@ -202,6 +202,8 @@ openstack quota set \
     ```text
     No output.
     ```
+
+The destination quota reserves the project's `default`, the fixture `coriolis-worker-sg` assigned to the migrated VM, and Coriolis's temporary worker-specific group.
 
 The `admin` membership makes the project available in Horizon's project selector. Continue to use the dedicated `coriolis` user, not `admin`, for Coriolis endpoints.
 
