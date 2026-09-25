@@ -1,46 +1,46 @@
 transfer:
-  # Unique label; no existing transfer or deployment may use it.
-  notes: "<UNIQUE_TRANSFER_NOTES>"
+  # Change this before a later independent rerun after an existing transfer or deployment remains.
+  notes: "headless-real-migration"
   # Required Coriolis live-migration scenario.
   scenario: "live_migration"
-  # Source endpoint UUID from the Web UI.
-  origin_endpoint_id: "<SOURCE_ENDPOINT_ID>"
-  # Destination endpoint UUID from the Web UI.
-  destination_endpoint_id: "<DESTINATION_ENDPOINT_ID>"
-  # Source fixture instance UUID.
+  # Validated source endpoint UUID.
+  origin_endpoint_id: "593a32db-5eeb-442d-83a1-2ec9f8045865"
+  # Validated destination endpoint UUID.
+  destination_endpoint_id: "732224c5-a451-4e09-a38f-fb70bca924c6"
+  # Validated source fixture instance UUID.
   instances:
-    - "<SOURCE_INSTANCE_ID>"
+    - "deb91e29-7901-466c-b799-90d439145ab6"
   source_environment:
     # Use the verified Swift backup export path.
     replica_export_mechanism: "swift_backups"
   destination_environment:
     migr_image_map:
-      # Linux image for the temporary migration worker.
-      linux: "<WORKER_LINUX_IMAGE_ID>"
-    # Network for the temporary migration worker.
-    migr_network: "<WORKER_NETWORK_ID>"
-    # Flavor for the temporary migration worker.
-    migr_flavor_name: "<WORKER_FLAVOR_NAME>"
+      # Validated Linux image for the temporary migration worker.
+      linux: "b480e10c-edc9-400a-8b70-49883cb68392"
+    # Provider network option validated for the temporary migration worker.
+    migr_network: "coriolis-destination-net"
+    # Validated flavor for the temporary migration worker.
+    migr_flavor_name: "c1.small"
     # Give the temporary worker a floating IP.
     migr_worker_use_fip: true
-    # Floating-IP pool for the temporary worker.
-    migr_fip_pool_name: "<WORKER_FLOATING_IP_POOL>"
+    # Validated floating-IP pool for the temporary worker.
+    migr_fip_pool_name: "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c"
     # Worker volume type; __DEFAULT__ permits destination placement.
     migr_worker_volume_type: "__DEFAULT__"
-    # Security group for the temporary migration worker.
+    # Validated security group for the temporary migration worker.
     security_groups:
-      - "<WORKER_SECURITY_GROUP_NAME>"
-    # Keypair for the temporary migration worker.
-    keypair_name: "<WORKER_KEYPAIR_NAME>"
+      - "coriolis-worker-sg"
+    # Validated keypair for the temporary migration worker.
+    keypair_name: "coriolis-worker-key"
     # Give the deployed destination instance a floating IP.
     use_floating_ip: true
-    # Floating-IP pool for the deployed destination instance.
-    floating_ip_pool: "<DESTINATION_FLOATING_IP_POOL>"
+    # Validated floating-IP pool for the deployed destination instance.
+    floating_ip_pool: "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c"
     # Do not preserve source fixed IPs on the destination.
     preserve_fixed_ips: false
   network_map:
-    # Map each source NIC network name to a destination network ID.
-    "<SOURCE_NETWORK_NAME>": "<DESTINATION_NETWORK_ID>"
+    # Map the validated source NIC network to the destination network ID.
+    "coriolis-source-net": "8f3f9804-e2f0-48ec-a9a9-d78a98234a69"
   storage_mappings:
     # Let the destination choose disk placement.
     default: "__DEFAULT__"

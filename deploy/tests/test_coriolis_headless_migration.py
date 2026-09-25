@@ -6,7 +6,6 @@ import importlib.util
 import io
 import json
 import os
-import re
 import sys
 import tempfile
 import unittest
@@ -70,21 +69,6 @@ def valid_config():
         },
         "execution": {"shutdown_instances": True, "auto_deploy": True},
     }
-
-
-def fill_placeholders(value):
-    """Replace every <...> placeholder string with a unique literal."""
-    if isinstance(value, str):
-        match = HELPER.PLACEHOLDER_PATTERN.fullmatch(value)
-        if match:
-            return "filled-" + value[1:-1].lower()
-        return value
-    if isinstance(value, dict):
-        return {fill_placeholders(key): fill_placeholders(item)
-                for key, item in value.items()}
-    if isinstance(value, list):
-        return [fill_placeholders(item) for item in value]
-    return value
 
 
 class FakeResponse:
@@ -259,7 +243,8 @@ class HelperTestCase(unittest.TestCase):
         self.assertEqual(recorder.calls, [])
 
     def test_validate_config_rejects_invalid_and_unresolved_configs(self):
-        unresolved = HELPER.load_config_file(MANIFEST_PATH)
+        unresolved = valid_config()
+        unresolved["transfer"]["notes"] = "<UNRESOLVED_NOTES>"
         for config, category in (({}, "config_invalid"), (
                 unresolved, "config_unresolved_placeholder")):
             with self.subTest(category=category), tempfile.NamedTemporaryFile(
@@ -368,7 +353,8 @@ class HelperTestCase(unittest.TestCase):
             execution_posts, [{"execution": config["execution"]}])
 
     def test_unresolved_placeholder_rejected_before_network(self):
-        config = HELPER.load_config_file(MANIFEST_PATH)
+        config = valid_config()
+        config["transfer"]["notes"] = "<UNRESOLVED_NOTES>"
         code, out, recorder = self.run_cli(config, success_routes())
         self.assertNotEqual(code, 0)
         self.assertEqual(recorder.calls, [])
@@ -662,47 +648,58 @@ execution:
 
 
 class ManifestTestCase(unittest.TestCase):
-    def test_manifest_validates_once_placeholders_are_filled(self):
-        raw = HELPER.load_config_file(MANIFEST_PATH)
-        filled = fill_placeholders(raw)
-        config = HELPER.validate_config(filled)
+    def test_manifest_validates_directly(self):
+        config = HELPER.validate_config(HELPER.load_config_file(MANIFEST_PATH))
         transfer = config["transfer"]
         self.assertEqual(transfer["scenario"], "live_migration")
         self.assertTrue(transfer["clone_disks"])
         self.assertTrue(transfer["skip_os_morphing"])
-        self.assertTrue(raw["execution"]["auto_deploy"])
-        self.assertTrue(raw["execution"]["shutdown_instances"])
+        self.assertTrue(config["execution"]["auto_deploy"])
+        self.assertTrue(config["execution"]["shutdown_instances"])
         self.assertEqual(
-            raw["transfer"]["source_environment"][
+            transfer["source_environment"][
                 "replica_export_mechanism"], "swift_backups")
         self.assertEqual(
-            raw["transfer"]["storage_mappings"]["default"], "__DEFAULT__")
+            transfer["storage_mappings"]["default"], "__DEFAULT__")
 
-    def test_manifest_contains_no_secrets_or_historical_ids(self):
+    def test_manifest_contains_current_values_without_placeholders_or_secrets(self):
         with open(MANIFEST_PATH, "r", encoding="utf-8") as handle:
             text = handle.read()
-        self.assertIsNone(
-            UUID_PATTERN.search(text),
-            "example must not embed historical UUID identifiers")
-        for historical in ("c09be736", "0067286c", "2d4a485c",
-                           "b480e10c", "8b1d447d", "c5815350",
-                           "08e4c993", "coriolis-m7", "ext_net_gts",
-                           "rbd1"):
-            self.assertNotIn(historical, text)
+        self.assertNotIn("<", text)
+        self.assertNotIn(">", text)
         lowered = text.lower()
         for secret_word in ("password", "secret", "token"):
             self.assertNotIn(secret_word, lowered)
+        config = HELPER.load_config_file(MANIFEST_PATH)
+        transfer = config["transfer"]
+        destination = transfer["destination_environment"]
+        self.assertEqual(transfer["notes"], "headless-real-migration")
+        self.assertEqual(
+            transfer["origin_endpoint_id"],
+            "593a32db-5eeb-442d-83a1-2ec9f8045865")
+        self.assertEqual(
+            transfer["destination_endpoint_id"],
+            "732224c5-a451-4e09-a38f-fb70bca924c6")
+        self.assertEqual(
+            transfer["instances"], ["deb91e29-7901-466c-b799-90d439145ab6"])
+        self.assertEqual(
+            destination["migr_image_map"]["linux"],
+            "b480e10c-edc9-400a-8b70-49883cb68392")
+        self.assertEqual(destination["migr_network"],
+                         "coriolis-destination-net")
+        self.assertEqual(
+            destination["migr_fip_pool_name"],
+            "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c")
+        self.assertEqual(
+            destination["floating_ip_pool"],
+            "c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c")
+        self.assertEqual(destination["security_groups"], ["coriolis-worker-sg"])
+        self.assertEqual(destination["keypair_name"], "coriolis-worker-key")
 
     def test_downloadable_helper_matches_runtime_helper(self):
         with open(HELPER_PATH, "rb") as runtime, \
                 open(DOWNLOAD_PATH, "rb") as downloadable:
             self.assertEqual(downloadable.read(), runtime.read())
-
-
-UUID_PATTERN = re.compile(
-    r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
-    r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
-
 
 if __name__ == "__main__":
     unittest.main()

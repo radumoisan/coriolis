@@ -224,6 +224,328 @@ Both projects can see the public `c1.small` flavor, public `ubuntu-24.04` image,
 !!! warning
     Unified project quotas cap Nova, Neutron, and Cinder resources but do not enforce a Swift byte quota in this environment. Use the demo project only for migration-related object storage and monitor its usage separately.
 
+### :material-application-edit-outline: Source Fixture
+
+!!! warning
+    The following commands create stateful resources. Record the returned IDs and do not rerun creation commands blindly against existing resources.
+
+The source fixture is volume-backed and uses a config drive for cloud-init. It has no router or floating IP because the `swift_backups` export path needs Cinder and Swift APIs, not SSH access to the source guest.
+
+[Download `coriolis-source-cloud-init.yaml`](assets/manifests/coriolis-source-cloud-init.yaml){ download="coriolis-source-cloud-init.yaml" }
+
+??? quote "coriolis-source-cloud-init.yaml"
+
+    ```yaml
+    --8<-- "assets/manifests/coriolis-source-cloud-init.yaml"
+    ```
+
+<!-- Load the local Coriolis project passwords. -->
+```bash
+# Load the local Coriolis project passwords.
+source .openstack/coriolis-passwords.env
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Load source-project credentials. -->
+```bash
+# Load source-project credentials.
+source .openstack/coriolis-openrc-source.sh
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Create the isolated source network in project be3c7405df8149bc84e65217576c1dd4. -->
+```bash
+# Create the isolated source network in project be3c7405df8149bc84e65217576c1dd4.
+openstack network create -f value -c id coriolis-source-net
+```
+
+??? example "Expected result"
+
+    ```text
+    3297153b-5c2b-44fc-8f0f-02fc0b92db73
+    ```
+
+<!-- Create the DHCP-enabled source subnet. -->
+```bash
+# Create the DHCP-enabled source subnet.
+openstack subnet create --network 3297153b-5c2b-44fc-8f0f-02fc0b92db73 --subnet-range 192.168.240.0/24 --gateway 192.168.240.1 -f value -c id coriolis-source-subnet
+```
+
+??? example "Expected result"
+
+    ```text
+    89ec32a8-93de-4b90-af24-55cf39e2882b
+    ```
+
+<!-- Create the 8 GiB bootable source volume from the validated Ubuntu image. -->
+```bash
+# Create the 8 GiB bootable source volume from the validated Ubuntu image.
+openstack volume create --bootable --size 8 --type __DEFAULT__ --image 82e26d47-c55e-4839-81aa-5b59dd8021c6 -f value -c id coriolis-source-boot
+```
+
+??? example "Expected result"
+
+    ```text
+    596f5c90-13bf-4773-97ec-33384873e94e
+    ```
+
+Wait for the volume to become `available`. Re-run this check until it reports `available` before creating the server.
+
+<!-- Check that the source volume is ready to attach. -->
+```bash
+# Check that the source volume is ready to attach.
+openstack volume show 596f5c90-13bf-4773-97ec-33384873e94e -f value -c status
+```
+
+??? example "Expected result"
+
+    ```text
+    available
+    ```
+
+<!-- Boot the source VM with its only volume, config drive, and the fixture cloud-init. -->
+```bash
+# Boot the source VM with its only volume, config drive, and the fixture cloud-init.
+openstack server create --flavor c1.small --volume 596f5c90-13bf-4773-97ec-33384873e94e --nic net-id=3297153b-5c2b-44fc-8f0f-02fc0b92db73 --security-group default --config-drive true --user-data coriolis-source-cloud-init.yaml --wait -f value -c id coriolis-source-vm
+```
+
+??? example "Expected result"
+
+    ```text
+    deb91e29-7901-466c-b799-90d439145ab6
+    ```
+
+<!-- Verify the source volume properties; attachment is verified by the server query. -->
+```bash
+# Verify the source volume properties; attachment is verified by the server query.
+openstack volume show 596f5c90-13bf-4773-97ec-33384873e94e -f yaml -c size -c type -c bootable -c status
+```
+
+??? example "Expected result"
+
+    ```yaml
+    bootable: true
+    size: 8
+    status: in-use
+    type: __DEFAULT__
+    ```
+
+<!-- Verify the source server is active with config drive and one attached boot volume. -->
+```bash
+# Verify the source server is active with config drive and one attached boot volume.
+openstack server show deb91e29-7901-466c-b799-90d439145ab6 -f yaml -c status -c addresses -c security_groups -c config_drive -c volumes_attached
+```
+
+??? example "Expected result"
+
+    ```yaml
+    addresses:
+      coriolis-source-net:
+      - 192.168.240.196
+    config_drive: 'True'
+    security_groups:
+    - name: default
+    status: ACTIVE
+    volumes_attached:
+    - delete_on_termination: false
+      id: 596f5c90-13bf-4773-97ec-33384873e94e
+    ```
+
+<!-- Verify the cloud-init marker through the Nova serial console. -->
+```bash
+# Verify the cloud-init marker through the Nova serial console.
+openstack console log show deb91e29-7901-466c-b799-90d439145ab6 | grep CORIOLIS_SOURCE_MARKER
+```
+
+??? example "Expected result"
+
+    ```text
+    CORIOLIS_SOURCE_MARKER=coriolis-source-fixture
+    ```
+
+### :material-application-edit-outline: Destination Resources
+
+The destination project provisions worker connectivity separately from the source fixture. Recheck the allowed SSH source `89.34.101.238/32` if the runtime egress address changes.
+
+<!-- Load the local Coriolis project passwords. -->
+```bash
+# Load the local Coriolis project passwords.
+source .openstack/coriolis-passwords.env
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Load destination-project credentials. -->
+```bash
+# Load destination-project credentials.
+source .openstack/coriolis-openrc-dest.sh
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Create the isolated destination network in project 6686f045c51b4f1da7b9742dbe9622cd. -->
+```bash
+# Create the isolated destination network in project 6686f045c51b4f1da7b9742dbe9622cd.
+openstack network create -f value -c id coriolis-destination-net
+```
+
+??? example "Expected result"
+
+    ```text
+    8f3f9804-e2f0-48ec-a9a9-d78a98234a69
+    ```
+
+<!-- Create the DHCP-enabled destination subnet with its resolver. -->
+```bash
+# Create the DHCP-enabled destination subnet with its resolver.
+openstack subnet create --network 8f3f9804-e2f0-48ec-a9a9-d78a98234a69 --subnet-range 192.168.241.0/24 --gateway 192.168.241.1 --dns-nameserver 1.1.1.1 -f value -c id coriolis-destination-subnet
+```
+
+??? example "Expected result"
+
+    ```text
+    b8b4dc44-9b53-444a-8b9e-281e6ec29351
+    ```
+
+<!-- Create the destination router. -->
+```bash
+# Create the destination router.
+openstack router create -f value -c id coriolis-destination-router
+```
+
+??? example "Expected result"
+
+    ```text
+    dac8f647-763d-4c31-be0c-fadea00e469c
+    ```
+
+<!-- Attach the router to the ext_net_gts external network. -->
+```bash
+# Attach the router to the ext_net_gts external network.
+openstack router set --external-gateway c5815350-3a4c-4a6a-a567-db9f0d6e5a19 --fixed-ip subnet=08e4c993-ad01-49fe-ada4-050f7339984c dac8f647-763d-4c31-be0c-fadea00e469c
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Attach the destination subnet to the router. -->
+```bash
+# Attach the destination subnet to the router.
+openstack router add subnet dac8f647-763d-4c31-be0c-fadea00e469c b8b4dc44-9b53-444a-8b9e-281e6ec29351
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Create the security group for destination worker SSH. -->
+```bash
+# Create the security group for destination worker SSH.
+openstack security group create -f value -c id coriolis-worker-sg
+```
+
+??? example "Expected result"
+
+    ```text
+    5f10c045-785c-4003-93a9-4b3527787da9
+    ```
+
+<!-- Permit SSH only from the current Coriolis runtime egress address. -->
+```bash
+# Permit SSH only from the current Coriolis runtime egress address.
+openstack security group rule create --ingress --ethertype IPv4 --protocol tcp --dst-port 22:22 --remote-ip 89.34.101.238/32 -f value -c id 5f10c045-785c-4003-93a9-4b3527787da9
+```
+
+??? example "Expected result"
+
+    ```text
+    1bbc103d-f302-4d0b-8710-fe42b7b057cd
+    ```
+
+<!-- Create the worker keypair without printing its private key. -->
+```bash
+# Create the worker keypair without printing its private key.
+openstack keypair create --private-key .openstack/coriolis-worker-key.pem -f value -c fingerprint coriolis-worker-key
+```
+
+??? example "Expected result"
+
+    ```text
+    66:12:9c:d6:3c:bd:c3:60:2e:60:dc:16:ad:ca:06:35
+    ```
+
+<!-- Restrict the generated private-key file to its owner. -->
+```bash
+# Restrict the generated private-key file to its owner.
+chmod 0600 .openstack/coriolis-worker-key.pem
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Load destination-cloud administrator credentials for the scoped external-network policy. -->
+```bash
+# Load destination-cloud administrator credentials for the scoped external-network policy.
+source .openstack/admin-openrc-dest.sh
+```
+
+??? example "Expected result"
+
+    ```text
+    No output.
+    ```
+
+<!-- Share only ext_net_gts with the destination Coriolis project. -->
+```bash
+# Share only ext_net_gts with the destination Coriolis project.
+openstack network rbac create --type network --action access_as_shared --target-project 6686f045c51b4f1da7b9742dbe9622cd -f value -c id c5815350-3a4c-4a6a-a567-db9f0d6e5a19
+```
+
+??? example "Expected result"
+
+    ```text
+    955f7fe7-596c-4aff-98fb-14877d442fb6
+    ```
+
+Never make the external network globally shared. This RBAC policy grants `access_as_shared` only to project `6686f045c51b4f1da7b9742dbe9622cd`.
+
+| Resource | Validated value |
+| --- | --- |
+| Source project | `be3c7405df8149bc84e65217576c1dd4`; `coriolis-source-net` (`3297153b-5c2b-44fc-8f0f-02fc0b92db73`), `coriolis-source-subnet` (`89ec32a8-93de-4b90-af24-55cf39e2882b`), `192.168.240.0/24`, gateway `192.168.240.1`, DHCP; image `ubuntu-24.04` (`82e26d47-c55e-4839-81aa-5b59dd8021c6`). |
+| Source workload | `coriolis-source-boot` (`596f5c90-13bf-4773-97ec-33384873e94e`), 8 GiB, `__DEFAULT__`, bootable at `/dev/vda`; `coriolis-source-vm` (`deb91e29-7901-466c-b799-90d439145ab6`), `ACTIVE`, `c1.small`, `192.168.240.196`, default security group, config drive, one volume; marker `CORIOLIS_SOURCE_MARKER=coriolis-source-fixture`; no router or floating IP. |
+| Destination project | `6686f045c51b4f1da7b9742dbe9622cd`; `coriolis-destination-net` (`8f3f9804-e2f0-48ec-a9a9-d78a98234a69`), `coriolis-destination-subnet` (`b8b4dc44-9b53-444a-8b9e-281e6ec29351`), `192.168.241.0/24`, gateway `192.168.241.1`, DHCP, DNS `1.1.1.1`. |
+| Destination access | Router `coriolis-destination-router` (`dac8f647-763d-4c31-be0c-fadea00e469c`) uses external network `ext_net_gts` (`c5815350-3a4c-4a6a-a567-db9f0d6e5a19`) and external subnet `08e4c993-ad01-49fe-ada4-050f7339984c`; floating-IP payload `c5815350-3a4c-4a6a-a567-db9f0d6e5a19/08e4c993-ad01-49fe-ada4-050f7339984c`. |
+| Destination worker | `coriolis-worker-sg` (`5f10c045-785c-4003-93a9-4b3527787da9`) with TCP/22 rule `1bbc103d-f302-4d0b-8710-fe42b7b057cd` from `89.34.101.238/32`; `coriolis-worker-key` fingerprint `66:12:9c:d6:3c:bd:c3:60:2e:60:dc:16:ad:ca:06:35`, private key `.openstack/coriolis-worker-key.pem` mode `0600`; destination image `b480e10c-edc9-400a-8b70-49883cb68392`, flavor `c1.small`, volume type `__DEFAULT__`. |
+| Scoped sharing | RBAC policy `955f7fe7-596c-4aff-98fb-14877d442fb6`, `access_as_shared`, network `c5815350-3a4c-4a6a-a567-db9f0d6e5a19`, target project `6686f045c51b4f1da7b9742dbe9622cd`. |
+
+These validated values feed the [headless configuration](assets/manifests/headless-migration.yaml), including source and destination resource mappings.
+
 ## :material-book-open-page-variant-outline: Source Disk Access
 
 - **Glance-rooted instance:** The operating system disk is created from a Glance image and normally resides on Nova-managed ephemeral storage.

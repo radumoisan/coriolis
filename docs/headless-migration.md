@@ -58,7 +58,7 @@ In a local working directory, download these two files:
     --8<-- "assets/manifests/headless-migration.yaml"
     ```
 
-The comments above each setting explain what to replace. Replace every angle-bracket placeholder before continuing. `transfer.notes` must be unique for this run; `shutdown_instances` controls whether the source is powered off after migration, and `auto_deploy` controls whether the helper creates and follows the destination deployment. Keep `skip_os_morphing` enabled only for a known-compatible disposable fixture.
+The included YAML contains the currently validated values provisioned in [Source Fixture](openstack-provider.md#source-fixture) and [Destination Resources](openstack-provider.md#destination-resources). `headless-real-migration` is currently unused, but change `transfer.notes` before a later independent rerun if an existing transfer or deployment remains. Keep `skip_os_morphing` enabled only for the known-compatible disposable fixture.
 
 Install PyYAML in the Python environment that runs the helper:
 
@@ -88,13 +88,13 @@ python3 coriolis-headless-migration.py --config headless-migration.yaml --valida
 
 ### :material-application-edit-outline: Run The Migration
 
-Replace every angle-bracket value in this command with your appliance details. The helper defaults to the `coriolis` user and `service` project; specify `--username` and `--project-name` when the endpoints are visible in a different Keystone scope. It authenticates with the `Default` user and project domains.
+The appliance `admin` user in the `admin` project owns the saved endpoint objects, so the helper authenticates in that same Keystone scope.
 
-The password is read through standard input rather than placed in a command argument, shell history, or configuration file. Use the correct password key from your appliance Secret.
+The password is read through standard input rather than placed in a command argument, shell history, or configuration file.
 
 <!-- Pipe the Keystone password into the helper without exposing it in the command line. -->
 ```bash
-kubectl -n "<appliance-namespace>" get secret "<keystone-password-secret>" -o jsonpath='{.data.<password-key>}' | base64 -d | python3 coriolis-headless-migration.py --api-base "https://<appliance-host>/coriolis" --keystone-base "https://<appliance-host>/identity" --username "<keystone-username>" --project-name "<keystone-project>" --config headless-migration.yaml --timeout 1800 --poll-interval 10 --run
+kubectl --context virt-infra-dev-buc-hq -n coriolis get secret coriolis-appliance-advanced-infrastructure-credentials -o jsonpath='{.data.keystone_admin_password}' | base64 -d | python3 coriolis-headless-migration.py --api-base "https://coriolis.app.cloudbase.wiki/coriolis" --keystone-base "https://coriolis.app.cloudbase.wiki/identity" --username admin --project-name admin --config headless-migration.yaml --timeout 1800 --poll-interval 10 --run
 ```
 
 ??? example "Expected result"
@@ -154,9 +154,9 @@ Check the workload marker, disks, and networking even when cloud-init reports `d
 
 | Symptom | Response |
 | --- | --- |
-| `ERROR category=config_unresolved_placeholder` | Replace every angle-bracket placeholder in `headless-migration.yaml`, then run the local validation command again. |
+| `ERROR category=config_unresolved_placeholder` | The published YAML has no placeholders. Remove placeholders introduced by local edits, or redownload the file, then run the local validation command again. |
 | `ERROR category=dependency_missing` | Install PyYAML in the Python environment used to run the helper. |
-| `ERROR category=preflight_failed` | No migration write occurred. Confirm the endpoint IDs are visible to the selected Keystone project and that no transfer or deployment already uses the notes value. Resolve the existing run instead of bypassing duplicate protection. |
+| `ERROR category=preflight_failed` | No migration write occurred. Confirm the provisioned fixture and saved endpoints still exist, the endpoint IDs are visible to the selected Keystone project, and no transfer or deployment already uses the notes value. Resolve the existing run instead of bypassing duplicate protection. |
 | `ERROR category=post_ambiguous` | A create request could not be confirmed. Inspect the UI for objects with the unique notes before deciding what happened. Do not blindly retry a POST request. |
 | A transient network error while polling | Polling GET requests tolerate up to three consecutive transient network failures. If the helper stops, verify appliance connectivity and the object state before running anything again. |
 | Execution or deployment failure or timeout | Inspect the associated object, task timeline, endpoint validity, destination capacity, and appliance logs. `--timeout` applies separately to execution, deployment discovery, and deployment polling. |

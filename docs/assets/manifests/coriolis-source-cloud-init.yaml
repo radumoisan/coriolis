@@ -1,0 +1,9 @@
+#cloud-config
+write_files:
+  - path: /var/lib/coriolis-source-marker
+    owner: root:root
+    permissions: "0644"
+    content: |
+      CORIOLIS_SOURCE_MARKER=coriolis-source-fixture
+runcmd:
+  - [sh, -c, "cat /var/lib/coriolis-source-marker > /dev/console"]

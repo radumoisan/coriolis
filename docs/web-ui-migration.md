@@ -11,21 +11,21 @@ This second phase follows [Reset Before Repeating In The Web UI](headless-migrat
    **Expected outcome:** the transfer wizard opens with the **Coriolis Migration** scenario selected by default (the `live_migration` scenario).
 2. Keep **Migration** selected and click **Next**.
    **Expected outcome:** the source cloud step appears. Remember a migration is a move, not a zero-downtime live re-place, and the backup-based disk path stages source data through Cinder backups in Swift.
-3. On the source cloud step, pick the existing source endpoint from the **Select** dropdown under the OpenStack logo, then click **Next**; do not click the logo itself.
+3. On the source cloud step, pick `source-openstack` from the **Select** dropdown under the OpenStack logo, then click **Next**; do not click the logo itself.
    **Expected outcome:** the source options step appears for that endpoint.
 4. Confirm the source options show the **Swift Backups** export mechanism, then click **Next**.
    **Expected outcome:** the wizard presents the mechanism consistent with the permissions you preflighted.
-5. On the VM selection step, choose only the disposable fixture, verify **1 instance selected**, and click **Next**.
+5. On the VM selection step, choose only the disposable `coriolis-source-vm` fixture, verify **1 instance selected**, and click **Next**.
    **Expected outcome:** the destination cloud step appears with the instance inventory (disks and NICs) loaded.
-6. On the destination cloud step, pick the existing destination endpoint from its **Select** dropdown and click **Next**.
+6. On the destination cloud step, pick `destination-openstack` from its **Select** dropdown and click **Next**.
    **Expected outcome:** the target options step appears.
-7. In the simple target options set: a unique **Title** (this run's notes), the worker **Migration Flavor** name `c1.small` (a searchable field), the Linux entry of the **Migration Image Map** (in this example, the `ubuntu-24.04` image, matching the source and destination guest OS), and the dedicated **Migration Network**.
+7. In the simple target options set: a unique **Title** (this run's notes), **Migration Flavor** `c1.small` (a searchable field), the Linux entry of the **Migration Image Map** to `ubuntu-24.04`, and **Migration Network** to `coriolis-destination-net`.
    **Expected outcome:** the form accepts every worker field.
-8. Expand the target options **Advanced** section to reach the remaining fields: **Keypair Name**, **Security Groups**, **Floating IP Pool**, **Use Floating IP**, **Migration Floating IP Pool Name**, **Migration Worker Use FIP**, **Migration Worker Volume Type** (set `__DEFAULT__`), and **Preserve Fixed IPs**. Wherever a pool dropdown lists candidates, its labels are network/subnet pairs (for example `ext_net_gts/ext_subnet_gts`); choose the IPv4 entry, not the IPv6 one.
+8. Expand the target options **Advanced** section. Set **Keypair Name** to `coriolis-worker-key`, **Security Groups** to `coriolis-worker-sg`, **Floating IP Pool** and **Migration Floating IP Pool Name** to `ext_net_gts/ext_subnet_gts`, and **Migration Worker Volume Type** to `__DEFAULT__`. Choose the IPv4 pool entry, not the IPv6 one.
    **Expected outcome:** every advanced field is accepted and each pool selection resolves to an IPv4 network/subnet label.
 9. Set the tri-state toggles: both **Use Floating IP** and **Migration Worker Use FIP** to **Yes**, and **Preserve Fixed IPs** to **No**. The switch reads left = No, middle = not set, right = Yes; verify each displayed value, then click **Next**.
    **Expected outcome:** each toggle's visible text matches its intended value.
-10. On the networks step, map every source NIC: each source network name is matched to a destination network selection; no interface may be left unmapped.
+10. On the networks step, map `coriolis-source-net` to `coriolis-destination-net`; no interface may be left unmapped.
     **Expected outcome:** each source network has a destination mapping.
 11. On the storage step, set **Default Storage** to `__DEFAULT__` and leave backend and per-disk entries at their **Default**, which inherits it.
     **Expected outcome:** storage mappings show the default everywhere.
