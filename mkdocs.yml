@@ -16,11 +16,11 @@ nav:
   - 📋 Quick Start:
       - 📄 Lab Environment: operator-lab-environment.md
       - 📋 Deploy an Appliance: deploy-appliance.md
+      - ⏳ Provider Preparation: openstack-provider.md
       - "📋 Phase 1: Headless Migration": headless-migration.md
       - "📋 Phase 2: Web UI Migration": web-ui-migration.md
       - 📋 Remove Appliance: remove-appliance.md
   - ⏳ Technical Debt And Limitations: technical-debt.md
-  - ⏳ OpenStack Context: openstack-provider.md
   - 📄 Terminology: terminology.md
 
 markdown_extensions:

@@ -3,7 +3,7 @@
 !!! abstract
     Definitions for the current OpenStack-to-OpenStack Coriolis documentation path.
 
-For component roles, see [Architecture](architecture.md). For the execution sequence, see [Migration Flow](migration-flow.md). For Kubernetes deployment and lifecycle, see [Coriolis Operator](architecture.md#coriolis-operator). For platform-specific behavior, see [OpenStack Context](openstack-provider.md).
+For component roles, see [Architecture](architecture.md). For the execution sequence, see [Migration Flow](migration-flow.md). For Kubernetes deployment and lifecycle, see [Coriolis Operator](architecture.md#coriolis-operator). For platform-specific behavior, see [Provider Preparation](openstack-provider.md).
 
 ## :material-book-open-page-variant-outline: Glossary
 

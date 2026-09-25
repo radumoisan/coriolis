@@ -28,8 +28,9 @@ The Quick Start reader path is ordered for a hands-on lab:
 
 1. Prepare the [Lab Environment](operator-lab-environment.md).
 2. [Deploy an Appliance](deploy-appliance.md).
-3. Complete [Phase 1: Headless Migration](headless-migration.md).
-4. Complete [Phase 2: Web UI Migration](web-ui-migration.md).
-5. [Remove Appliance](remove-appliance.md).
+3. Complete [Provider Preparation](openstack-provider.md).
+4. Complete [Phase 1: Headless Migration](headless-migration.md).
+5. Complete [Phase 2: Web UI Migration](web-ui-migration.md).
+6. [Remove Appliance](remove-appliance.md).
 
-Prepare the two-cloud prerequisites described in the [OpenStack Context](openstack-provider.md), and use the focused [Terminology](terminology.md) when terms need clarification.
+Use the focused [Terminology](terminology.md) when terms need clarification.

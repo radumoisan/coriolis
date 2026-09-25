@@ -1,4 +1,4 @@
-# OpenStack Context
+# Provider Preparation
 
 !!! abstract
     This page covers the initial OpenStack-to-OpenStack migration path. A transfer copies or synchronizes disks; deployment is a separate step described in [Migration Flow](migration-flow.md).

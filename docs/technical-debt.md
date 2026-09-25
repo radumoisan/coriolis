@@ -13,7 +13,7 @@
 
 **Workaround:** Use the documented development scope and validate a controlled workload in the target cloud.
 
-**Resolution or validation criterion:** Repeatable, production-oriented validation covers the outstanding operator and provider scope described in [Validation History](#validation-history), [Migration Flow](migration-flow.md#status-cleanup-and-validation), and [OpenStack Context](openstack-provider.md#cleanup-and-validation), including broader browser-flow, OpenStack provider, and API migration qualification.
+**Resolution or validation criterion:** Repeatable, production-oriented validation covers the outstanding operator and provider scope described in [Validation History](#validation-history), [Migration Flow](migration-flow.md#status-cleanup-and-validation), and [Provider Preparation](openstack-provider.md#cleanup-and-validation), including broader browser-flow, OpenStack provider, and API migration qualification.
 
 ### :material-application-edit-outline: Single-Replica Core Profile
 
