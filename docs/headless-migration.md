@@ -150,19 +150,20 @@ unset CORIOLIS_KEYSTONE_PASSWORD
 
 ## :material-book-open-page-variant-outline: Observe The Headless Result
 
-1. Open **Cloud Endpoints**.
-   **Expected outcome:** both endpoints remain valid and usable.
-2. Find the transfer with your unique notes and open its execution.
-   **Expected outcome:** the execution is `COMPLETED`.
-3. When auto-deploy is enabled, open the correlated deployment and its latest execution.
-   **Expected outcome:** both are `COMPLETED`.
-4. Review the execution and deployment task timelines.
-   **Expected outcome:** all tasks are complete and none is in `ERROR`.
-5. Check the source instance.
-   **Expected outcome:** it is `SHUTOFF` when `shutdown_instances` is `true`.
-6. Check the destination instance, boot volume, mapped network, security groups, and floating IP when requested. Verify the workload marker inside the guest.
-   **Expected outcome:** the instance is `ACTIVE` and the workload is usable. A completed Coriolis workflow alone does not prove guest usability.
-7. Review appliance logs around the migration window if further evidence is needed. See [Log Observation](web-ui-migration.md#log-observation).
+1. Open **Cloud Endpoints**.<br>
+   &emsp;⤷ **Expected outcome:** both endpoints remain valid and usable.
+2. Find the transfer with your unique notes and open its execution.<br>
+   &emsp;⤷ **Expected outcome:** the execution is `COMPLETED`.
+3. When auto-deploy is enabled, open the correlated deployment and its latest execution.<br>
+   &emsp;⤷ **Expected outcome:** both are `COMPLETED`.
+4. Review the execution and deployment task timelines.<br>
+   &emsp;⤷ **Expected outcome:** all tasks are complete and none is in `ERROR`.
+5. Check the source instance.<br>
+   &emsp;⤷ **Expected outcome:** it is `SHUTOFF` when `shutdown_instances` is `true`.
+6. Check the destination instance, boot volume, mapped network, security groups, and floating IP when requested. Verify the workload marker inside the guest.<br>
+   &emsp;⤷ **Expected outcome:** the instance is `ACTIVE` and the workload is usable.
+7. Review appliance logs around the migration window if further evidence is needed. See [Log Observation](web-ui-migration.md#log-observation).<br>
+   &emsp;⤷ **Expected outcome:** the logs corroborate the completed tasks without migration errors.
 
 From inside the migrated guest, confirm cloud-init has finished:
 
@@ -186,16 +187,3 @@ Check the workload marker, disks, and networking even when cloud-init reports `d
 2. Restore or rebuild the disposable source instance so it is `ACTIVE`, attached to the expected source network, and contains the workload marker.
    **Expected outcome:** the source satisfies the migration prerequisites again.
 3. Continue with [Phase 2: Full Web UI Migration Walkthrough](web-ui-migration.md#full-web-ui-migration-walkthrough) using the same endpoints.
-
-## :material-book-open-page-variant-outline: Troubleshooting
-
-| Symptom | Response |
-| --- | --- |
-| `ERROR category=config_unresolved_placeholder` | The published YAML has no placeholders. Remove placeholders introduced by local edits, or restore or copy the included YAML content, then run the local validation command again. |
-| `ERROR category=dependency_missing` | Install PyYAML in the Python environment used to run the helper. |
-| `ERROR category=missing_password` | Set `CORIOLIS_KEYSTONE_PASSWORD`, or supply the password through the standard-input fallback. |
-| `ERROR category=preflight_failed` | No migration write occurred. Confirm the provisioned fixture and saved endpoints still exist, the endpoint IDs are visible to the selected Keystone project, and no transfer or deployment already uses the notes value. Resolve the existing run instead of bypassing duplicate protection. |
-| `ERROR category=post_ambiguous` | A create request could not be confirmed. Inspect the UI for objects with the unique notes before deciding what happened. Do not blindly retry a POST request. |
-| A transient network error while polling | Polling GET requests tolerate up to three consecutive transient network failures. If the helper stops, verify appliance connectivity and the object state before running anything again. |
-| Execution or deployment failure or timeout | Inspect the associated object, task timeline, endpoint validity, destination capacity, and appliance logs. `--timeout` applies separately to execution, deployment discovery, and deployment polling. |
-| Any other `ERROR category=...` | The error is terminal and safely reports only a category and HTTP status. Stop and diagnose the indicated phase before retrying. |
