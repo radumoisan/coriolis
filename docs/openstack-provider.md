@@ -148,26 +148,25 @@ openstack quota set \
 
 ### :material-application-edit-outline: Source Disk Access
 
-- **Glance-rooted instance:** The operating system disk is created from a Glance image and normally resides on Nova-managed ephemeral storage.
-- **Volume-backed instance:** The operating system resides on an attached Cinder volume. Coriolis expects exactly one attached volume marked `bootable` so it can identify the source operating-system disk. No bootable volume, or multiple bootable volumes, makes the root disk ambiguous.
-- **Select the disk path:** Decide how Coriolis will access and transfer that disk, such as Cinder backup through Swift, Ceph access, or a temporary worker VM. This choice determines the required OpenStack permissions and network connectivity.
+!!! note "Source disk access"
+    - **Glance-rooted instance:** The operating system disk is created from a Glance image and normally resides on Nova-managed ephemeral storage.
+    - **Volume-backed instance:** The operating system resides on an attached Cinder volume. Coriolis expects exactly one attached volume marked `bootable` so it can identify the source operating-system disk. No bootable volume, or multiple bootable volumes, makes the root disk ambiguous.
+    - **Select the disk path:** Decide how Coriolis will access and transfer that disk, such as Cinder backup through Swift, Ceph access, or a temporary worker VM. This choice determines the required OpenStack permissions and network connectivity.
 
-!!! note "Demo disk path"
+    ---
+
+    **Demo disk path**
+
     This demo uses a small, disposable, volume-backed source VM with exactly one attached bootable Cinder volume. Coriolis exports it with `swift_backups`, so the source project requires both Cinder backup and Swift access.
 
     This path does not require a floating IP or SSH access to the source VM. The destination uses a temporary worker VM and places the cloned disk on the `__DEFAULT__` volume type. The tutorial shuts down the source after the transfer and automatically deploys the destination VM.
 
 ### :material-application-edit-outline: Source Fixture
 
-!!! warning
-    The following commands create stateful resources. Record the returned IDs and do not rerun creation commands blindly against existing resources.
-
 The source fixture is volume-backed and uses a config drive for cloud-init. It has no router or floating IP because the `swift_backups` export path needs Cinder and Swift APIs, not SSH access to the source guest.
 
 !!! note "Validation marker"
     This cloud-init manifest writes a known marker to the source boot volume and serial console. The marker is not required by Coriolis; it provides a simple way to verify that the expected disk content reached the destination and the migrated guest boots.
-
-[Download `coriolis-source-cloud-init.yaml`](assets/manifests/coriolis-source-cloud-init.yaml){ download="coriolis-source-cloud-init.yaml" }
 
 ??? quote "coriolis-source-cloud-init.yaml"
 
