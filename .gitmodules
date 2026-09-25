@@ -31,3 +31,19 @@
 [submodule "coriolis-logs-api-adaptor"]
 	path = coriolis-logs-api-adaptor
 	url = git@github.com:radumoisan/coriolis-logs-api-adaptor.git
+[submodule "cixpress/frontend"]
+	path = cixpress/frontend
+	url = git@github.com:virtomat/cixpress-demo.git
+	branch = dev
+[submodule "cixpress/conductor"]
+	path = cixpress/conductor
+	url = git@github.com:virtomat/ci-conductor.git
+	branch = dev
+[submodule "cixpress/configuration/default"]
+	path = cixpress/configuration/default
+	url = git@github.com:virtomat/cixpress-configuration.git
+	branch = dev
+[submodule "cixpress/configuration/onboarding"]
+	path = cixpress/configuration/onboarding
+	url = git@github.com:virtomat/cixpress-configuration-onb.git
+	branch = dev
