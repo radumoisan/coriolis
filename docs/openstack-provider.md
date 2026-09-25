@@ -164,6 +164,9 @@ openstack quota set \
 
 The source fixture is volume-backed and uses a config drive for cloud-init. It has no router or floating IP because the `swift_backups` export path needs Cinder and Swift APIs, not SSH access to the source guest.
 
+!!! note "Validation marker"
+    This cloud-init manifest writes a known marker to the source boot volume and serial console. The marker is not required by Coriolis; it provides a simple way to verify that the expected disk content reached the destination and the migrated guest boots.
+
 [Download `coriolis-source-cloud-init.yaml`](assets/manifests/coriolis-source-cloud-init.yaml){ download="coriolis-source-cloud-init.yaml" }
 
 ??? quote "coriolis-source-cloud-init.yaml"
